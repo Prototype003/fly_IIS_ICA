@@ -1,0 +1,49 @@
+#!/bin/bash
+# Usage: sbatch slurm-serial-job-script
+# Prepared By: Kai Xi,  Oct 2014
+#              help@massive.org.au
+
+# NOTE: To activate a SLURM option, remove the whitespace between the '#' and 'SBATCH'
+
+# To give your job a name, replace "MyJob" with an appropriate name
+#SBATCH --job-name=phi3_fly4
+
+
+# To set a project account for credit charging, 
+#SBATCH --account=NCIfb7
+
+
+# Request CPU resource for a serial job
+#SBATCH --ntasks=16
+#SBATCH --ntasks-per-node=16
+#SBATCH --exclusive
+#SBATCH --cpus-per-task=1
+
+# Memory usage (MB)
+#SBATCH --mem-per-cpu=4000
+
+# Set your minimum acceptable walltime, format: day-hours:minutes:seconds
+#SBATCH --time=5-00:00:00
+
+
+# To receive an email when job completes or fails
+#SBATCH --mail-user=aleu6@student.monash.edu
+#SBATCH --mail-type=END
+#SBATCH --mail-type=FAIL
+
+
+# Set the file for output (stdout)
+#SBATCH --output=logs/myJob-fly4-%j.out
+
+# Set the file for error log (stderr)
+#SBATCH --error=logs/myJob-fly4-%j.err
+
+
+# Use reserved node to run job when a node reservation is made for you already
+# SBATCH --reservation=reservation_name
+
+
+# Command to run a serial job
+module load python/3.6.0
+
+python3 main_phi3_fly4.py
