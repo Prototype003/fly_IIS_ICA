@@ -1,0 +1,4 @@
+# This is for pandoc (tracking changes in Word)
+# Source: http://blog.martinfenner.org/2014/08/25/using-microsoft-word-with-git/
+# .gitconfig also updated: .../Users/this_/.gitconfig
+*.docx diff=pandoc
