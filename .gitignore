@@ -1,0 +1,11 @@
+# Python cache and compiled code
+**/__*/
+**/*.pyc
+
+# MATLAB compiled code and datafiles
+**/*.asv
+**/*.mat
+
+# Windows
+**/*.db
+**/*.ini
