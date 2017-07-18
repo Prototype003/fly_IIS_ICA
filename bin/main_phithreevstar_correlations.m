@@ -33,7 +33,7 @@ data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim'.
 % phi_threes = phis;
 % 
 % % Phi-star
-% load([data_directory data_filename '_medianSplit1_phistar.mat']);
+% load([data_directory data_filename '_phistar.mat']);
 % phi_stars = phis;
 % 
 % disp('loaded');
@@ -156,18 +156,18 @@ data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim'.
 % 
 %% Correlation after averaging values across trials
 
-% Normalise
-for nChannels_counter = 1 : length(phi_threes)
-    phi_threes{nChannels_counter}.phi_threes = zscore(phi_threes{nChannels_counter}.phi_threes, [], 3);
-    phi_stars{nChannels_counter}.phi_stars = zscore(phi_stars{nChannels_counter}.phi_stars, [], 3);
-end
+% % Normalise
+% for nChannels_counter = 1 : length(phi_threes)
+%     phi_threes{nChannels_counter}.phi_threes = zscore(phi_threes{nChannels_counter}.phi_threes, [], 3);
+%     phi_stars{nChannels_counter}.phi_stars = zscore(phi_stars{nChannels_counter}.phi_stars, [], 3);
+% end
 
 % Average values across trials
 phi_threes_avg = cell(length(phi_threes), 1);
 phi_stars_avg = cell(length(phi_stars), 1);
 for nChannels_counter = 1 : length(phi_threes)
-    phi_threes_avg{nChannels_counter} = squeeze(mean(phi_threes{nChannels_counter}.phi_threes, 2));
-    phi_stars_avg{nChannels_counter} = squeeze(mean(phi_stars{nChannels_counter}.phi_stars, 2));
+    phi_threes_avg{nChannels_counter} = (squeeze(mean(phi_threes{nChannels_counter}.phi_threes, 2)));
+    phi_stars_avg{nChannels_counter} = (squeeze(mean(phi_stars{nChannels_counter}.phi_stars, 2)));
 end
 
 % Correlate for each fly, condition, tau level
@@ -190,6 +190,8 @@ for tau_counter = 1 : size(phi_threes_avg{nChannels_counter}, 4)
                 %hold on;
                 
                 scatter(three(:), star(:), condition_shapes{condition}); hold on;
+                set(gca, 'xscale', 'log');
+                set(gca, 'yscale', 'log'); % correlation test will be conducted after log transform
                 
                 if subplot_counter <= length(phi_threes_avg)
                     title([num2str(phi_threes{nChannels_counter}.nChannels) ' channels']);
@@ -202,7 +204,7 @@ for tau_counter = 1 : size(phi_threes_avg{nChannels_counter}, 4)
                 end
                 
                 % Compute and store correlation
-                [correlation, p] = corrcoef(three, star);
+                [correlation, p] = corrcoef(log(three), log(star));
                 correlations{nChannels_counter}(fly_counter, condition, tau_counter) = correlation(1, 2);
             end
         end
@@ -237,6 +239,10 @@ end
 %% Correlations after matching MIPs
 
 mipmatch_correlation(phi_threes, phi_threes_avg, phi_stars_avg, condition_shapes, 1, tau_colours);
+
+%% Correlations per set
+
+correlate_per_set(phi_threes_avg, phi_stars_avg);
 
 %% Function: correlation after filtering for 'matching' MIPs
 
@@ -275,10 +281,10 @@ for nChannels_counter = 1 : length(matches_per_trial)
     for tau = 1 : size(matches_per_trial{nChannels_counter}.matches, 5)
         for condition = 1 : size(matches_per_trial{nChannels_counter}.matches, 4)
             for fly = 1 : size(matches_per_trial{nChannels_counter}.matches, 3)
-                for set = 1 : size(matches_per_trial{nChannels_counter}.matches, 1)
-                    trial_matches = sum(matches_per_trial{nChannels_counter}.matches(set, :, fly, condition, tau));
+                for channel_set = 1 : size(matches_per_trial{nChannels_counter}.matches, 1)
+                    trial_matches = sum(matches_per_trial{nChannels_counter}.matches(channel_set, :, fly, condition, tau));
                     if trial_matches >= samples_per_trial*size(matches_per_trial{nChannels_counter}.matches, 2)*(chance_levels(nChannels_counter) * chance_multiplier_threshold)
-                        match_sets{nChannels_counter}(set, fly, condition, tau) = 1;
+                        match_sets{nChannels_counter}(channel_set, fly, condition, tau) = 1;
                     end
                 end
             end
@@ -300,6 +306,8 @@ for tau_counter = 1 : size(phi_threes_avg{nChannels_counter}, 4)
                 star = phi_stars_avg{nChannels_counter}(not(logical(match_sets{nChannels_counter}(:, fly_counter, condition, tau_counter))), fly_counter, condition, tau_counter);
                 
                 scatter(three(:), star(:), condition_shapes{condition}); hold on;
+                set(gca, 'xscale', 'log');
+                set(gca, 'yscale', 'log');
                 
                 if subplot_counter <= length(phi_threes_avg)
                     title([num2str(phi_threes{nChannels_counter}.nChannels) ' channels']);
@@ -345,7 +353,7 @@ for nChannels_counter = 2 : length(correlations)
         for condition_counter = 1 : size(correlations{nChannels_counter}, 2)
             for tau_counter = 1 : size(correlations{nChannels_counter}, 3)
                 scatter(fly_counter, correlations{nChannels_counter}(fly_counter, condition_counter, tau_counter), [condition_shapes{condition_counter} tau_colours{tau_counter}]);
-                axis([0 size(correlations{nChannels_counter}, 1)+1 -0.5 1]);
+                axis([0 size(correlations{nChannels_counter}, 1)+1 0 1]);
                 hold on;
                 
                 title([num2str(phi_threes{nChannels_counter}.nChannels) ' channels']);
@@ -357,6 +365,66 @@ for nChannels_counter = 2 : length(correlations)
         end
     end
 
+end
+
+end
+
+%% Function: correlate per channel set
+
+function [correlations, correlation_ps] = correlate_per_set(phi_threes_avg, phi_stars_avg)
+% Takes trial averaged values (i.e. one value per set, fly, condition, tau)
+
+q = 0.05;
+height = 1;
+
+correlations = cell(length(phi_threes_avg), 1);
+correlation_ps = cell(length(phi_threes_avg), 1);
+for nChannels_counter = 1 : length(phi_threes_avg)
+    correlations{nChannels_counter} = zeros(size(phi_threes_avg{nChannels_counter}, 1), size(phi_threes_avg{nChannels_counter}, 3), size(phi_threes_avg{nChannels_counter}, 4));
+    correlation_ps{nChannels_counter} = zeros(size(phi_threes_avg{nChannels_counter}, 1), size(phi_threes_avg{nChannels_counter}, 3), size(phi_threes_avg{nChannels_counter}, 4));
+end
+
+% Compute correlations, combining across nChannels
+for nChannels_counter = 1 : length(phi_threes_avg)
+    for tau = 1 : size(phi_threes_avg{nChannels_counter}, 4)
+        for condition = 1 : size(phi_threes_avg{nChannels_counter}, 3)
+            for set = 1 : size(phi_threes_avg{nChannels_counter}, 1)
+                three = phi_threes_avg{nChannels_counter}(set, :, condition, tau);
+                star = phi_stars_avg{nChannels_counter}(set, :, condition, tau);
+                [correlation, p] = corrcoef(log(three), log(star));
+                correlations{nChannels_counter}(set, condition, tau) = correlation(1, 2);
+                correlation_ps{nChannels_counter}(set, condition, tau) = p(1, 2);
+            end
+        end
+    end
+end
+
+% Concatenate nChannels (to get a single axis)
+correlations_all = [];
+correlation_ps_all = [];
+for nChannels_counter = 1 : length(correlations)
+    correlations_all = cat(1, correlations_all, correlations{nChannels_counter});
+    correlation_ps_all = cat(1, correlation_ps_all, correlation_ps{nChannels_counter});
+end
+
+% Plot
+figure;
+subplot_counter = 1;
+for tau = 1 : size(correlations_all, 3)
+    for condition = 1 : size(correlations_all, 2)
+        subplot(size(correlations_all, 3), size(correlations_all, 2), subplot_counter);
+        
+        bar(correlations_all(:, condition, tau));
+        axis([-50 size(correlations_all, 1)+50 -0.5 1.1]);
+        hold on;
+        
+        % Plot significance after FDR correction
+        corrected = fdr_correct(correlation_ps_all(:, condition, tau), q);
+        xs = (1:length(corrected));
+        scatter(xs(logical(corrected)), corrected(logical(corrected))*height, 5, 'k*', 'MarkerEdgeAlpha', 0.025);
+        
+        subplot_counter = subplot_counter + 1;
+    end
 end
 
 end

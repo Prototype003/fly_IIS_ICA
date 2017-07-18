@@ -5,6 +5,8 @@ This script tests the first hypothesis: phi in the air condition is greater than
 
 Tests for all nChannels in loaded datafile
 
+Test is conducted using LME with model comparisons (to the null)
+
 %}
 
 %% SETUP
@@ -21,58 +23,147 @@ data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim'.
     '_phithree'...
     ];
 
+results_directory = 'analysis_results/';
+results_filename = [data_filename '_lmeStats'];
+
 %% LOAD
+
+disp('loading');
 
 load([data_directory data_filename '.mat']);
 
-%% t-test (after averaging across tau, channel sets, and trials)
+disp('loaded');
 
-nChannels = length(phis);
+%% Preprocess
 
-averaged_results = cell(nChannels, 1);
-
-for nChannels_counter = 1 : nChannels
-    phi_struct = phis{nChannels_counter};
-    channels_used = phi_struct.nChannels;
-    averaged_results{nChannels_counter}.nChannels = channels_used;
+for nChannels_counter = 1 : length(phis)
+    % So I don't need to keep on typing ...}.phi_threes
+    phis{nChannels_counter}.phis = phis{nChannels_counter}.phi_threes;
     
-    % Does it matter what order we average in?
-    % i.e. across tau, then channel sets, then trials vs across channel sets, tau, then trials?
-    phi_values = phi_struct.phi_threes;
-    phi_values = squeeze(mean(mean(mean(phi_values, 5), 1), 2));
-    
-    [averaged_results{nChannels_counter}.H,...
-        averaged_results{nChannels_counter}.P,...
-        averaged_results{nChannels_counter}.CI,...
-        averaged_results{nChannels_counter}.stats] = ttest(phi_values(:, 1), phi_values(:, 2));
+    % Average across trials
+    phis{nChannels_counter}.phis = mean(phis{nChannels_counter}.phis, 2);
 end
 
-%% t-test without averaging (at each tau)
+%% Build table for LME
 
-%% Taking into account nesting
+disp('building table');
 
-nChannels = length(phis);
-
-nested_results = cell(nChannels, 1);
-for nChannels_counter = 1 : nChannels
-    phi_struct = phis{nChannels_counter};
-    channels_used = phi_struct.nChannels;
-    nested_results{nChannels_counter}.nChannels = channels_used;
-    
-    % We are using a one-way ANOVA : main effect of condition
-    % Or are we using a two-way ANOVA : main effects of condition and tau? (or can we treat tau as nested?)
-    condition_grouping = [];
-    fly_grouping = [];
-    trial_grouping = [];
-    tau_grouping = [];
-    % Nesting order:
-    % fly > trial > channel combination > tau
-    
-    % Channel combinations are nested within trials, which are nested within flies
-    
-    
-    % Reformat phi matrix into a vector while allowing for grouping/nesting
-    phi_vector = zeros(numel(phi_struct.phi_threes), 1);
-    
-    
+% Determine total number of parameter combinations
+table_length = 0;
+for nChannels_counter = 1 : length(phis)
+    parameter_combos = numel(phis{nChannels_counter}.phis);
+    table_length = table_length + parameter_combos;
 end
+
+% Extract all values and parameters into vectors
+table_raw = struct();
+table_raw.nChannels = zeros(table_length, 1);
+table_raw.set = zeros(table_length, 1);
+table_raw.trial = zeros(table_length, 1);
+table_raw.fly = zeros(table_length, 1);
+table_raw.condition = zeros(table_length, 1);
+table_raw.tau = zeros(table_length, 1);
+table_raw.phi = zeros(table_length, 1);
+row_counter = 1;
+% Loop is based on natural ordering: fly, condition, tau, nChannels, set, trial
+% Assumes same number of flies, conditions and taus for all nChannels
+for fly = 1 : size(phis{1}.phis, 3)
+    for condition = 1 : size(phis{1}.phis, 4)
+        for tau = 1 : size(phis{1}.phis, 5)
+            for nChannels = 1 : length(phis)
+                for set = 1 : size(phis{nChannels}.phis, 1)
+                    for trial = 1 : size(phis{nChannels}.phis, 2)
+                        table_raw.nChannels(row_counter) = phis{nChannels}.nChannels;
+                        table_raw.set(row_counter) = set;
+                        table_raw.trial(row_counter) = trial;
+                        table_raw.fly(row_counter) = fly;
+                        table_raw.condition(row_counter) = condition;
+                        table_raw.tau(row_counter) = tau;
+                        table_raw.phi(row_counter) = log(phis{nChannels}.phis(set, trial, fly, condition, tau));
+                        row_counter = row_counter + 1;
+                    end
+                end
+            end
+        end
+    end
+end
+
+% Natural ordering: fly, condition, tau, nChannels, set, trial
+table_headings = {'fly', 'condition', 'tau', 'nChannels', 'set', 'trial', 'phi'};
+phi_table = table(table_raw.fly, table_raw.condition, table_raw.tau, table_raw.nChannels, table_raw.set, table_raw.trial, table_raw.phi, 'VariableNames', table_headings);
+
+disp('table built');
+
+%% LME model
+
+% We want to take everything into account
+% channel sets are nested within fly
+% channel sets are crossed across trials
+% Main effects: set size (nChannels), condition, tau
+% Nested effects: (1|fly/set)=(1|fly) +  OR (1|fly/trial/set)
+% Crossed effects: (1|trial) (may just ignore this)
+% Consequences of not include trial in the model? Less fit, so test is more conservative?
+
+model_spec = 'phi ~ nChannels + condition + tau + (1|fly) + (1|fly:set)';
+
+
+disp(['fitting model: ' model_spec]);
+
+model_full = fitlme(phi_table, model_spec);
+
+disp('full model built');
+
+%% Build null models for comparison
+
+model_null_specs = {...
+    'phi ~ condition + tau + (1|fly) + (1|fly:set)',... % nChannels null model
+    'phi ~ nChannels + tau + (1|fly) + (1|fly:set)',... % condition null model
+    'phi ~ nChannels + condition + (1|fly) + (1|fly:set)'... % tau null model
+    };
+
+% Build null models
+model_nulls = cell(length(model_null_specs), 1);
+for null = 1 : length(model_null_specs)
+    disp(['fitting null model: ' model_null_specs{null}]);
+    model_nulls{null} = fitlme(phi_table, model_null_specs{null});
+    disp('null model built');
+end
+
+%% Likelihood ratio test
+% Likelihood ratio test is anticonservative when testing for fixed effects, so use simulated test
+
+iterations = 1000;
+
+options = statset('LinearMixedModel');
+options.UseParallel = true;
+
+%compute_pool = parpool();
+
+model_comparisons = cell(length(model_nulls), 1);
+model_comparisons_sim = cell(length(model_nulls), 1);
+for null = 1 : length(model_nulls)
+    disp(['conducting likelihood ratio tests (sim) on: ' model_null_specs{null}]);
+    %[model_comparisons{null}, model_comparisons_sim{null}] = compare(model_nulls{null}, model_full, 'NSim', iterations, 'Options', options);
+    model_comparisons{null} = compare(model_nulls{null}, model_full);
+    disp('completed');
+end
+
+%delete(compute_pool);
+
+%% Save results
+
+% disp('Saving');
+% if ~isdir(results_directory)
+%     mkdir(results_directory)
+% end
+% save([results_directory results_filename '.mat'],...
+%     'phi_table',...
+%     'model_spec',...
+%     'model_full',...
+%     'model_null_specs',...
+%     'model_nulls',...
+%     'model_comparisons',...
+%     'model_comparisons_sim'...
+%     );
+% 
+% disp('Saved');

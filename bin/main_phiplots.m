@@ -6,6 +6,8 @@ This is for plotting of raw phi values
 
 %% SETUP
 
+star_metric = 'phi_stars';
+
 flies = (1:13); %[1 2 3 4 5 6 7 9 10 11 12 13];
 
 data_nChannels = '2t4';
@@ -26,49 +28,49 @@ data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim'.
 
 %% LOAD
 
-% disp('loading');
-% % Phi-3
-% load([data_directory data_filename '_phithree.mat']);
-% phi_threes = phis;
-% 
-% % Phi-star
-% load([data_directory data_filename '_phistar.mat']);
-% phi_stars = phis;
-% 
-% disp('loaded');
+disp('loading');
+% Phi-3
+load([data_directory data_filename '_phithree.mat']);
+phi_threes = phis;
+
+% Phi-star
+load([data_directory data_filename '_phistar.mat']);
+phi_stars = phis;
+
+disp('loaded');
 
 %% Average across trials and flies, calculate deltas and associated standard error
 
 for nChannels_counter = 1 : length(phi_threes)
     % Raw
     phi_threes{nChannels_counter}.phis_raw = phi_threes{nChannels_counter}.phi_threes(:, :, flies, :, :);
-    phi_stars{nChannels_counter}.phis_raw = phi_stars{nChannels_counter}.phi_stars(:, :, flies, :, :);
+    phi_stars{nChannels_counter}.phis_raw = phi_stars{nChannels_counter}.(star_metric)(:, :, flies, :, :);
     
     % Average 
     phi_threes{nChannels_counter}.phis = squeeze(mean(mean(phi_threes{nChannels_counter}.phi_threes(:, :, flies, :, :), 2), 3));
-    phi_stars{nChannels_counter}.phis = squeeze(mean(mean(phi_stars{nChannels_counter}.phi_stars(:, :, flies, :, :), 2), 3));
+    phi_stars{nChannels_counter}.phis = squeeze(mean(mean(phi_stars{nChannels_counter}.(star_metric)(:, :, flies, :, :), 2), 3));
     
     % Standard error (across flies)
     phi_threes{nChannels_counter}.phis_std = squeeze(std(mean(phi_threes{nChannels_counter}.phi_threes(:, :, flies, :, :), 2), [], 3)) / sqrt(length(flies));
-    phi_stars{nChannels_counter}.phis_std = squeeze(std(mean(phi_stars{nChannels_counter}.phi_stars(:, :, flies, :, :), 2), [], 3)) / sqrt(length(flies));
+    phi_stars{nChannels_counter}.phis_std = squeeze(std(mean(phi_stars{nChannels_counter}.(star_metric)(:, :, flies, :, :), 2), [], 3)) / sqrt(length(flies));
     
     % Delta (air - iso)
     phi_threes{nChannels_counter}.phis_delta = squeeze(mean(mean(phi_threes{nChannels_counter}.phi_threes(:, :, flies, 1, :) - phi_threes{nChannels_counter}.phi_threes(:, :, flies, 2, :), 2), 3));
-    phi_stars{nChannels_counter}.phis_delta = squeeze(mean(mean(phi_stars{nChannels_counter}.phi_stars(:, :, flies, 1, :) - phi_stars{nChannels_counter}.phi_stars(:, :, flies, 2, :), 2), 3));
+    phi_stars{nChannels_counter}.phis_delta = squeeze(mean(mean(phi_stars{nChannels_counter}.(star_metric)(:, :, flies, 1, :) - phi_stars{nChannels_counter}.(star_metric)(:, :, flies, 2, :), 2), 3));
     
     % Delta std (air - iso)
     phi_threes{nChannels_counter}.phis_delta_std = squeeze(std(mean(phi_threes{nChannels_counter}.phi_threes(:, :, flies, 1, :) - phi_threes{nChannels_counter}.phi_threes(:, :, flies, 2, :), 2), [], 3)) / sqrt(length(flies));
-    phi_stars{nChannels_counter}.phis_delta_std = squeeze(std(mean(phi_stars{nChannels_counter}.phi_stars(:, :, flies, 1, :) - phi_stars{nChannels_counter}.phi_stars(:, :, flies, 2, :), 2), [], 3)) / sqrt(length(flies));
+    phi_stars{nChannels_counter}.phis_delta_std = squeeze(std(mean(phi_stars{nChannels_counter}.(star_metric)(:, :, flies, 1, :) - phi_stars{nChannels_counter}.(star_metric)(:, :, flies, 2, :), 2), [], 3)) / sqrt(length(flies));
     
 end
 %% Plot all phi values on a single axis
 % Uses natural channel-set ordering
 
-q = 0.1;
+q = 0.05;
 labelled_subplot = 7;
 
 % Phi-3
-plot_phis(phi_threes(1), [-0.005 0.06], 1, 'phi-3', labelled_subplot);
+plot_phis(phi_threes, [-0.005 0.06], 1, 'phi-3', labelled_subplot);
 % Add t-tests for delta
 [sigs_three_corrected, sigs_three] = phi_tests(phi_threes, 0.1);
 plot_sigs(sigs_three_corrected, 0.05);
@@ -76,6 +78,7 @@ plot_sigs(sigs_three_corrected, 0.05);
 
 % Phi-star
 plot_phis(phi_stars, [-0.005 0.03], 1, 'phi-*', labelled_subplot);
+% plot_phis(phi_stars, [-10 0.1], 1, 'phi-*', labelled_subplot);
 % Add t-tests for delta
 [sigs_star_corrected, sigs_star] = phi_tests(phi_stars, 0.1);
 plot_sigs(sigs_star_corrected, 0.025);
@@ -185,7 +188,7 @@ for nChannels_counter = 1 : length(phis)
 end
 
 % Average across trials
-phis_all = squeeze(mean(phis_all, 2));
+phis_all = log(squeeze(mean(phis_all, 2)));
 
 % Conduct t-tests across flies, comparing conditions
 sigs = zeros(size(phis_all, 1), size(phis_all, 4));
