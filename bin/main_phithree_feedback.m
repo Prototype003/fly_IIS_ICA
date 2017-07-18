@@ -22,14 +22,6 @@ data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim'.
     '_nChannels' data_nChannels...
     ];
 
-results_directory = 'analysis_results/';
-results_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim'...
-    '_detrend' num2str(data_detrended)...
-    '_zscore' num2str(data_zscored)...
-    '_nChannels' data_nChannels...
-    '_mipComparison.mat'
-    ];
-
 %% LOAD
 % disp('loading');
 % 
@@ -38,6 +30,46 @@ results_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreSti
 % load([data_directory data_filename '_phithree.mat']);
 % 
 % disp('loaded');
+
+%% Reformat MIPs if necessary
+
+% .mips should have dimensions corresponding to set, fly, condition, etc.
+% If not, it will have size 2, with the first dimension being a combination of all parameters
+if length(size(phis{1}.mips)) == 2
+    
+    % If partitions only consist of groups of one element (i.e. for 2 channels), then mips are stored in an array
+    % We want to conver this to a cell
+    if isa(phis{1}.mips, 'int64')
+        phis{1}.mips = num2cell(phis{1}.mips);
+    end
+    
+    % 4th dimension is nFlies (should be the same as specified during setup)
+    [nStates, nSets, nFlies, nConditions, nTaus] = size(phis{1}.state_phis);
+    
+    % Looks like the partitions only splits into 2 groups
+    % MIPs are calculated per state, not per trial
+    % (only variance across trials is the state-weighting when averaging phi)
+    mips_formatted = cell(nStates, nSets, nFlies, nConditions, nTaus);
+    
+    % Iterate through in same order as python3 script and reformat
+    mip_counter = 1;
+    for fly = 1 : nFlies
+        for condition = 1 : nConditions
+            for tau = 1 : nTaus
+                for set = 1 : nSets
+                    for state = 1 : nStates
+                        cut{1} = phis{1}.mips(mip_counter, :);
+                        mips_formatted(state, set, fly, condition, tau) = cut;
+                        mip_counter = mip_counter + 1;
+                    end
+                end
+            end
+        end
+    end
+    
+    % Replace the unformatted .mips with the new format
+    phis{1}.mips = mips_formatted;
+end
 
 %% Filter out sets which have a periphery and a centre channel
 
