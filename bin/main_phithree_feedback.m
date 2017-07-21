@@ -34,7 +34,7 @@ data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim'.
 %% Reformat MIPs if necessary
 
 % .mips should have dimensions corresponding to set, fly, condition, etc.
-% If not, it will have size 2, with the first dimension being a combination of all parameters
+% If not, it will have size of length 2, with the first dimension being a combination of all parameters
 if length(size(phis{1}.mips)) == 2
     
     % If partitions only consist of groups of one element (i.e. for 2 channels), then mips are stored in an array
@@ -71,11 +71,37 @@ if length(size(phis{1}.mips)) == 2
     phis{1}.mips = mips_formatted;
 end
 
+%% Relabel MIPs to have the actual channel label (instead of always 0, 1, 2, 3)
+
+% for nChannels = 1 : length(phis)
+%     for tau = 1 : size(phis{nChannels}.mips, 5)
+%         for condition = 1 : size(phis{nChannels}.mips, 4)
+%             for fly = 1 : size(phis{nChannels}.mips, 3)
+%                 for set = 1 : size(phis{nChannels}.mips, 2)
+%                     for state = 1 : size(phis{nChannels}.mips, 1)
+%                         mip = phis{nChannels}.mips{state, set, fly, condition, tau};
+%                         mip_relabelled = mip;
+%                         for group = 1 : length(mip)
+%                             for channel = 1 : length(mip{group})
+%                                 mip_relabelled{group}(channel) = phis{nChannels}.channel_sets(set, mip{group}(channel)+1); % +1 because of python's 0 indexing
+%                             end
+%                         end
+%                         phis{nChannels}.mips{state, set, fly, condition, tau} = mip_relabelled;
+%                     end
+%                 end
+%             end
+%         end
+%     end
+% end
+
 %% Filter out sets which have a periphery and a centre channel
 
 % Take only trials which contain a periphery channel and a central channel
 [phis{1}.mips, phis{1}.state_counters, phis{1}.channel_sets, phis{1}.phi_threes] = group_filter(phis{1}.mips, phis{1}.state_counters, phis{1}.channel_sets, phis{1}.phi_threes, groupings);
 
+for nChannels = 1 : length(phis)
+    [phis{nChannels}.mips, phis{nChannels}.state_counters, phis{nChannels}.channel_sets, phis{nChannels}.phi_threes] = group_filter(phis{nChannels}.mips, phis{nChannels}.state_counters, phis{nChannels}.channel_sets, phis{nChannels}.phi_threes, groupings);
+end
 %% Portion of feedback cuts per trial, considering all MIPs
 
 % % Classify each cut in a trial as feedback or not
@@ -141,7 +167,7 @@ end
 % Find channels with positive delta phi
 
 % Classify each cut in a trial as feedback or not
-phis_unmoded.feedback = feedback_classify(phis{1}.mips);
+phis_unmoded.feedback = feedback_classify(phis{1}.mips, groupings);
 
 % Count number of times states with a feedback cut occurred within each trial, for each channel set
 phis_unmoded.feedback_counts = feedback_count(phis_unmoded.feedback, phis{1}.state_counters);
@@ -211,13 +237,39 @@ function [filtered_mips, filtered_counters, filtered_sets, filtered_phis] = grou
 % Filters for mips which contain channels as specified by groupings
 %
 
+%%%%%%%%%%%%
 % First channel is in periphery and second is in centre, or vice versa
-% However, if channel_sets is sorted, the second case never occurs
+% However, if channel_sets is sorted, the second case never occurs (so it shouldn't be sorted)
+% This is the 2 channel condition
 filter_indices =...
     ((channel_sets(:, 1) >= groupings.p(1) & channel_sets(:, 1) <= groupings.p(end)) &...
     (channel_sets(:, 2) >= groupings.c(1) & channel_sets(:, 2) <= groupings.c(end))) |...
     ((channel_sets(:, 1) >= groupings.c(1) & channel_sets(:, 1) <= groupings.c(end)) &...
     (channel_sets(:, 2) >= groupings.p(1) & channel_sets(:, 2) <= groupings.p(end)));
+%%%%%%%%%%%
+
+%%%%%%%%%%%
+% % This is for selecting sets which are built of the grouping channels (with no other restrictions)
+% filter_indices = zeros(size(channel_sets, 1), 1);
+% % For each channel set, check if set is contains only the channels in grouping
+% for set = 1 : size(channel_sets, 1)
+%     within_grouping = true;
+%     for channel = 1 : size(channel_sets, 2)
+%         % Check if channel is peripheral OR central
+%         % If it is not, then within_grouping should become 0
+%         % If it is, and within_grouping is 0, then it should stay 0
+%         within_grouping = min([within_grouping (any(groupings.p==channel_sets(set, channel)) || any(groupings.c==channel_sets(set, channel)))]);
+%     end
+%     filter_indices(set) = within_grouping;
+% end
+%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%
+% This is for selecting sets where each partition group consists of either ONLY peripheral channels, or ONLY central channels
+% Actually, not doable, as this depends on the MIP, not the channel set (and the MIP varies per state within a single channel set)
+%%%%%%%%%%%%%
+
+filter_indices = logical(filter_indices);
 
 filtered_sets = channel_sets(filter_indices, :);
 
@@ -257,25 +309,46 @@ end
 
 %% Function: determine if cut is feedback or feedfoward
 
-function [feedback] = feedback_cut(cut)
+function [feedback] = feedback_cut(partition_cut, groupings)
 % Returns 1 if cut is c -> p (i.e. first element is larger than second; assumes larger elements are more central)
+%
+% A cut is defined as feedback if it is made of more feedback cuts than feedforward cuts
+% e.g. for A B C D (A is most peripheral), if the cut is AB-/->CD, then it is made of
+% the cuts A-/->C, A-/->D, B-/->C, and B-/->D, so 4 feedback cuts and no feedforward
+% e.g. for A B C D (A is most peripheral), if the cut is AD-/->BC, then it is made of
+% the cuts A-/->B, A-/->C, D-/->B, and D-/->C, so 2 feedback cuts, and 2 feedforward
+% Due to channel labelling convention, D>C>B>A
 %
 % Inputs:
 %   cut = cell array with length 2, each cell holds a single numeric
+%   cut = cell array representing a partition cut (i.e. with length 2); the cut is from
+%       the channels in the first cell to the channels in the second cell
 % Outputs:
-%   feedback = 1 if the cut is to a feedback connection, 0 otherwise
+%   feedback = 1 if the cut is to a feedback connection, 0 otherwise (if equal feedback and feedforward, 0)
+cuts_fb = 0;
+cuts_ff = 0;
 
-feedback = 0;
+for from = 1 : length(partition_cut{1}) % for each cut source
+    for to = 1 : length(partition_cut{2}) % for each cut end
+        if any(groupings.c==partition_cut{1}(from)) && any(groupings.p==partition_cut{2}(to)) % feedback if source is central and target is peripheral
+            cuts_fb = cuts_fb + 1;
+        else
+            cuts_ff = cuts_ff + 1;
+        end
+    end
+end
 
-if cut{1} > cut{2}
+if cuts_fb > cuts_ff
     feedback = 1;
+else
+    feedback = 0;
 end
 
 end
 
 %% Function: classify cuts as feedback or not
 
-function [classified] = feedback_classify(mips)
+function [classified] = feedback_classify(mips, groupings)
 % Classifies each mip/cut in mips as feedback (1) or not (0)
 %
 % Inputs:
@@ -286,7 +359,7 @@ function [classified] = feedback_classify(mips)
 classified = zeros(size(mips));
 
 for cut = 1 : numel(mips)
-    classified(cut) = feedback_cut(mips{cut});
+    classified(cut) = feedback_cut(mips{cut}, groupings);
 end
 
 end
