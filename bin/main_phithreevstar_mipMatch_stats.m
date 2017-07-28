@@ -9,7 +9,8 @@ Chance level of match for 3 channels:
 A BC
 AB C
 AC B
-3/9 = 1/3
+3/9 = 1/3 (for both bipartition filtering and no filtering)
+Bell(3) = 5
 
 Chance level of match for 4 channels:
 
@@ -20,7 +21,9 @@ AD BC
 ABC D
 ABD C
 ACD B
-7/42    (not 1/7)
+7/42    (not 1/7 if not filtering for bipartitions)
+1/7 if filtering for bipartitions only
+Bell(4) = 15
 
 
 MIP* == MIP3, per set, trial, ...
@@ -38,7 +41,7 @@ MIP3 per set, trial, ...
 
 %% SETUP
 
-chance_levels = [1 1/3 7/42];
+chance_levels = [1 1/3 1/7];% [1 1/3 7/42]; (7/42 is wrong....)
 
 data_nChannels = '2t4';
 data_detrended = 0;
@@ -126,7 +129,7 @@ figure;
 for nChannels_counter = 2 : length(matches_per_trial)
     subplot(1, length(matches_per_trial)-1, nChannels_counter-1);
     match_portion = permute(squeeze(mean(match_portions_per_trial_filtered{nChannels_counter}, 1)), [2 1]);
-    match_portion_err = permute(squeeze(std(match_portions_per_trial_filtered{nChannels_counter}, [], 1)), [2, 1]) / sqrt(size(match_portions_per_trial_filtered, 1));
+    match_portion_err = permute(squeeze(std(match_portions_per_trial_filtered{nChannels_counter}, [], 1)), [2, 1]) / sqrt(size(match_portions_per_trial_filtered{nChannels_counter}, 1));
     
     bar((1:3)-0.15, match_portion(:, 1), 0.25); hold on;
     bar((1:3)+0.15, match_portion(:, 2), 0.25, 'r');

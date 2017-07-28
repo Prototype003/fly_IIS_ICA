@@ -11,6 +11,8 @@ Test is conducted using LME with model comparisons (to the null)
 
 %% SETUP
 
+phi_type = 'star';
+
 data_nChannels = '2t4';
 data_detrended = 0;
 data_zscored = 0;
@@ -20,7 +22,7 @@ data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim'.
     '_detrend' num2str(data_detrended)...
     '_zscore' num2str(data_zscored)...
     '_nChannels' data_nChannels...
-    '_phithree'...
+    '_phi' phi_type...
     ];
 
 results_directory = 'analysis_results/';
@@ -38,7 +40,7 @@ disp('loaded');
 
 for nChannels_counter = 1 : length(phis)
     % So I don't need to keep on typing ...}.phi_threes
-    phis{nChannels_counter}.phis = phis{nChannels_counter}.phi_threes;
+    phis{nChannels_counter}.phis = phis{nChannels_counter}.(['phi_' phi_type 's']);
     
     % Average across trials
     phis{nChannels_counter}.phis = mean(phis{nChannels_counter}.phis, 2);
@@ -137,33 +139,33 @@ iterations = 1000;
 options = statset('LinearMixedModel');
 options.UseParallel = true;
 
-%compute_pool = parpool();
+compute_pool = parpool();
 
 model_comparisons = cell(length(model_nulls), 1);
 model_comparisons_sim = cell(length(model_nulls), 1);
 for null = 1 : length(model_nulls)
     disp(['conducting likelihood ratio tests (sim) on: ' model_null_specs{null}]);
-    %[model_comparisons{null}, model_comparisons_sim{null}] = compare(model_nulls{null}, model_full, 'NSim', iterations, 'Options', options);
-    model_comparisons{null} = compare(model_nulls{null}, model_full);
+    [model_comparisons{null}, model_comparisons_sim{null}] = compare(model_nulls{null}, model_full, 'NSim', iterations, 'Options', options);
+    %model_comparisons{null} = compare(model_nulls{null}, model_full);
     disp('completed');
 end
 
-%delete(compute_pool);
+delete(compute_pool);
 
 %% Save results
 
-% disp('Saving');
-% if ~isdir(results_directory)
-%     mkdir(results_directory)
-% end
-% save([results_directory results_filename '.mat'],...
-%     'phi_table',...
-%     'model_spec',...
-%     'model_full',...
-%     'model_null_specs',...
-%     'model_nulls',...
-%     'model_comparisons',...
-%     'model_comparisons_sim'...
-%     );
-% 
-% disp('Saved');
+disp('Saving');
+if ~isdir(results_directory)
+    mkdir(results_directory)
+end
+save([results_directory results_filename '.mat'],...
+    'phi_table',...
+    'model_spec',...
+    'model_full',...
+    'model_null_specs',...
+    'model_nulls',...
+    'model_comparisons',...
+    'model_comparisons_sim'...
+    );
+
+disp('Saved');

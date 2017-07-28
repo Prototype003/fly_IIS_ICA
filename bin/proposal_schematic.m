@@ -27,7 +27,8 @@ imagesc(binarised_data); colorbar;
 %}
 
 % Load
-load('../../flies/fly_data/trials_anesthDescAdded11092014_bPlrRerefTyp2/Analyzed_WalkingDrosDror115610072014/trials.mat');
+%load('../../flies/fly_data/trials_anesthDescAdded11092014_bPlrRerefTyp2/Analyzed_WalkingDrosDror115610072014/trials.mat');
+load('../../flies/fly_data_lineNoiseRemoved/Analyzed_WalkingDrosDror115610072014/trials.mat');
 
 channels = (1:3);
 samples = (81787:81787+19);

@@ -7,6 +7,8 @@ This script tests the second hypothesis: phi-star is correlated with phi-three
 
 %% SETUP
 
+star_metric = 'phi_stars';
+
 data_nChannels = '2t4';
 data_detrended = 0;
 data_zscored = 0;
@@ -167,7 +169,8 @@ phi_threes_avg = cell(length(phi_threes), 1);
 phi_stars_avg = cell(length(phi_stars), 1);
 for nChannels_counter = 1 : length(phi_threes)
     phi_threes_avg{nChannels_counter} = (squeeze(mean(phi_threes{nChannels_counter}.phi_threes, 2)));
-    phi_stars_avg{nChannels_counter} = (squeeze(mean(phi_stars{nChannels_counter}.phi_stars, 2)));
+    phi_stars_avg{nChannels_counter} = (squeeze(mean(phi_stars{nChannels_counter}.(star_metric), 2)));
+    %phi_stars_avg{nChannels_counter} = (squeeze(mean(phi_stars{nChannels_counter}.mis - phi_stars{nChannels_counter}.mi_stars, 2)));
 end
 
 % Correlate for each fly, condition, tau level
@@ -192,6 +195,7 @@ for tau_counter = 1 : size(phi_threes_avg{nChannels_counter}, 4)
                 scatter(three(:), star(:), condition_shapes{condition}); hold on;
                 set(gca, 'xscale', 'log');
                 set(gca, 'yscale', 'log'); % correlation test will be conducted after log transform
+                axis tight
                 
                 if subplot_counter <= length(phi_threes_avg)
                     title([num2str(phi_threes{nChannels_counter}.nChannels) ' channels']);
@@ -204,7 +208,7 @@ for tau_counter = 1 : size(phi_threes_avg{nChannels_counter}, 4)
                 end
                 
                 % Compute and store correlation
-                [correlation, p] = corrcoef(log(three), log(star));
+                [correlation, p] = corrcoef((three), (star));
                 correlations{nChannels_counter}(fly_counter, condition, tau_counter) = correlation(1, 2);
             end
         end
@@ -238,11 +242,11 @@ end
 
 %% Correlations after matching MIPs
 
-mipmatch_correlation(phi_threes, phi_threes_avg, phi_stars_avg, condition_shapes, 1, tau_colours);
+%mipmatch_correlation(phi_threes, phi_threes_avg, phi_stars_avg, condition_shapes, 1, tau_colours);
 
 %% Correlations per set
 
-correlate_per_set(phi_threes_avg, phi_stars_avg);
+[correlation_rs, correlations_ps, correlation_sigs] = correlate_per_set(phi_threes_avg, phi_stars_avg);
 
 %% Function: correlation after filtering for 'matching' MIPs
 
@@ -371,11 +375,15 @@ end
 
 %% Function: correlate per channel set
 
-function [correlations, correlation_ps] = correlate_per_set(phi_threes_avg, phi_stars_avg)
+function [correlations, correlation_ps, correlation_sigs] = correlate_per_set(phi_threes_avg, phi_stars_avg)
 % Takes trial averaged values (i.e. one value per set, fly, condition, tau)
 
 q = 0.05;
-height = 1;
+height_sig = 1;
+height_nonsig = 0.1;
+nChannels_list = [2 3 4];
+tau_list = [4 8 16];
+
 
 correlations = cell(length(phi_threes_avg), 1);
 correlation_ps = cell(length(phi_threes_avg), 1);
@@ -391,7 +399,7 @@ for nChannels_counter = 1 : length(phi_threes_avg)
             for set = 1 : size(phi_threes_avg{nChannels_counter}, 1)
                 three = phi_threes_avg{nChannels_counter}(set, :, condition, tau);
                 star = phi_stars_avg{nChannels_counter}(set, :, condition, tau);
-                [correlation, p] = corrcoef(log(three), log(star));
+                [correlation, p] = corrcoef((three), (star));
                 correlations{nChannels_counter}(set, condition, tau) = correlation(1, 2);
                 correlation_ps{nChannels_counter}(set, condition, tau) = p(1, 2);
             end
@@ -402,26 +410,48 @@ end
 % Concatenate nChannels (to get a single axis)
 correlations_all = [];
 correlation_ps_all = [];
+channel_ticks = []; xtick_counter = 1;
+channel_labels = [];
 for nChannels_counter = 1 : length(correlations)
     correlations_all = cat(1, correlations_all, correlations{nChannels_counter});
     correlation_ps_all = cat(1, correlation_ps_all, correlation_ps{nChannels_counter});
+    channel_ticks = cat(1, channel_ticks, xtick_counter);
+    channel_labels = cat(1, channel_labels, nChannels_list(nChannels_counter));
+    xtick_counter = xtick_counter + size(correlations{nChannels_counter}, 1);
 end
 
 % Plot
 figure;
 subplot_counter = 1;
+correlation_sigs = zeros(size(correlation_ps_all, 1), size(correlations_all, 2), size(correlations_all, 3));
 for tau = 1 : size(correlations_all, 3)
     for condition = 1 : size(correlations_all, 2)
         subplot(size(correlations_all, 3), size(correlations_all, 2), subplot_counter);
         
         bar(correlations_all(:, condition, tau));
-        axis([-50 size(correlations_all, 1)+50 -0.5 1.1]);
+        axis([-50 size(correlations_all, 1)+50 -0.3 1.1]);
         hold on;
         
         % Plot significance after FDR correction
         corrected = fdr_correct(correlation_ps_all(:, condition, tau), q);
         xs = (1:length(corrected));
-        scatter(xs(logical(corrected)), corrected(logical(corrected))*height, 5, 'k*', 'MarkerEdgeAlpha', 0.025);
+        scatter(xs(logical(corrected)), corrected(logical(corrected))*height_sig, 10, 'k*', 'MarkerEdgeAlpha', 0.1); % Sig
+        scatter(xs(not(logical(corrected))), (corrected(not(logical(corrected))))-height_nonsig, 10, 'k*', 'MarkerEdgeAlpha', 0.1); % Not sig
+        correlation_sigs(:, condition, tau) = corrected; % Store for returning
+        
+        xticks(channel_ticks); xticklabels(channel_labels);
+        
+        if subplot_counter == 1
+            title('air');
+        elseif subplot_counter == 2
+            title('iso');
+        end
+        
+        if subplot_counter == (size(correlations_all, 3) * size(correlations_all, 2)) - 1
+            ylabel(['r tau=' num2str(tau_list(tau))]);
+        elseif mod(subplot_counter, size(correlations_all, 2)) == 1
+            ylabel(['tau=' num2str(tau_list(tau))]);
+        end
         
         subplot_counter = subplot_counter + 1;
     end

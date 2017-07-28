@@ -28,16 +28,16 @@ data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim'.
 
 %% LOAD
 
-disp('loading');
-% Phi-3
-load([data_directory data_filename '_phithree.mat']);
-phi_threes = phis;
-
-% Phi-star
-load([data_directory data_filename '_phistar.mat']);
-phi_stars = phis;
-
-disp('loaded');
+% disp('loading');
+% % Phi-3
+% load([data_directory data_filename '_phithree.mat']);
+% phi_threes = phis;
+% 
+% % Phi-star
+% load([data_directory data_filename '_phistar.mat']);
+% phi_stars = phis;
+% 
+% disp('loaded');
 
 %% Average across trials and flies, calculate deltas and associated standard error
 
@@ -70,18 +70,21 @@ q = 0.05;
 labelled_subplot = 7;
 
 % Phi-3
-plot_phis(phi_threes, [-0.005 0.06], 1, 'phi-3', labelled_subplot);
+%plot_phis(phi_threes, [-0.005 0.06], 1, 'phi-3', labelled_subplot);
+plot_phis(phi_threes, [-0.005 0.04], 1, 'phi-3', labelled_subplot);
 % Add t-tests for delta
-[sigs_three_corrected, sigs_three] = phi_tests(phi_threes, 0.1);
-plot_sigs(sigs_three_corrected, 0.05);
+[sigs_three_corrected, sigs_three] = phi_tests(phi_threes, q);
+%plot_sigs(sigs_three_corrected, 0.05, -0.0025);
+plot_sigs(sigs_three_corrected, 0.035, -0.0025);
 
 
 % Phi-star
-plot_phis(phi_stars, [-0.005 0.03], 1, 'phi-*', labelled_subplot);
-% plot_phis(phi_stars, [-10 0.1], 1, 'phi-*', labelled_subplot);
+%plot_phis(phi_stars, [-0.005 0.03], 1, 'phi-*', labelled_subplot);
+plot_phis(phi_stars, [-0.002 0.02], 1, 'phi-*', labelled_subplot);
 % Add t-tests for delta
-[sigs_star_corrected, sigs_star] = phi_tests(phi_stars, 0.1);
-plot_sigs(sigs_star_corrected, 0.025);
+[sigs_star_corrected, sigs_star] = phi_tests(phi_stars, q);
+%plot_sigs(sigs_star_corrected, 0.025, -0.0025);
+plot_sigs(sigs_star_corrected, 0.018, -0.001);
 
 %% Plot all phi values on a single axis (sorted by air phi)
 % Sort, within channels-used, by air phi
@@ -123,7 +126,8 @@ for nChannels_counter = 1 : length(phis)
 end
 
 % Plot for each tau, for each condition, averaging across trials and flies
-figure;
+%figure;
+figure('units','normalized','outerposition',[0 0 1 1])
 subplot_counter = 1;
 for tau = 1 : size(phis_all, 3)
     for condition = 1 : size(phis_all, 2)
@@ -141,6 +145,7 @@ for tau = 1 : size(phis_all, 3)
         end
         axis([-50 size(phis_all, 1)+50 y_limits]);
         xticks(channel_ticks); xticklabels(channel_labels);
+        set(gca,'yticklabel',num2str(get(gca,'ytick')'))
         
         if subplot_counter == labelled_subplot
             xlabel('channel set');
@@ -164,6 +169,7 @@ for tau = 1 : size(phis_all, 3)
     end
     axis([-50 size(phis_all, 1)+50 y_limits]);
     xticks(channel_ticks); xticklabels(channel_labels);
+    set(gca,'yticklabel',num2str(get(gca,'ytick')'))
     
     if subplot_counter + 1 - size(phis_all, 3) == labelled_subplot
         ylabel(['delta ' ylabel_text]);
@@ -188,7 +194,7 @@ for nChannels_counter = 1 : length(phis)
 end
 
 % Average across trials
-phis_all = log(squeeze(mean(phis_all, 2)));
+phis_all = (squeeze(mean(phis_all, 2)));
 
 % Conduct t-tests across flies, comparing conditions
 sigs = zeros(size(phis_all, 1), size(phis_all, 4));
@@ -197,10 +203,12 @@ for tau = 1 : size(phis_all, 4)
     for set = 1 : size(phis_all, 1)
         air = phis_all(set, :, 1, tau);
         iso = phis_all(set, :, 2, tau);
-        [decision, sigs(set, tau)] = ttest(air(:), iso(:));
+        %[decision, sigs(set, tau)] = ttest(air(:), iso(:), 'Tail', 'right'); % para paired
+        [sigs(set, tau), decision] = signrank(air(:), iso(:), 'Tail', 'right'); % non-para paired
+        %[decision, sigs(set, tau)] = swtest(air(:) - iso(:)); % normality
     end
     
-    % FDR correction for multiple comparisons
+    % FDR correction for multiple comparisons (don't correct for normality testing)
     sigs_corrected(:, tau) = fdr_correct(sigs(:, tau), q);
     
 end
@@ -209,15 +217,18 @@ end
 
 %% Function: plot significances
 
-function [] = plot_sigs(sigs, height)
+function [] = plot_sigs(sigs, height, height_nonsig)
 % Adds asterisks to each subplot
+
+alpha = 0.1;%0.025;
 
 for tau = 1 : size(sigs, 2)
     subplot(3, 3, tau*3); hold on;
     
     xs = (1:size(sigs, 1));
     
-    scatter(xs(logical(sigs(:, tau))), sigs(logical(sigs(:, tau)), tau)*height, 5, 'k*', 'MarkerEdgeAlpha', 0.025);
+    scatter(xs(logical(sigs(:, tau))), sigs(logical(sigs(:, tau)), tau)*height, 10, 'k*', 'MarkerEdgeAlpha', alpha); % sig
+    scatter(xs(not(logical(sigs(:, tau)))), sigs(not(logical(sigs(:, tau))), tau)+height_nonsig, 10, 'k*', 'MarkerEdgeAlpha', alpha);% non-sig
 end
 
 end
