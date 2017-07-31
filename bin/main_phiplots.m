@@ -24,6 +24,7 @@ data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim'.
     '_detrend' num2str(data_detrended)...
     '_zscore' num2str(data_zscored)...
     '_nChannels' data_nChannels...
+    '_shareFiltered'
     ];
 
 %% LOAD
@@ -38,10 +39,22 @@ data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim'.
 % phi_stars = phis;
 % 
 % disp('loaded');
+% 
+% for nChannels_counter = 1 : length(phi_threes)
+%     phi_threes{nChannels_counter}.phis = phi_threes{nChannels_counter}.phi_threes;
+%     phi_stars{nChannels_counter}.phis = phi_stars{nChannels_counter}.phi_stars;
+% end
+
+%% Sort channel sets by phi
+% % Sort, within channels-used, by air phi
+% % Sort within fly (so the first average channel set can be different among flies) - thus the average across flies will be across different sets also
+% 
+% phi_threes = sort_phis(phi_threes, 'phi_threes', 'within flies');
+% phi_stars = sort_phis(phi_stars, 'phi_stars', 'within flies');
 
 %% Average across trials and flies, calculate deltas and associated standard error
 
-for nChannels_counter = 1 : length(phi_threes)
+for nChannels_counter = 1 : numel(phi_threes)
     % Raw
     phi_threes{nChannels_counter}.phis_raw = phi_threes{nChannels_counter}.phi_threes(:, :, flies, :, :);
     phi_stars{nChannels_counter}.phis_raw = phi_stars{nChannels_counter}.(star_metric)(:, :, flies, :, :);
@@ -71,7 +84,7 @@ labelled_subplot = 7;
 
 % Phi-3
 %plot_phis(phi_threes, [-0.005 0.06], 1, 'phi-3', labelled_subplot);
-plot_phis(phi_threes, [-0.005 0.04], 1, 'phi-3', labelled_subplot);
+plot_phis(phi_threes, [-0.005 0.04], 1, 'phi-3', 1, labelled_subplot);
 % Add t-tests for delta
 [sigs_three_corrected, sigs_three] = phi_tests(phi_threes, q);
 %plot_sigs(sigs_three_corrected, 0.05, -0.0025);
@@ -80,21 +93,38 @@ plot_sigs(sigs_three_corrected, 0.035, -0.0025);
 
 % Phi-star
 %plot_phis(phi_stars, [-0.005 0.03], 1, 'phi-*', labelled_subplot);
-plot_phis(phi_stars, [-0.002 0.02], 1, 'phi-*', labelled_subplot);
+plot_phis(phi_stars, [-0.002 0.02], 1, 'phi-*', 1, labelled_subplot);
 % Add t-tests for delta
 [sigs_star_corrected, sigs_star] = phi_tests(phi_stars, q);
 %plot_sigs(sigs_star_corrected, 0.025, -0.0025);
 plot_sigs(sigs_star_corrected, 0.018, -0.001);
 
-%% Plot all phi values on a single axis (sorted by air phi)
-% Sort, within channels-used, by air phi
 
-%% Plot all phi values on a single axis (sorted by delta)
-% Sort, within channels-used, by delta phi
+%% Function: sort all phi values
+
+function [phis] = sort_phis(phis, field, across)
+
+if strcmp(across, 'within flies')
+    for nChannels_counter = 1 : length(phis)
+        % Average across trials first (as different trials might give a different 'best' channel combination)
+        phis{nChannels_counter}.(field) = mean(phis{nChannels_counter}.(field), 2);
+        
+        % sort_linear_index()
+        % Get the indices for sorting the first condition (awake)
+        [~, indices] = sort_linear_index(phis{nChannels_counter}.(field)(:, :, :, 1, :), 1, 'descend');
+        % Sort all conditions using indices from the first condition
+        for condition = 1 : size(phis{nChannels_counter}.(field), 4)
+            condition_phis = phis{nChannels_counter}.(field)(:, :, :, condition, :);
+            phis{nChannels_counter}.(field)(:, :, :, condition, :) = condition_phis(indices);
+        end
+    end
+end
+
+end
 
 %% Function: concatenate all phi values and plot on a single axis
 
-function [] = plot_phis(phis, y_limits, errorbars, ylabel_text, labelled_subplot)
+function [] = plot_phis(phis, y_limits, errorbars, ylabel_text, sort_sets, labelled_subplot)
 % Plots all phis (for all nChannels used) on a single axis
 %
 % Inputs:
@@ -115,7 +145,10 @@ phis_all_delta_std = [];
 channel_ticks = []; xtick_counter = 1;
 channel_labels = [];
 % Concatenate results
-for nChannels_counter = 1 : length(phis)
+for nChannels_counter = 1 : numel(phis)
+    if sort_sets == 1
+        
+    end
     phis_all = cat(1, phis_all, phis{nChannels_counter}.phis);
     phis_all_stds = cat(1, phis_all_stds, phis{nChannels_counter}.phis_std);
     phis_all_delta = cat(1, phis_all_delta, phis{nChannels_counter}.phis_delta);
@@ -127,7 +160,7 @@ end
 
 % Plot for each tau, for each condition, averaging across trials and flies
 %figure;
-figure('units','normalized','outerposition',[0 0 1 1])
+figure('units','normalized','outerposition',[0 0 1 1]) % Source: https://au.mathworks.com/matlabcentral/answers/102219-how-do-i-make-a-figure-full-screen-programmatically-in-matlab
 subplot_counter = 1;
 for tau = 1 : size(phis_all, 3)
     for condition = 1 : size(phis_all, 2)
@@ -178,6 +211,15 @@ for tau = 1 : size(phis_all, 3)
     subplot_counter = subplot_counter + 1;
 end
 
+    function [] = sort_phis(phis)
+        % Sort based on first condition (awake)
+        [~, indices] = sort_linear_index(phis, 1, 'descend');
+        for sort_condition = 1 : size(phis, 2) % sort_condition = condition; new name due to nested sharing
+            condition_phis = phis(:, sort_condition, :);
+            phis(:, sort_condition, :) = condition_phis(indices);
+        end
+    end
+
 end
 
 %% Function: t-tests for each channel set
@@ -189,7 +231,7 @@ function [sigs_corrected, sigs] = phi_tests(phis, q)
 
 phis_all = [];
 % Concatenate results
-for nChannels_counter = 1 : length(phis)
+for nChannels_counter = 1 : numel(phis)
     phis_all = cat(1, phis_all, phis{nChannels_counter}.phis_raw);
 end
 
