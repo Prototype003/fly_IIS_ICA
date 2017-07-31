@@ -24,21 +24,33 @@ data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim'.
     '_detrend' num2str(data_detrended)...
     '_zscore' num2str(data_zscored)...
     '_nChannels' data_nChannels...
+    '_shareFiltered'
     ];
+
+share_pairs = 0;
 
 %% LOAD
 
-% disp('loading');
-% 
-% % Phi-3
-% load([data_directory data_filename '_phithree.mat']);
-% phi_threes = phis;
-% 
-% % Phi-star
-% load([data_directory data_filename '_phistar.mat']);
-% phi_stars = phis;
-% 
-% disp('loaded');
+disp('loading');
+
+% Phi-3
+load([data_directory data_filename '_phithree.mat']);
+phi_threes = phis;
+
+% Phi-star
+load([data_directory data_filename '_phistar.mat']);
+phi_stars = phis;
+
+disp('loaded');
+
+%% Filter for non-sharing/sharing channel sets
+
+% First row contains sets with no pairs of channels sharing an electrode
+% Second row contains sets with at least one pair of channels sharing an electrode
+% So use option+1: (0+1)=no-share, (1+1)=share
+
+phi_threes = phi_threes(share_pairs+1, :);
+phi_stars = phi_stars(share_pairs+1, :);
 
 %% Extract top and bottom 5% of phi values, and top/bottom 5% of delta phi
 % % We sort both phi-3 and phi-star using sorted phi-3 indexes
