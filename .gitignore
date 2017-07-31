@@ -6,6 +6,9 @@
 **/*.asv
 **/*.mat
 
+# Figures
+**/figures*
+
 # Windows
 **/*.db
 **/*.ini
