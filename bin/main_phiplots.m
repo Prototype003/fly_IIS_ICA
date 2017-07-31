@@ -24,33 +24,33 @@ data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim'.
     '_detrend' num2str(data_detrended)...
     '_zscore' num2str(data_zscored)...
     '_nChannels' data_nChannels...
-    '_shareFiltered'
+    %'_shareFiltered'
     ];
 
 %% LOAD
 
-% disp('loading');
-% % Phi-3
-% load([data_directory data_filename '_phithree.mat']);
-% phi_threes = phis;
-% 
-% % Phi-star
-% load([data_directory data_filename '_phistar.mat']);
-% phi_stars = phis;
-% 
-% disp('loaded');
-% 
-% for nChannels_counter = 1 : length(phi_threes)
-%     phi_threes{nChannels_counter}.phis = phi_threes{nChannels_counter}.phi_threes;
-%     phi_stars{nChannels_counter}.phis = phi_stars{nChannels_counter}.phi_stars;
-% end
+disp('loading');
+% Phi-3
+load([data_directory data_filename '_phithree.mat']);
+phi_threes = phis;
+
+% Phi-star
+load([data_directory data_filename '_phistar.mat']);
+phi_stars = phis;
+
+disp('loaded');
+
+for nChannels_counter = 1 : length(phi_threes)
+    phi_threes{nChannels_counter}.phis = phi_threes{nChannels_counter}.phi_threes;
+    phi_stars{nChannels_counter}.phis = phi_stars{nChannels_counter}.phi_stars;
+end
 
 %% Sort channel sets by phi
-% % Sort, within channels-used, by air phi
-% % Sort within fly (so the first average channel set can be different among flies) - thus the average across flies will be across different sets also
-% 
-% phi_threes = sort_phis(phi_threes, 'phi_threes', 'within flies');
-% phi_stars = sort_phis(phi_stars, 'phi_stars', 'within flies');
+% Sort, within channels-used, by air phi
+% Sort within fly (so the first average channel set can be different among flies) - thus the average across flies will be across different sets also
+
+phi_threes = sort_phis(phi_threes, 'phi_threes', 'within flies');
+phi_stars = sort_phis(phi_stars, 'phi_stars', 'within flies');
 
 %% Average across trials and flies, calculate deltas and associated standard error
 
@@ -105,7 +105,7 @@ plot_sigs(sigs_star_corrected, 0.018, -0.001);
 function [phis] = sort_phis(phis, field, across)
 
 if strcmp(across, 'within flies')
-    for nChannels_counter = 1 : length(phis)
+    for nChannels_counter = 1 : numel(phis)
         % Average across trials first (as different trials might give a different 'best' channel combination)
         phis{nChannels_counter}.(field) = mean(phis{nChannels_counter}.(field), 2);
         
