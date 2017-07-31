@@ -24,7 +24,7 @@ data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim'.
     '_detrend' num2str(data_detrended)...
     '_zscore' num2str(data_zscored)...
     '_nChannels' data_nChannels...
-    %'_shareFiltered'
+    '_shareFiltered'
     ];
 
 %% LOAD
@@ -48,9 +48,10 @@ end
 %% Sort channel sets by phi
 % Sort, within channels-used, by air phi
 % Sort within fly (so the first average channel set can be different among flies) - thus the average across flies will be across different sets also
+% Not valid, as this mixes up the channel sets (which probably violates our assumption of independence of observations at each channel set)
 
-phi_threes = sort_phis(phi_threes, 'phi_threes', 'within flies');
-phi_stars = sort_phis(phi_stars, 'phi_stars', 'within flies');
+% phi_threes = sort_phis(phi_threes, 'phi_threes', 'within flies');
+% phi_stars = sort_phis(phi_stars, 'phi_stars', 'within flies');
 
 %% Average across trials and flies, calculate deltas and associated standard error
 
@@ -146,8 +147,18 @@ channel_ticks = []; xtick_counter = 1;
 channel_labels = [];
 % Concatenate results
 for nChannels_counter = 1 : numel(phis)
+    % Sort if necessary
     if sort_sets == 1
-        
+        % Get sorting indices for condition 1
+        [~, indices] = sort_linear_index(phis{nChannels_counter}.phis(:, 1, :), 1, 'descend');
+        for condition = 1 : size(phis{nChannels_counter}.phis, 2)
+            tmp = phis{nChannels_counter}.phis(:, condition, :);
+            phis{nChannels_counter}.phis(:, condition, :) = tmp(indices);
+            tmp = phis{nChannels_counter}.phis_std(:, condition, :);
+            phis{nChannels_counter}.phis_std(:, condition, :) = tmp(indices);
+        end
+        phis{nChannels_counter}.phis_delta = phis{nChannels_counter}.phis_delta(squeeze(indices));
+        phis{nChannels_counter}.phis_delta_std = phis{nChannels_counter}.phis_delta_std(squeeze(indices));
     end
     phis_all = cat(1, phis_all, phis{nChannels_counter}.phis);
     phis_all_stds = cat(1, phis_all_stds, phis{nChannels_counter}.phis_std);
@@ -211,14 +222,14 @@ for tau = 1 : size(phis_all, 3)
     subplot_counter = subplot_counter + 1;
 end
 
-    function [] = sort_phis(phis)
-        % Sort based on first condition (awake)
-        [~, indices] = sort_linear_index(phis, 1, 'descend');
-        for sort_condition = 1 : size(phis, 2) % sort_condition = condition; new name due to nested sharing
-            condition_phis = phis(:, sort_condition, :);
-            phis(:, sort_condition, :) = condition_phis(indices);
-        end
-    end
+%     function [] = sort_phis(phis)
+%         % Sort based on first condition (awake)
+%         [~, indices] = sort_linear_index(phis, 1, 'descend');
+%         for sort_condition = 1 : size(phis, 2) % sort_condition = condition; new name due to nested sharing
+%             condition_phis = phis(:, sort_condition, :);
+%             phis(:, sort_condition, :) = condition_phis(indices);
+%         end
+%     end
 
 end
 
