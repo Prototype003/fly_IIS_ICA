@@ -59,8 +59,8 @@ disp('Saving');
 if ~isdir(results_directory)
     mkdir(results_directory)
 end
-save([results_directory results_filename '_phi_three.mat'], 'phi_threes');
-save([results_directory results_filename '_phi_star.mat'], 'phi_stars');
+save([results_directory results_filename '_phithree.mat'], 'phi_threes');
+save([results_directory results_filename '_phistar.mat'], 'phi_stars');
 
 disp('Saved');
 
