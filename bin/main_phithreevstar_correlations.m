@@ -24,7 +24,7 @@ data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim'.
     '_detrend' num2str(data_detrended)...
     '_zscore' num2str(data_zscored)...
     '_nChannels' data_nChannels...
-    '_shareFiltered'
+    %'_shareFiltered'
     ];
 
 share_pairs = 0;
@@ -39,7 +39,7 @@ phi_threes = phis;
 
 % Phi-star
 load([data_directory data_filename '_phistar.mat']);
-phi_stars = phis;
+phi_stars = phis';
 
 disp('loaded');
 
