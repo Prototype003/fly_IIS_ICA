@@ -16,6 +16,7 @@ data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim'.
     '_detrend' num2str(data_detrended)...
     '_zscore' num2str(data_zscored)...
     '_nChannels' data_nChannels...
+    '_shareFiltered'
     ];
 
 results_directory = 'analysis_results/';
@@ -23,6 +24,7 @@ results_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreSti
     '_detrend' num2str(data_detrended)...
     '_zscore' num2str(data_zscored)...
     '_nChannels' data_nChannels...
+    '_shareFiltered'...
     '_mipComparison.mat'
     ];
 
@@ -47,7 +49,7 @@ disp('loaded')
 
 disp('relabelling');
 
-for nChannels_counter = 1 : length(phi_threes)
+for nChannels_counter = 1 : numel(phi_threes)
     phi_threes{nChannels_counter}.mips = relabel(phi_threes{nChannels_counter}.mips, phi_threes{nChannels_counter}.channel_sets);
 end
 
@@ -56,7 +58,7 @@ disp('relabelled');
 %% Convert phi-three cuts into partitions
 % Not actually needed - due to bipartitioning only, the ends of the cuts give the partition groups
 
-for nChannels_counter = 1 : length(phi_threes)
+for nChannels_counter = 1 : numel(phi_threes)
     phi_threes{nChannels_counter}.mips = cuts2partitions(phi_threes{nChannels_counter}.mips);
 end
 
@@ -64,10 +66,10 @@ end
 % Because each trial has 1 phi-star MIP and many phi-3 states (i.e. multiple MIPs), this scheme
 % only allows for finding the probability of matching phi-3 MIPs for a phi-star MIP and not vice versa
 
-matches_per_trial = cell(length(phi_threes), 1);
+matches_per_trial = cell(size(phi_threes));
 
 % For each trial, find the ratio of matching MIPs to non matching MIPs
-for nChannels_counter = 1 : length(phi_threes)
+for nChannels_counter = 1 : numel(phi_threes)
     nChannels = phi_threes{nChannels_counter}.nChannels;
     
     % This will hold the number of matches per trial
@@ -104,7 +106,7 @@ end
 disp('Choosing most frequent phi-3 MIPs');
 
 phi_threes_moded = phi_threes;
-for nChannels_counter = 1 : length(phi_threes_moded)
+for nChannels_counter = 1 : numel(phi_threes_moded)
     [phi_threes_moded{nChannels_counter}.mips, phi_threes_moded{nChannels_counter}.mip_counts] = mip_mode(phi_threes{nChannels_counter}.mips, phi_threes{nChannels_counter}.state_counters);
 end
 
@@ -115,9 +117,9 @@ disp('Chosen');
 % overall probability across trials of phi-star MIPs having corresponding phi-3 MIPs, and vice versa
 % (probability of phi-3 MIPs having corresponding phi-star MIPs)
 
-matches = cell(length(phi_threes), 1);
+matches = cell(size(phi_threes));
 
-for nChannels_counter = 1 : length(phi_stars)
+for nChannels_counter = 1 : numel(phi_stars)
     channels_used = phi_stars{nChannels_counter}.nChannels;
     matches{nChannels_counter} = zeros(size(phi_stars{nChannels_counter}.mips)); % Equality matrix
     
@@ -140,10 +142,12 @@ end
 
 %% Save the results
 
+disp('Saving');
 if ~isdir(results_directory)
     mkdir(results_directory)
 end
 save([results_directory results_filename], 'matches_per_trial', 'matches');
+disp('Saved');
 
 %% Functions: relabel phi3 channels with actual channels
 

@@ -29,21 +29,21 @@ data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim'.
 
 %% LOAD
 
-disp('loading');
-% Phi-3
-load([data_directory data_filename '_phithree.mat']);
-phi_threes = phis;
-
-% Phi-star
-load([data_directory data_filename '_phistar.mat']);
-phi_stars = phis;
-
-disp('loaded');
-
-for nChannels_counter = 1 : length(phi_threes)
-    phi_threes{nChannels_counter}.phis = phi_threes{nChannels_counter}.phi_threes;
-    phi_stars{nChannels_counter}.phis = phi_stars{nChannels_counter}.phi_stars;
-end
+% disp('loading');
+% % Phi-3
+% load([data_directory data_filename '_phithree.mat']);
+% phi_threes = phis;
+% 
+% % Phi-star
+% load([data_directory data_filename '_phistar.mat']);
+% phi_stars = phis;
+% 
+% disp('loaded');
+% 
+% for nChannels_counter = 1 : length(phi_threes)
+%     phi_threes{nChannels_counter}.phis = phi_threes{nChannels_counter}.phi_threes;
+%     phi_stars{nChannels_counter}.phis = phi_stars{nChannels_counter}.phi_stars;
+% end
 
 %% Sort channel sets by phi
 % Sort, within channels-used, by air phi
@@ -82,10 +82,11 @@ end
 
 q = 0.05;
 labelled_subplot = 7;
+sort_phi = 1;
 
 % Phi-3
 %plot_phis(phi_threes, [-0.005 0.06], 1, 'phi-3', labelled_subplot);
-plot_phis(phi_threes, [-0.005 0.04], 1, 'phi-3', 1, labelled_subplot);
+plot_phis(phi_threes, [-0.005 0.05], 1, 'phi-3', sort_phi, labelled_subplot);
 % Add t-tests for delta
 [sigs_three_corrected, sigs_three] = phi_tests(phi_threes, q);
 %plot_sigs(sigs_three_corrected, 0.05, -0.0025);
@@ -94,7 +95,7 @@ plot_sigs(sigs_three_corrected, 0.035, -0.0025);
 
 % Phi-star
 %plot_phis(phi_stars, [-0.005 0.03], 1, 'phi-*', labelled_subplot);
-plot_phis(phi_stars, [-0.002 0.02], 1, 'phi-*', 1, labelled_subplot);
+plot_phis(phi_stars, [-0.002 0.03], 1, 'phi-*', sort_phi, labelled_subplot);
 % Add t-tests for delta
 [sigs_star_corrected, sigs_star] = phi_tests(phi_stars, q);
 %plot_sigs(sigs_star_corrected, 0.025, -0.0025);

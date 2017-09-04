@@ -39,7 +39,10 @@ phi_threes = phis;
 
 % Phi-star
 load([data_directory data_filename '_phistar.mat']);
-phi_stars = phis';
+phi_stars = phis;
+if numel(phi_stars) == length(phi_stars) && size(phi_stars, 1) ~= 1
+    phi_stars = phi_stars';
+end
 
 disp('loaded');
 

@@ -102,6 +102,7 @@ end
 for nChannels = 1 : length(phis)
     [phis{nChannels}.mips, phis{nChannels}.state_counters, phis{nChannels}.state_phis, phis{nChannels}.channel_sets, phis{nChannels}.phi_threes] = group_filter(phis{nChannels}.mips, phis{nChannels}.state_counters, phis{nChannels}.state_phis, phis{nChannels}.channel_sets, phis{nChannels}.phi_threes, groupings);
 end
+
 %% Portion of feedback cuts per trial, considering all MIPs
 
 % Classify each cut in a trial as feedback or not

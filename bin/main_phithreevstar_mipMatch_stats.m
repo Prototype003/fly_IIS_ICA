@@ -41,7 +41,7 @@ MIP3 per set, trial, ...
 
 %% SETUP
 
-chance_levels = [1 1/3 1/7];% [1 1/3 7/42]; (7/42 is wrong....)
+chance_levels = [1 1/3 1/7; 1 1/3 1/7];% [1 1/3 7/42]; (7/42 is wrong....)
 
 data_nChannels = '2t4';
 data_detrended = 0;
@@ -52,6 +52,7 @@ data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim'.
     '_detrend' num2str(data_detrended)...
     '_zscore' num2str(data_zscored)...
     '_nChannels' data_nChannels...
+    '_shareFiltered'...
     '_phistar.mat'
     ];
 
@@ -60,6 +61,7 @@ results_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreSti
     '_detrend' num2str(data_detrended)...
     '_zscore' num2str(data_zscored)...
     '_nChannels' data_nChannels...
+    '_shareFiltered'...
     '_mipComparison.mat'
     ];
 
@@ -85,8 +87,8 @@ disp('loaded')
 % this works because the number of samples is constant, so avg(total across trials) = avg(avg per trial)
 
 matches_old = matches;
-matches = cell(length(matches_old), 1); % update matches to have a matching format with matches_per_trial
-for nChannels_counter = 1 : length(matches_per_trial)
+matches = cell(size(matches_old)); % update matches to have a matching format (cell array of structs) with matches_per_trial
+for nChannels_counter = 1 : numel(matches_per_trial)
     [matches_per_trial{nChannels_counter}.matches_sum, matches_per_trial{nChannels_counter}.trial_totals] = sum_bipartitions_only(phis{nChannels_counter}.mips, matches_per_trial{nChannels_counter}.matches, matches_per_trial{nChannels_counter}.trial_total);
     matches{nChannels_counter}.matches = matches_old{nChannels_counter};
     [matches{nChannels_counter}.matches_sum, matches{nChannels_counter}.trial_totals] = sum_bipartitions_only(phis{nChannels_counter}.mips, matches{nChannels_counter}.matches, 1);
@@ -109,9 +111,9 @@ end
 
 %% Overall matching percentage (after filtering for bipartition MIPs)
 
-match_portions_per_trial_filtered = cell(length(matches_per_trial), 1);
-match_portions_filtered = cell(length(matches), 1);
-for nChannels_counter = 1 : length(matches_per_trial)
+match_portions_per_trial_filtered = cell(size(matches_per_trial));
+match_portions_filtered = cell(size(matches));
+for nChannels_counter = 1 : numel(matches_per_trial)
     
     % Get portions of matches per trial
     match_portions_per_trial_filtered{nChannels_counter} = matches_per_trial{nChannels_counter}.matches_sum ./ matches_per_trial{nChannels_counter}.trial_totals;
@@ -126,8 +128,8 @@ end
 
 % Plot
 figure;
-for nChannels_counter = 2 : length(matches_per_trial)
-    subplot(1, length(matches_per_trial)-1, nChannels_counter-1);
+for nChannels_counter = numel(matches_per_trial) / numel(phis{1}.taus)+1 : numel(matches_per_trial)
+    subplot(size(matches_per_trial, 1), size(matches_per_trial, 2)-1, nChannels_counter-size(matches_per_trial, 1));
     match_portion = permute(squeeze(mean(match_portions_per_trial_filtered{nChannels_counter}, 1)), [2 1]);
     match_portion_err = permute(squeeze(std(match_portions_per_trial_filtered{nChannels_counter}, [], 1)), [2, 1]) / sqrt(size(match_portions_per_trial_filtered{nChannels_counter}, 1));
     
