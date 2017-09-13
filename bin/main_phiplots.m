@@ -8,7 +8,7 @@ This is for plotting of raw phi values
 
 star_metric = 'phi_stars';
 
-flies = (1:13); %[1 2 3 4 5 6 7 9 10 11 12 13];
+flies = (1); %[1 2 3 4 5 6 7 9 10 11 12 13];
 
 data_nChannels = '2t4';
 data_detrended = 0;
@@ -24,7 +24,7 @@ data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim'.
     '_detrend' num2str(data_detrended)...
     '_zscore' num2str(data_zscored)...
     '_nChannels' data_nChannels...
-    '_shareFiltered'
+    %'_shareFiltered'
     ];
 
 %% LOAD
@@ -82,7 +82,7 @@ end
 
 q = 0.05;
 labelled_subplot = 7;
-sort_phi = 1;
+sort_phi = 0;
 
 % Phi-3
 %plot_phis(phi_threes, [-0.005 0.06], 1, 'phi-3', labelled_subplot);
