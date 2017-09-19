@@ -8,7 +8,7 @@ This is for plotting of raw phi values
 
 star_metric = 'phi_stars';
 
-flies = (1); %[1 2 3 4 5 6 7 9 10 11 12 13];
+flies = (1:13); %[1 2 3 4 5 6 7 9 10 11 12 13];
 
 data_nChannels = '2t4';
 data_detrended = 0;
@@ -80,7 +80,7 @@ end
 %% Plot all phi values on a single axis
 % Uses natural channel-set ordering
 
-q = 0.05;
+q = 0.01;
 labelled_subplot = 7;
 sort_phi = 0;
 
@@ -88,7 +88,7 @@ sort_phi = 0;
 %plot_phis(phi_threes, [-0.005 0.06], 1, 'phi-3', labelled_subplot);
 plot_phis(phi_threes, [-0.005 0.05], 1, 'phi-3', sort_phi, labelled_subplot);
 % Add t-tests for delta
-[sigs_three_corrected, sigs_three] = phi_tests(phi_threes, q);
+[sigs_three_corrected, sigs_three] = phi_tests(phi_threes, q, sort_phi);
 %plot_sigs(sigs_three_corrected, 0.05, -0.0025);
 plot_sigs(sigs_three_corrected, 0.035, -0.0025);
 
@@ -97,7 +97,7 @@ plot_sigs(sigs_three_corrected, 0.035, -0.0025);
 %plot_phis(phi_stars, [-0.005 0.03], 1, 'phi-*', labelled_subplot);
 plot_phis(phi_stars, [-0.002 0.03], 1, 'phi-*', sort_phi, labelled_subplot);
 % Add t-tests for delta
-[sigs_star_corrected, sigs_star] = phi_tests(phi_stars, q);
+[sigs_star_corrected, sigs_star] = phi_tests(phi_stars, q, sort_phi);
 %plot_sigs(sigs_star_corrected, 0.025, -0.0025);
 plot_sigs(sigs_star_corrected, 0.018, -0.001);
 
@@ -236,7 +236,7 @@ end
 
 %% Function: t-tests for each channel set
 
-function [sigs_corrected, sigs] = phi_tests(phis, q)
+function [sigs_corrected, sigs] = phi_tests(phis, q, sort_sets)
 % Conducts a t-test at each channel set, and corrects using FDR
 % Also plots significances
 
@@ -244,6 +244,14 @@ function [sigs_corrected, sigs] = phi_tests(phis, q)
 phis_all = [];
 % Concatenate results
 for nChannels_counter = 1 : numel(phis)
+    if sort_sets == 1
+        % Get sorting indices for condition 1
+        [~, indices] = sort_linear_index(phis{nChannels_counter}.phis_raw(:, :, :, 1, :), 1, 'descend');
+        for condition = 1 : size(phis{nChannels_counter}.phis_raw, 4)
+            tmp = phis{nChannels_counter}.phis_raw(:, :, :, condition, :);
+            phis{nChannels_counter}.phis_raw(:, :, :, condition, :) = tmp(indices);
+        end
+    end
     phis_all = cat(1, phis_all, phis{nChannels_counter}.phis_raw);
 end
 
@@ -274,7 +282,7 @@ end
 function [] = plot_sigs(sigs, height, height_nonsig)
 % Adds asterisks to each subplot
 
-alpha = 0.1;%0.025;
+alpha = 0.1;% 0.1; %0.025;
 
 for tau = 1 : size(sigs, 2)
     subplot(3, 3, tau*3); hold on;

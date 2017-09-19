@@ -1,71 +1,9 @@
-%{
-Figure creation for research proposal
-
-Experimental setup > data > binarised data > transition probability matrix
-> phi
-%}
-
-%{
-dimensions = [3 10]; % channels x samples
-sample_range = [-30 60];
-
-sample_data = rand(dimensions);
-sample_data = sample_range(1) + (sample_range(2) - sample_range(1)) .* sample_data;
-
-middle = median(sample_data(:));
-middle_mat = repmat(middle, dimensions);
-
-binarised_data = sample_data > middle_mat;
-
-figure;
-colormap('jet');
-subplot(4, 1, [1 2]);
-imagesc(sample_data);
-
-subplot(4, 1, [3 4]);
-imagesc(binarised_data); colorbar;
-%}
-
-%{
-% Load
-%load('../../flies/fly_data/trials_anesthDescAdded11092014_bPlrRerefTyp2/Analyzed_WalkingDrosDror115610072014/trials.mat');
-load('../../flies/fly_data_lineNoiseRemoved/Analyzed_WalkingDrosDror115610072014/trials.mat');
-
-channels = (1:2);
-samples = (81787:81787+19);
-
-sample_data = [trials.LFP];
-sample_data = sample_data(channels, samples);
-
-% Each channel is binarised based on its median value
-middle = median(sample_data, 2);
-middle_mat = repmat(middle, [1 length(samples)]);
-%middle_mat = repmat(median(sample_data(:)), [length(channels) length(samples)]);
-
-binarised_data = sample_data > middle_mat;
-
-figure;
-sub1 = subplot(4, 1, [1 2]);
-imagesc(sample_data); cbar = colorbar;
-set(gca, 'YTick', [1 2 3], 'XTickLabel', '');
-xlabel(cbar, '\muV');
-colormap(sub1, 'jet');
-
-sub2 = subplot(4, 1, [3 4]);
-imagesc(binarised_data);
-set(gca, 'YTick', [1 2 3]);
-cbar = colorbar; caxis([0 1]);
-set(cbar, 'YTick', [0.25 0.75], 'YTickLabel', {'off', 'on'});
-xlabel('time sample'); ylabel('channel');
-colormap(sub2, [0 0 0; 1 1 1]);
-%}
-
 %% Settings
 
 fly = 1;
-channels = [5 6];
-trial = 4;
-samples = (1:10); %(101:110);
+channels = [5 6]; %[5 6];
+trial = 1;
+samples = (101:120); %(101:110);
 condition = 1;
 tau = 1;
 
@@ -97,31 +35,60 @@ channel_data = binarised_data; %fly_data_binarised(samples, channels, trial, fly
 tpm = build_tpm(channel_data, 1, n_values);
 
 % Independent TPM
-tpm_ind = build_tpm_independent(channel_data, 1, n_values)
+[tpm_ind, ind_a, ind_b] = build_tpm_independent(channel_data, 1, n_values);
 
 %% Plot data
 figure;
-data_plot = subplot(2, 1, 1);
+data_plot = subplot(5, 6, (1:3));
 imagesc(raw_data'); cbar = colorbar;
 set(gca, 'YTick', [1 2 3], 'XTickLabel', '');
 xlabel(cbar, '\muV');
+ylabel('channel');
 colormap(data_plot, 'jet');
 
-binarised_plot = subplot(2, 1, 2);
+binarised_plot = subplot(5, 6, (7:9));
 imagesc(channel_data');
 set(gca, 'YTick', [1 2]);
 cbar = colorbar; caxis([0 1]);
-set(cbar, 'YTick', [0.25 0.75], 'YTickLabel', {'off', 'on'});
+set(cbar, 'YTick', [0.25 0.75], 'YTickLabel', {'off (0)', 'on (1)'});
 xlabel('time sample'); ylabel('channel');
 colormap(binarised_plot, [0 0 0; 1 1 1]);
 
 %% Plot TPMs
 
-figure;
-imagesc(tpm); colorbar;
+states_ind = {'0', '1'};
+states = {'00', '01', '10', '11'};
+
+plim = [0 1]; % Probability colourbar
+
+% Empirical TPM
+tpm_plot = subplot(5, 6, [4.5 5.2 10.5 11.2]);
+imagesc(tpm, plim); cbar = colorbar; xlabel(cbar, 'P');
+set(gca, 'XTick', [1 2 3 4], 'YTick', [1 2 3 4], 'YTickLabel', states, 'XTickLabel', states);
+xlabel('state t+1'); ylabel('state t');
+%colormap(tpm_plot, 'gray');
+
+% Independent channel TPMs
+ind_a_plot = subplot(5, 6, [13 13.1]+6);
+imagesc(ind_a, plim); cbar = colorbar; cbar.Visible = 'off';
+set(gca, 'XTick', [1 2], 'YTick', [1 2], 'YTickLabel', states_ind, 'XTickLabel', states_ind);
+xlabel('t+1'); ylabel('t');
+%colormap(ind_a_plot, 'gray');
+ind_b_plot = subplot(5, 6, [15 15.1]+6);
+imagesc(ind_b, plim); cbar = colorbar; cbar.Visible = 'off';
+set(gca, 'XTick', [1 2], 'YTick', [1 2], 'YTickLabel', states_ind, 'XTickLabel', states_ind);
+xlabel('t+1'); ylabel('t');
+%colormap(ind_b_plot, 'gray');
+
+% Independent TPM (product of indepent channel TPMs)
+tpm_ind_plot = subplot(5, 6, [4.5 5.2 10.5 11.2]+18);
+imagesc(tpm_ind, plim); cbar = colorbar; xlabel(cbar, 'P');
+set(gca, 'XTick', [1 2 3 4], 'YTick', [1 2 3 4], 'YTickLabel', states, 'XTickLabel', states);
+xlabel('state t+1'); ylabel('state t');
+%colormap(tpm_ind_plot, 'gray');
 
 %% Function: build independent TPM from 2 channel data
-function [tpm] = build_tpm_independent(channel_data, tau, n_values)
+function [tpm, a, b] = build_tpm_independent(channel_data, tau, n_values)
 % For the 2 channel scenario
 % Multiplies two (independent) TPMs together using Kronecker Tensor
 % multiplication (kron())
