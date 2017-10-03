@@ -29,21 +29,21 @@ data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim'.
 
 %% LOAD
 
-% disp('loading');
-% % Phi-3
-% load([data_directory data_filename '_phithree.mat']);
-% phi_threes = phis;
-% 
-% % Phi-star
-% load([data_directory data_filename '_phistar.mat']);
-% phi_stars = phis;
-% 
-% disp('loaded');
-% 
-% for nChannels_counter = 1 : length(phi_threes)
-%     phi_threes{nChannels_counter}.phis = phi_threes{nChannels_counter}.phi_threes;
-%     phi_stars{nChannels_counter}.phis = phi_stars{nChannels_counter}.phi_stars;
-% end
+disp('loading');
+% Phi-3
+load([data_directory data_filename '_phithree.mat']);
+phi_threes = phis;
+
+% Phi-star
+load([data_directory data_filename '_phistar.mat']);
+phi_stars = phis;
+
+disp('loaded');
+
+for nChannels_counter = 1 : length(phi_threes)
+    phi_threes{nChannels_counter}.phis = phi_threes{nChannels_counter}.phi_threes;
+    phi_stars{nChannels_counter}.phis = phi_stars{nChannels_counter}.phi_stars;
+end
 
 %% Sort channel sets by phi
 % Sort, within channels-used, by air phi
@@ -68,7 +68,7 @@ for nChannels_counter = 1 : numel(phi_threes)
     phi_threes{nChannels_counter}.phis_std = squeeze(std(mean(phi_threes{nChannels_counter}.phi_threes(:, :, flies, :, :), 2), [], 3)) / sqrt(length(flies));
     phi_stars{nChannels_counter}.phis_std = squeeze(std(mean(phi_stars{nChannels_counter}.(star_metric)(:, :, flies, :, :), 2), [], 3)) / sqrt(length(flies));
     
-    % Delta (air - iso)
+    % Delta (air - iso) (absolute)
     phi_threes{nChannels_counter}.phis_delta = squeeze(mean(mean(phi_threes{nChannels_counter}.phi_threes(:, :, flies, 1, :) - phi_threes{nChannels_counter}.phi_threes(:, :, flies, 2, :), 2), 3));
     phi_stars{nChannels_counter}.phis_delta = squeeze(mean(mean(phi_stars{nChannels_counter}.(star_metric)(:, :, flies, 1, :) - phi_stars{nChannels_counter}.(star_metric)(:, :, flies, 2, :), 2), 3));
     
@@ -76,17 +76,29 @@ for nChannels_counter = 1 : numel(phi_threes)
     phi_threes{nChannels_counter}.phis_delta_std = squeeze(std(mean(phi_threes{nChannels_counter}.phi_threes(:, :, flies, 1, :) - phi_threes{nChannels_counter}.phi_threes(:, :, flies, 2, :), 2), [], 3)) / sqrt(length(flies));
     phi_stars{nChannels_counter}.phis_delta_std = squeeze(std(mean(phi_stars{nChannels_counter}.(star_metric)(:, :, flies, 1, :) - phi_stars{nChannels_counter}.(star_metric)(:, :, flies, 2, :), 2), [], 3)) / sqrt(length(flies));
     
+%     % Delta (air - iso / air) (relative)
+%     phi_threes{nChannels_counter}.phis_delta = squeeze(mean(mean((phi_threes{nChannels_counter}.phi_threes(:, :, flies, 1, :) - phi_threes{nChannels_counter}.phi_threes(:, :, flies, 2, :)) ./ phi_threes{nChannels_counter}.phi_threes(:, :, flies, 1, :), 2), 3));
+%     phi_stars{nChannels_counter}.phis_delta = squeeze(mean(mean((phi_stars{nChannels_counter}.(star_metric)(:, :, flies, 1, :) - phi_stars{nChannels_counter}.(star_metric)(:, :, flies, 2, :)) ./ phi_stars{nChannels_counter}.(star_metric)(:, :, flies, 1, :), 2), 3));
+%     
+%     % Delta std (air - iso)
+%     phi_threes{nChannels_counter}.phis_delta_std = squeeze(std(mean((phi_threes{nChannels_counter}.phi_threes(:, :, flies, 1, :) - phi_threes{nChannels_counter}.phi_threes(:, :, flies, 2, :)) ./phi_threes{nChannels_counter}.phi_threes(:, :, flies, 1, :), 2), [], 3)) / sqrt(length(flies));
+%     phi_stars{nChannels_counter}.phis_delta_std = squeeze(std(mean((phi_stars{nChannels_counter}.(star_metric)(:, :, flies, 1, :) - phi_stars{nChannels_counter}.(star_metric)(:, :, flies, 2, :)) ./ phi_stars{nChannels_counter}.(star_metric)(:, :, flies, 1, :), 2), [], 3)) / sqrt(length(flies));
 end
 %% Plot all phi values on a single axis
 % Uses natural channel-set ordering
 
-q = 0.01;
+q = 0.05;
 labelled_subplot = 7;
 sort_phi = 0;
 
+phis_concatenated = struct();
+phis_concatenated.threes = struct();
+phis_concatenated.stars = struct();
+
 % Phi-3
-%plot_phis(phi_threes, [-0.005 0.06], 1, 'phi-3', labelled_subplot);
-plot_phis(phi_threes, [-0.005 0.05], 1, 'phi-3', sort_phi, labelled_subplot);
+[phis_concatenated.threes.all, phis_concatenated.threes.stds, phis_concatenated.threes.deltas, phis_concatenated.threes.delta_stds, channel_ticks, channel_labels] =...
+    plot_phis(phi_threes, [-0.005 0.05], 1, 'phi-3', sort_phi, labelled_subplot);
+%plot_phis(phi_threes, [-1.5 1.5], 1, 'phi-3', sort_phi, labelled_subplot);
 % Add t-tests for delta
 [sigs_three_corrected, sigs_three] = phi_tests(phi_threes, q, sort_phi);
 %plot_sigs(sigs_three_corrected, 0.05, -0.0025);
@@ -94,13 +106,208 @@ plot_sigs(sigs_three_corrected, 0.035, -0.0025);
 
 
 % Phi-star
-%plot_phis(phi_stars, [-0.005 0.03], 1, 'phi-*', labelled_subplot);
-plot_phis(phi_stars, [-0.002 0.03], 1, 'phi-*', sort_phi, labelled_subplot);
+[phis_concatenated.stars.all, phis_concatenated.stars.stds, phis_concatenated.stars.deltas, phis_concatenated.stars.delta_stds, channel_ticks, channel_labels] =...
+    plot_phis(phi_stars, [-0.002 0.03], 1, 'phi-*', sort_phi, labelled_subplot);
+%plot_phis(phi_stars, [-1.5 1.5], 1, 'phi-*', sort_phi, labelled_subplot);
 % Add t-tests for delta
 [sigs_star_corrected, sigs_star] = phi_tests(phi_stars, q, sort_phi);
 %plot_sigs(sigs_star_corrected, 0.025, -0.0025);
 plot_sigs(sigs_star_corrected, 0.018, -0.001);
 
+%% Plot portion of significance per nChannels
+
+total_channels = 15;
+
+sig_portions = struct();
+sig_portions.phi_threes = zeros(length(phi_threes), length(phi_threes{1}.taus));
+sig_portions.phi_stars = zeros(length(phi_threes), length(phi_threes{1}.taus));
+
+set_counter = 1;
+for nChannels_counter = 1 : length(phi_threes)
+    sig_sets = double(nchoosek(total_channels, phi_threes{nChannels_counter}.nChannels));
+    sig_portions.phi_threes(nChannels_counter, :) = 100 * sum(sigs_three_corrected(set_counter:set_counter+sig_sets-1, :), 1) / sig_sets;
+    sig_portions.phi_stars(nChannels_counter, :) = 100 * sum(sigs_star_corrected(set_counter:set_counter+sig_sets-1, :), 1) / sig_sets;
+    set_counter = set_counter + sig_sets;
+end
+
+figure;
+subplot(1, 2, 1);
+bar(sig_portions.phi_threes);
+subplot(1, 2, 2);
+bar(sig_portions.phi_stars);
+xlabel('nChannels');
+
+%% Plot figure for phi three and phi star
+% Top row = delta across flies, one tau
+% Second row = comparisons at each tau (x3); percentage of significant
+% decreases per nChannels
+
+% RUN main_avi_plot.m FIRST (loading appropriate phi table of course)
+
+plot_tau = 1;
+plot_metric = 'threes';
+
+figure;
+subplot(2, length(phi_threes{1}.taus)+1, [1 length(phi_threes{1}.taus)+1]);
+bar(phis_concatenated.(plot_metric).deltas(:, plot_tau));
+hold on;
+errorbar((1:size(phis_concatenated.(plot_metric).deltas, 1)), phis_concatenated.(plot_metric).deltas(:, plot_tau), zeros(size(phis_concatenated.(plot_metric).deltas, 1), 1), phis_concatenated.(plot_metric).delta_stds(:, plot_tau), 'k', 'LineStyle', 'none', 'LineWidth', 0.1, 'CapSize', 0);
+if strcmp(plot_metric, 'threes')
+    axis([-24 size(phis_concatenated.(plot_metric).deltas, 1)+25 -0.005 0.035])
+    %set(gca, 'yscale', 'log');
+else
+    axis([-24 size(phis_concatenated.(plot_metric).deltas, 1)+25 -0.005 0.02])
+    %set(gca, 'yscale', 'log');
+end
+ylabel(char(981), 'FontSize', 15, 'rotation', 0);
+xlabel('channels in set');
+xticks(channel_ticks); xticklabels(channel_labels);
+
+% Relies on results from previous plots
+for tau_counter = 1 : length(taus)
+    s = subplot(2, length(phi_threes{1}.taus)+1, length(phi_threes{1}.taus)+1+tau_counter);
+    [bars, errors] = barwitherr(plot_data_perTau.stds(:, :, tau_counter), plot_data_perTau.means(:, :, tau_counter));
+    if strcmp(plot_metric, 'threes')
+        axis([0.5 2.5 0 0.028]);
+        set(gca, 'XTick', [1 2], 'XTickLabel', {'air', 'iso'}, 'YTick', [0 0.01 0.02]);
+    else
+        axis([0.5 2.5 0 0.005]);
+        set(gca, 'XTick', [1 2], 'XTickLabel', {'air', 'iso'});
+    end
+    title(['\tau = ' num2str(taus(tau_counter)) ' ms'], 'FontSize', 15);
+    s.XAxis.FontSize = 15;
+    set(errors, 'LineWidth', 0.1, 'CapSize', 0);
+    set(bars(3), 'FaceColor', 'g');
+    if tau_counter == 1
+        ylabel(char(981), 'FontSize', 15, 'rotation', 0);
+        legend('2ch', '3ch', '4ch');
+    end
+end
+
+subplot(2, length(phi_threes{1}.taus)+1, 2*(length(phi_threes{1}.taus)+1));
+bars = bar(sig_portions.(['phi_' plot_metric])');
+set(bars(3), 'FaceColor', 'g');
+set(gca, 'XTick', [1 2 3], 'XTickLabel', phi_threes{1}.taus);
+xlabel('\tau', 'FontSize', 15, 'rotation', 0);
+
+%% Plot main effects after averaging across other effects
+
+plot_tau = 1;
+plot_metric = 'stars';
+
+figure;
+subplot(2, length(phi_threes{1}.taus)+1, [1 length(phi_threes{1}.taus)+1]);
+bar(phis_concatenated.(plot_metric).deltas(:, plot_tau));
+hold on;
+errorbar((1:size(phis_concatenated.(plot_metric).deltas, 1)), phis_concatenated.(plot_metric).deltas(:, plot_tau), zeros(size(phis_concatenated.(plot_metric).deltas, 1), 1), phis_concatenated.(plot_metric).delta_stds(:, plot_tau), 'k', 'LineStyle', 'none', 'LineWidth', 0.1, 'CapSize', 0);
+if strcmp(plot_metric, 'threes')
+    axis([-24 size(phis_concatenated.(plot_metric).deltas, 1)+25 -0.005 0.035])
+    %set(gca, 'yscale', 'log');
+else
+    axis([-24 size(phis_concatenated.(plot_metric).deltas, 1)+25 -0.005 0.02])
+    %set(gca, 'yscale', 'log');
+end
+ylabel(char(981), 'FontSize', 15, 'rotation', 0);
+xlabel('channels in set');
+xticks(channel_ticks); xticklabels(channel_labels)
+
+% Build matrix holding average across channel sets (nChannels x conditions
+% x taus x flies)
+field = ['phi_' plot_metric];
+effects_matrix.phi_threes = zeros(length(phi_threes), size(phi_threes{1}.phi_threes, 4), size(phi_threes{1}.phi_threes, 5), size(phi_threes{1}.phi_threes, 3));
+effects_matrix.phi_stars = zeros(length(phi_threes), size(phi_threes{1}.phi_threes, 4), size(phi_threes{1}.phi_threes, 5), size(phi_threes{1}.phi_threes, 3));
+
+for nChannels_counter = 1 : length(phi_threes)
+    for condition_counter = 1 : size(phi_threes{nChannels_counter}.phi_threes, 4)
+        for tau_counter = 1 : size(phi_threes{nChannels_counter}.phi_threes, 5)
+            for fly_counter = 1 : size(phi_threes{nChannels_counter}.phi_threes, 3)
+            effects_matrix.phi_threes(nChannels_counter, condition_counter, tau_counter, fly_counter) =...
+                mean(mean(phi_threes{nChannels_counter}.phi_threes(:, :, fly_counter, condition_counter, tau_counter), 2));
+            effects_matrix.phi_stars(nChannels_counter, condition_counter, tau_counter, fly_counter) =...
+                mean(mean(phi_stars{nChannels_counter}.phi_stars(:, :, fly_counter, condition_counter, tau_counter), 2));
+            end
+        end
+    end
+end
+
+% Subplots for each effect
+% Average across flies, then other effects
+
+if strcmp(plot_metric, 'threes')
+    ylimit = 0.018;
+else
+    ylimit = 0.004;
+end
+
+% Condition
+s = subplot(2, 4, 5);
+effect = mean(mean(mean(effects_matrix.(field), 1), 3), 4);
+effect_std = std(mean(mean(effects_matrix.(field), 1), 3), [], 4) / sqrt(size(effects_matrix.(field), 4));
+bar([1 2], effect); hold on;
+errorbar((1:length(effect)), effect, effect_std, effect_std, 'k', 'LineStyle', 'none', 'CapSize', 0);
+set(gca, 'XTick', [1 2], 'XTickLabel', {'air', 'iso'});
+axis([0.5 2.5 0 ylimit]);
+ylabel(char(981), 'FontSize', 15, 'rotation', 0);
+
+% Number of channels
+s = subplot(2, 4, 6);
+effect = mean(mean(mean(effects_matrix.(field), 2), 3), 4);
+effect_std = std(mean(mean(effects_matrix.(field), 2), 3), [], 4) / sqrt(size(effects_matrix.(field), 4));
+bar(effect); hold on;
+errorbar((1:length(effect)), effect, effect_std, effect_std, 'k', 'LineStyle', 'none', 'CapSize', 0);
+set(gca, 'XTick', [1 2 3], 'XTickLabel', [2 3 4], 'YTick', []);
+axis([0.5 3.5 0 ylimit]);
+xlabel('channels');
+
+% Lag
+s = subplot(2, 4, 7);
+effect = squeeze(mean(mean(mean(effects_matrix.(field), 1), 2), 4));
+effect_std = squeeze(std(mean(mean(effects_matrix.(field), 1), 2), [], 4) / sqrt(size(effects_matrix.(field), 4)));
+bar(effect); hold on;
+errorbar((1:length(effect)), effect, effect_std, effect_std, 'k', 'LineStyle', 'none', 'CapSize', 0);
+set(gca, 'XTick', [1 2 3], 'XTickLabel', [4 8 16], 'YTick', []);
+axis([0.5 3.5 0 ylimit]);
+xlabel('\tau');
+
+% Portion of significant decreases
+subplot(2, length(phi_threes{1}.taus)+1, 2*(length(phi_threes{1}.taus)+1));
+bars = bar(sig_portions.(['phi_' plot_metric])');
+%set(bars(3), 'FaceColor', 'g');
+set(gca, 'XTick', [1 2 3], 'XTickLabel', phi_threes{1}.taus);
+ylabel('%', 'rotation', 0);
+xlabel('\tau');
+
+%% Find portion of decreases per fly
+
+% decrease_portions = struct();
+% [decrease_portions.threes, decrease_counts.threes] = decrease_portion(phi_threes);
+% [decrease_portions.stars, decrease_counts.stars] = decrease_portion(phi_stars);
+% 
+% figure;
+% subplot(1, 2, 1);
+% bar(mean(decrease_portions.threes, 3));
+% subplot(1, 2, 2);
+% bar(mean(decrease_portions.stars, 3));
+% 
+% function [portions, counts] = decrease_portion(phis)
+% % Outputs:
+% %   portions = matrix (nChannels x tau x flies); gives percentage of sets
+% %   (of size nChannels) for which phi decreased in isoflurane; averaged
+% %   across trials
+% 
+% portions = zeros(length(phis), length(phis{1}.taus), size(phis{1}.phis_raw, 3));
+% counts = zeros(length(phis), length(phis{1}.taus), size(phis{1}.phis_raw, 3));
+% for nChannels_counter = 1 : length(phis)
+%     phi_diffs = permute(phis{nChannels_counter}.phis_raw(:, :, :, 1, :) - phis{nChannels_counter}.phis_raw(:, :, :, 2, :), [1 2 3 5 4]);
+%     decreased = phi_diffs > 0;
+%     nSets = size(decreased, 1); 
+%     decreased = permute(sum(decreased, 1), [2 3 4 1]); % Sum across sets
+%     decreased = permute(mean(decreased, 1), [3 2 1]); % Average across trials
+%     portions(nChannels_counter, :, :) = 100 * decreased / nSets;
+%     counts(nChannels_counter, :, :) = decreased;
+% end
+% 
+% end
 
 %% Function: sort all phi values
 
@@ -126,7 +333,7 @@ end
 
 %% Function: concatenate all phi values and plot on a single axis
 
-function [] = plot_phis(phis, y_limits, errorbars, ylabel_text, sort_sets, labelled_subplot)
+function [phis_all, phis_all_stds, phis_all_delta, phis_all_delta_std, channel_ticks, channel_labels] = plot_phis(phis, y_limits, errorbars, ylabel_text, sort_sets, labelled_subplot)
 % Plots all phis (for all nChannels used) on a single axis
 %
 % Inputs:

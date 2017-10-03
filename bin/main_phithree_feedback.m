@@ -30,49 +30,49 @@ data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim'.
 % load([data_directory data_filename '_phithree.mat']);
 % 
 % disp('loaded');
-
-%% Reformat MIPs if necessary
-
-% .mips should have dimensions corresponding to set, fly, condition, etc.
-% If not, it will have size of length 2, with the first dimension being a combination of all parameters
-if length(size(phis{1}.mips)) == 2
-    
-    % If partitions only consist of groups of one element (i.e. for 2 channels), then mips are stored in an array
-    % We want to conver this to a cell
-    if isa(phis{1}.mips, 'int64')
-        phis{1}.mips = num2cell(phis{1}.mips);
-    end
-    
-    % 4th dimension is nFlies (should be the same as specified during setup)
-    [nStates, nSets, nFlies, nConditions, nTaus] = size(phis{1}.state_phis);
-    
-    % Looks like the partitions only splits into 2 groups
-    % MIPs are calculated per state, not per trial
-    % (only variance across trials is the state-weighting when averaging phi)
-    mips_formatted = cell(nStates, nSets, nFlies, nConditions, nTaus);
-    
-    % Iterate through in same order as python3 script and reformat
-    mip_counter = 1;
-    for fly = 1 : nFlies
-        for condition = 1 : nConditions
-            for tau = 1 : nTaus
-                for set = 1 : nSets
-                    for state = 1 : nStates
-                        cut{1} = phis{1}.mips(mip_counter, :);
-                        mips_formatted(state, set, fly, condition, tau) = cut;
-                        mip_counter = mip_counter + 1;
-                    end
-                end
-            end
-        end
-    end
-    
-    % Replace the unformatted .mips with the new format
-    phis{1}.mips = mips_formatted;
-end
-
-%% Relabel MIPs to have the actual channel label (instead of always 0, 1, 2, 3)
-
+% 
+% %% Reformat MIPs if necessary
+% 
+% % .mips should have dimensions corresponding to set, fly, condition, etc.
+% % If not, it will have size of length 2, with the first dimension being a combination of all parameters
+% if length(size(phis{1}.mips)) == 2
+%     
+%     % If partitions only consist of groups of one element (i.e. for 2 channels), then mips are stored in an array
+%     % We want to conver this to a cell
+%     if isa(phis{1}.mips, 'int64')
+%         phis{1}.mips = num2cell(phis{1}.mips);
+%     end
+%     
+%     % 4th dimension is nFlies (should be the same as specified during setup)
+%     [nStates, nSets, nFlies, nConditions, nTaus] = size(phis{1}.state_phis);
+%     
+%     % Looks like the partitions only splits into 2 groups
+%     % MIPs are calculated per state, not per trial
+%     % (only variance across trials is the state-weighting when averaging phi)
+%     mips_formatted = cell(nStates, nSets, nFlies, nConditions, nTaus);
+%     
+%     % Iterate through in same order as python3 script and reformat
+%     mip_counter = 1;
+%     for fly = 1 : nFlies
+%         for condition = 1 : nConditions
+%             for tau = 1 : nTaus
+%                 for set = 1 : nSets
+%                     for state = 1 : nStates
+%                         cut{1} = phis{1}.mips(mip_counter, :);
+%                         mips_formatted(state, set, fly, condition, tau) = cut;
+%                         mip_counter = mip_counter + 1;
+%                     end
+%                 end
+%             end
+%         end
+%     end
+%     
+%     % Replace the unformatted .mips with the new format
+%     phis{1}.mips = mips_formatted;
+% end
+% 
+% %% Relabel MIPs to have the actual channel label (instead of always 0, 1, 2, 3)
+% 
 % for nChannels = 1 : length(phis)
 %     for tau = 1 : size(phis{nChannels}.mips, 5)
 %         for condition = 1 : size(phis{nChannels}.mips, 4)
@@ -93,15 +93,15 @@ end
 %         end
 %     end
 % end
-
-%% Filter out sets which have a periphery and a centre channel
-
-% Take only trials which contain a periphery channel and a central channel
-[phis{1}.mips, phis{1}.state_counters, phis{1}.state_phis, phis{1}.channel_sets, phis{1}.phi_threes] = group_filter(phis{1}.mips, phis{1}.state_counters, phis{1}.state_phis, phis{1}.channel_sets, phis{1}.phi_threes, groupings);
-
-for nChannels = 1 : length(phis)
-    [phis{nChannels}.mips, phis{nChannels}.state_counters, phis{nChannels}.state_phis, phis{nChannels}.channel_sets, phis{nChannels}.phi_threes] = group_filter(phis{nChannels}.mips, phis{nChannels}.state_counters, phis{nChannels}.state_phis, phis{nChannels}.channel_sets, phis{nChannels}.phi_threes, groupings);
-end
+% 
+% %% Filter out sets which have a periphery and a centre channel
+% 
+% % Take only trials which contain a periphery channel and a central channel
+% [phis{1}.mips, phis{1}.state_counters, phis{1}.state_phis, phis{1}.channel_sets, phis{1}.phi_threes] = group_filter(phis{1}.mips, phis{1}.state_counters, phis{1}.state_phis, phis{1}.channel_sets, phis{1}.phi_threes, groupings);
+% 
+% for nChannels = 1 : length(phis)
+%     [phis{nChannels}.mips, phis{nChannels}.state_counters, phis{nChannels}.state_phis, phis{nChannels}.channel_sets, phis{nChannels}.phi_threes] = group_filter(phis{nChannels}.mips, phis{nChannels}.state_counters, phis{nChannels}.state_phis, phis{nChannels}.channel_sets, phis{nChannels}.phi_threes, groupings);
+% end
 
 %% Portion of feedback cuts per trial, considering all MIPs
 
@@ -117,14 +117,22 @@ phis_unmoded.feedback_portions = phis_unmoded.feedback_counts / sum(phis{1}.stat
 % Average across sets and trials
 %phis_unmoded.feedback_counts = squeeze(mean(mean(phis_unmoded.feedback_counts, 1), 2));
 
-% Test for differing portions after averaging at each tau level
-sigs = zeros(size(phis_unmoded.feedback_portions, 5), 1);
+% Test for different portion than chance
+sigs = zeros(size(phis_unmoded.feedback_portions, 5), size(phis_unmoded.feedback_portions, 4));
+chance_level = 0.5;
+anova_data = [];
 for tau = 1 : size(phis_unmoded.feedback_portions, 5)
-    air = squeeze(mean(phis_unmoded.feedback_portions(:, :, :, 1, tau), 2));
-    iso = squeeze(mean(phis_unmoded.feedback_portions(:, :, :, 2, tau), 2));
+    air = squeeze(mean(mean(phis_unmoded.feedback_portions(:, :, :, 1, tau), 2), 1));
+    iso = squeeze(mean(mean(phis_unmoded.feedback_portions(:, :, :, 2, tau), 2), 1));
     
-    [decision, sigs(tau)] = ttest(air(:), iso(:));
+    [decision, sigs(tau, 1)] = ttest(air(:), 0.5);
+    [decision, sigs(tau, 2)] = ttest(iso(:), 0.5);
+    
+    anova_data = [anova_data [air(:); iso(:)]];
 end
+
+% ANOVA for effects of tau and condition
+[anova_p, anova_table] = anova2(anova_data, size(phis_unmoded.feedback_portions, 3));
 
 % Create barplot matrix (rows group bars together)
 portion_plot = permute(squeeze(mean(mean(mean(phis_unmoded.feedback_portions, 1), 2), 3)), [2 1]);
@@ -134,6 +142,7 @@ bar((1:3)-0.15, portion_plot(:, 1), 0.25); hold on;
 bar((1:3)+0.15, portion_plot(:, 2), 0.25, 'r');
 errorbar((1:3)-0.15, portion_plot(:, 1), portion_plot_err(:, 1), 'k', 'LineStyle', 'none', 'LineWidth', 1);
 errorbar((1:3)+0.15, portion_plot(:, 2), portion_plot_err(:, 2), 'k', 'LineStyle', 'none', 'LineWidth', 1);
+line([0.5 3.5], [chance_level chance_level], 'Color', 'black', 'LineStyle', ':', 'Linewidth', 2);
 xticks((1:3));
 xticklabels((phis{1}.taus));
 xlabel('tau lag (ms)');

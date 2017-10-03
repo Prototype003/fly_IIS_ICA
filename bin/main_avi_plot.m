@@ -17,7 +17,7 @@ conditions = (1:2);
 
 %% Load
 
-phi_type = 'three';
+phi_type = 'star'; % 'three' or 'star'
 
 data_nChannels = '2t4';
 data_detrended = 0;
