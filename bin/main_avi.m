@@ -11,7 +11,7 @@ Test is conducted using LME with model comparisons (to the null)
 
 %% SETUP
 
-phi_type = 'star';
+phi_type = 'three';
 
 data_nChannels = '2t4';
 data_detrended = 0;
@@ -132,25 +132,25 @@ for null = 1 : length(model_null_specs)
 end
 
 %% Likelihood ratio test
-% Likelihood ratio test is anticonservative when testing for fixed effects, so use simulated test
-
-iterations = 1000;
-
-options = statset('LinearMixedModel');
-options.UseParallel = true;
-
-compute_pool = parpool();
-
-model_comparisons = cell(length(model_nulls), 1);
-model_comparisons_sim = cell(length(model_nulls), 1);
-for null = 1 : length(model_nulls)
-    disp(['conducting likelihood ratio tests (sim) on: ' model_null_specs{null}]);
-    [model_comparisons{null}, model_comparisons_sim{null}] = compare(model_nulls{null}, model_full, 'NSim', iterations, 'Options', options);
-    %model_comparisons{null} = compare(model_nulls{null}, model_full);
-    disp('completed');
-end
-
-delete(compute_pool);
+% % Likelihood ratio test is anticonservative when testing for fixed effects, so use simulated test
+% 
+% iterations = 1000;
+% 
+% options = statset('LinearMixedModel');
+% options.UseParallel = true;
+% 
+% compute_pool = parpool();
+% 
+% model_comparisons = cell(length(model_nulls), 1);
+% model_comparisons_sim = cell(length(model_nulls), 1);
+% for null = 1 : length(model_nulls)
+%     disp(['conducting likelihood ratio tests (sim) on: ' model_null_specs{null}]);
+%     [model_comparisons{null}, model_comparisons_sim{null}] = compare(model_nulls{null}, model_full, 'NSim', iterations, 'Options', options);
+%     %model_comparisons{null} = compare(model_nulls{null}, model_full);
+%     disp('completed');
+% end
+% 
+% delete(compute_pool);
 
 %% Save results
 

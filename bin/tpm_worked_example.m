@@ -8,13 +8,13 @@ condition = 1;
 tau = 1;
 
 %% Load
-% data_directory = 'workspace_results/';
-% data_file = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim';
-% 
-% disp("Loading fly data");
-% loaded_data = load([data_directory data_file '.mat']);
-% fly_data = loaded_data.fly_data; % Reminder: dimensions are: (samples x channels x trials x flies x conditions)
-% disp("Fly data loaded")
+data_directory = 'workspace_results/';
+data_file = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim';
+
+disp("Loading fly data");
+loaded_data = load([data_directory data_file '.mat']);
+fly_data = loaded_data.fly_data; % Reminder: dimensions are: (samples x channels x trials x flies x conditions)
+disp("Fly data loaded")
 
 %%
 
