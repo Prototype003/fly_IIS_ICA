@@ -29,21 +29,21 @@ data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim'.
 
 %% LOAD
 
-disp('loading');
-% Phi-3
-load([data_directory data_filename '_phithree.mat']);
-phi_threes = phis;
-
-% Phi-star
-load([data_directory data_filename '_phistar.mat']);
-phi_stars = phis;
-
-disp('loaded');
-
-for nChannels_counter = 1 : length(phi_threes)
-    phi_threes{nChannels_counter}.phis = phi_threes{nChannels_counter}.phi_threes;
-    phi_stars{nChannels_counter}.phis = phi_stars{nChannels_counter}.phi_stars;
-end
+% disp('loading');
+% % Phi-3
+% load([data_directory data_filename '_phithree.mat']);
+% phi_threes = phis;
+% 
+% % Phi-star
+% load([data_directory data_filename '_phistar.mat']);
+% phi_stars = phis;
+% 
+% disp('loaded');
+% 
+% for nChannels_counter = 1 : length(phi_threes)
+%     phi_threes{nChannels_counter}.phis = phi_threes{nChannels_counter}.phi_threes;
+%     phi_stars{nChannels_counter}.phis = phi_stars{nChannels_counter}.phi_stars;
+% end
 
 %% Sort channel sets by phi
 % Sort, within channels-used, by air phi
@@ -195,7 +195,7 @@ xlabel('\tau', 'FontSize', 15, 'rotation', 0);
 plot_tau = 1;
 plot_metric = 'stars';
 
-figure;
+figure('units','normalized','outerposition',[0 0 1 0.5])
 subplot(2, length(phi_threes{1}.taus)+1, [1 length(phi_threes{1}.taus)+1]);
 bar(phis_concatenated.(plot_metric).deltas(:, plot_tau));
 hold on;
@@ -207,9 +207,13 @@ else
     axis([-24 size(phis_concatenated.(plot_metric).deltas, 1)+25 -0.005 0.02])
     %set(gca, 'yscale', 'log');
 end
-ylabel(char(981), 'FontSize', 15, 'rotation', 0);
+y = ylabel([char(981) '*'], 'FontSize', 15, 'rotation', 0);
+set(y, 'Units', 'Normalized', 'Position', [-0.1, 0.5, 0]);
 xlabel('channels in set');
 xticks(channel_ticks); xticklabels(channel_labels)
+curtick = get(gca, 'YTick');7
+set(gca, 'YTickLabel', cellstr(num2str(curtick(:))));
+
 
 % Build matrix holding average across channel sets (nChannels x conditions
 % x taus x flies)
@@ -247,7 +251,10 @@ bar([1 2], effect); hold on;
 errorbar((1:length(effect)), effect, effect_std, effect_std, 'k', 'LineStyle', 'none', 'CapSize', 0);
 set(gca, 'XTick', [1 2], 'XTickLabel', {'air', 'iso'});
 axis([0.5 2.5 0 ylimit]);
-ylabel(char(981), 'FontSize', 15, 'rotation', 0);
+y = ylabel([char(981) '*'], 'FontSize', 15, 'rotation', 0);
+set(y, 'Units', 'Normalized', 'Position', [-0.5, 0.5, 0]);
+curtick = get(gca, 'YTick');
+set(gca, 'YTickLabel', cellstr(num2str(curtick(:))));
 
 % Number of channels
 s = subplot(2, 4, 6);

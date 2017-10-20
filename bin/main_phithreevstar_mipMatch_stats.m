@@ -66,33 +66,33 @@ results_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreSti
     ];
 
 %% LOAD
-% disp('loading');
-% 
-% % Match results
-% load([results_directory results_filename]);
-% 
-% % Phi-star results (for exclusion of certain MIPs)
-% load([data_directory data_filename]);
-% 
-% matches_per_trial_bkp = matches_per_trial;
-% matches_bkp = matches;
-% 
-% disp('loaded')
-% 
-% %% Filter results
-% 
-% % Exclude results from MIPs which were not bipartitions (because these never match with phi-3 bipartitioning)
-% % In order to exclude MIPs which are not bipartitions, we sum the number of occurrences together, ignoring nonbipartitions
-% % Then average afterwards, correcting for the total number of samples
-% % this works because the number of samples is constant, so avg(total across trials) = avg(avg per trial)
-% 
-% matches_old = matches;
-% matches = cell(size(matches_old)); % update matches to have a matching format (cell array of structs) with matches_per_trial
-% for nChannels_counter = 1 : numel(matches_per_trial)
-%     [matches_per_trial{nChannels_counter}.matches_sum, matches_per_trial{nChannels_counter}.trial_totals] = sum_bipartitions_only(phis{nChannels_counter}.mips, matches_per_trial{nChannels_counter}.matches, matches_per_trial{nChannels_counter}.trial_total);
-%     matches{nChannels_counter}.matches = matches_old{nChannels_counter};
-%     [matches{nChannels_counter}.matches_sum, matches{nChannels_counter}.trial_totals] = sum_bipartitions_only(phis{nChannels_counter}.mips, matches{nChannels_counter}.matches, 1);
-% end
+disp('loading');
+
+% Match results
+load([results_directory results_filename]);
+
+% Phi-star results (for exclusion of certain MIPs)
+load([data_directory data_filename]);
+
+matches_per_trial_bkp = matches_per_trial;
+matches_bkp = matches;
+
+disp('loaded')
+
+%% Filter results
+
+% Exclude results from MIPs which were not bipartitions (because these never match with phi-3 bipartitioning)
+% In order to exclude MIPs which are not bipartitions, we sum the number of occurrences together, ignoring nonbipartitions
+% Then average afterwards, correcting for the total number of samples
+% this works because the number of samples is constant, so avg(total across trials) = avg(avg per trial)
+
+matches_old = matches;
+matches = cell(size(matches_old)); % update matches to have a matching format (cell array of structs) with matches_per_trial
+for nChannels_counter = 1 : numel(matches_per_trial)
+    [matches_per_trial{nChannels_counter}.matches_sum, matches_per_trial{nChannels_counter}.trial_totals] = sum_bipartitions_only(phis{nChannels_counter}.mips, matches_per_trial{nChannels_counter}.matches, matches_per_trial{nChannels_counter}.trial_total);
+    matches{nChannels_counter}.matches = matches_old{nChannels_counter};
+    [matches{nChannels_counter}.matches_sum, matches{nChannels_counter}.trial_totals] = sum_bipartitions_only(phis{nChannels_counter}.mips, matches{nChannels_counter}.matches, 1);
+end
 
 %% Overall matching percentage (without filtering for bipartition MIPs)
 

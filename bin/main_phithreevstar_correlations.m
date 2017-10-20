@@ -254,16 +254,16 @@ for nChannels_counter = 1 : length(correlations)
     end
 
 end
-
+    
 %% Plot figure
 % Top row: relationship between phis for one fly
 % Bottom row: coeffs for all flies
-plot_fly = 1;
+plot_fly = 11;
 condition_colours = 'rb';
 plot_tau = 1;
 tau_shapes = '*o^';
 
-figure;
+figure('units','normalized','outerposition',[0 0 1 0.5])
 for nChannels_counter = 1 : length(correlations)
     subplot(2, length(correlations), nChannels_counter);
     for tau_counter = 1 : plot_tau %size(phi_threes_avg{nChannels_counter}, 4)
@@ -276,9 +276,20 @@ for nChannels_counter = 1 : length(correlations)
         set(gca, 'xscale', 'log');
         set(gca, 'yscale', 'log'); % correlation test will be conducted after log transform
         axis tight
+        
+        curtick = get(gca, 'XTick');
+        set(gca, 'XTickLabel', cellstr(num2str(curtick(:))));
+        curtick = get(gca, 'YTick');
+        set(gca, 'YTickLabel', cellstr(num2str(curtick(:))));
+        
         title([num2str(phi_threes{nChannels_counter}.nChannels) ' channels']);
-        ylabel([char(981) '*'], 'FontSize', 15, 'rotation', 0);
-        xlabel(char(981), 'FontSize', 15, 'rotation', 0);
+        if nChannels_counter == 1
+            y = ylabel([char(981) '*'], 'FontSize', 25, 'rotation', 0);
+            set(y, 'Units', 'Normalized', 'Position', [-0.25, 0.5, 0]);
+            xlabel(char(981), 'FontSize', 25, 'rotation', 0);
+        end
+        
+        set(gca, 'FontSize', 12);
     end
 end
 
@@ -301,23 +312,101 @@ for nChannels_counter = 1 : length(correlations)
     end
 end
 
+% for nChannels_counter = 1 : length(correlations)
+%     subplot(2, length(correlations), nChannels_counter + length(correlations));
+%     
+%     for fly_counter = 1 : size(correlations{nChannels_counter}, 1)
+%         for tau_counter = 1 : size(correlations{nChannels_counter}, 2)
+%             scatter(fly_counter, correlations{nChannels_counter}(fly_counter, tau_counter), [tau_shapes(tau_counter) tau_colours{tau_counter}]);
+%             axis([0 size(correlations{nChannels_counter}, 1)+1 0 1]);
+%             hold on;
+%             
+%             if nChannels_counter == 1
+%                 xlabel('fly', 'FontSize', 15, 'rotation', 0);
+%                 ylabel('r', 'FontSize', 15, 'rotation', 0);
+%             end
+%         end
+%     end
+%     
+% end
+
+%% Average correlations across flies
+
+% Fisher r to z transform
+correlations_z = zeros(length(correlations), size(correlations{1}, 2), size(correlations{1}, 1));
+correlations_r = zeros(length(correlations), size(correlations{1}, 2), size(correlations{1}, 1)); % original coefficients in new format
 for nChannels_counter = 1 : length(correlations)
-    subplot(2, length(correlations), nChannels_counter + length(correlations));
-    
     for fly_counter = 1 : size(correlations{nChannels_counter}, 1)
         for tau_counter = 1 : size(correlations{nChannels_counter}, 2)
-            scatter(fly_counter, correlations{nChannels_counter}(fly_counter, tau_counter), [tau_shapes(tau_counter) tau_colours{tau_counter}]);
-            axis([0 size(correlations{nChannels_counter}, 1)+1 0 1]);
-            hold on;
-            
-            if nChannels_counter == 1
-                xlabel('fly', 'FontSize', 15, 'rotation', 0);
-                ylabel('r', 'FontSize', 15, 'rotation', 0);
-            end
+            correlations_z(nChannels_counter, tau_counter, fly_counter) = fisher_rz(correlations{nChannels_counter}(fly_counter, tau_counter));
+            correlations_r(nChannels_counter, tau_counter, fly_counter) = correlations{nChannels_counter}(fly_counter, tau_counter);
         end
     end
-    
 end
+
+% Mean and standard error
+correlations_z_mean = mean(correlations_z, 3);
+correlations_z_stderr = std(correlations_z, [], 3) / sqrt(size(correlations_z, 3));
+
+subplot(2, length(correlations), 4.5);
+correlations_nChannels = mean(mean(correlations_z, 2), 3);
+stderr_nChannels = std(mean(correlations_z, 2), [], 3) / sqrt(size(correlations_z, 3));
+bar(correlations_nChannels); hold on;
+errorbar((1:length(correlations)), correlations_nChannels, stderr_nChannels, stderr_nChannels, 'k', 'LineStyle', 'none', 'CapSize', 0);
+axis([0.5 3.5 0 0.7]);
+xlabel('channels', 'FontSize', 25, 'rotation', 0);
+y = ylabel('r', 'FontSize', 25, 'rotation', 0);
+set(y, 'Units', 'Normalized', 'Position', [-0.25, 0.5, 0]);
+set(gca, 'XTick', [1 2 3], 'XTickLabel', [2 3 4]);
+set(gca, 'FontSize', 12);
+
+subplot(2, length(correlations), 5.5);
+correlations_tau = mean(mean(correlations_z, 1), 3);
+stderr_tau = std(mean(correlations_z, 1), [], 3) / sqrt(size(correlations_z, 3));
+bar(correlations_tau); hold on;
+errorbar((1:length(correlations)), correlations_tau, stderr_tau, stderr_tau, 'k', 'LineStyle', 'none', 'CapSize', 0);
+axis([0.5 3.5 0 0.7]);
+xlabel('\tau', 'FontSize', 25, 'rotation', 0);
+y = ylabel('r', 'FontSize', 25, 'rotation', 0);
+set(y, 'Units', 'Normalized', 'Position', [-0.25, 0.5, 0]);
+set(gca, 'XTick', [1 2 3], 'XTickLabel', [4 8 16]);
+set(gca, 'FontSize', 12);
+
+% Mean across other effect
+
+% % Fisher z to r transform
+% correlations_mean = zeros(size(correlations_z_mean));
+% correlations_stderr = zeros(size(correlations_z_stderr));
+% for nChannels_counter = 1 : size(correlations_z_mean, 1)
+%     for tau_counter = 1 : size(correlations_z_mean, 2)
+%         correlations_mean(nChannels_counter, tau_counter) = fisher_zr(correlations_z_mean(nChannels_counter, tau_counter));
+%         correlations_stderr(nChannels_counter, tau_counter) = fisher_zr(correlations_z_stderr(nChannels_counter, tau_counter));
+%     end
+% end
+% 
+% % Plot over previous figures
+% for nChannels_counter = 1 : length(correlations)
+%     subplot(2, length(correlations), nChannels_counter + length(correlations));
+%     
+%     bar(correlations_mean(nChannels_counter, :)); hold on;
+%     errorbar((1:length(correlations)), correlations_mean(nChannels_counter, :), correlations_stderr(nChannels_counter, :), correlations_stderr(nChannels_counter, :), 'k', 'LineStyle', 'none', 'CapSize', 0);
+%     
+%     if nChannels_counter == 1
+%         xlabel('\tau', 'FontSize', 25, 'rotation', 0);
+%         y = ylabel('r', 'FontSize', 25, 'rotation', 0);
+%         set(y, 'Units', 'Normalized', 'Position', [-0.25, 0.5, 0]);
+%     end
+%     
+
+%%
+
+% ANOVA
+anova_data = []; % flies*nChannels x taus
+for nChannels_counter = 1 : length(correlations)
+    anova_data = [anova_data; permute(correlations_z(nChannels_counter, :, :), [3 2 1])];
+end
+anova_results = struct();
+[anova_results.p, anova_results.table, anova_results.stats] = anova2(anova_data, size(correlations_z, 3));
 
 %% Correlations after matching MIPs
 
