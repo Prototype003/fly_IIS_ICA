@@ -29,21 +29,21 @@ data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim'.
 
 %% LOAD
 
-% disp('loading');
-% % Phi-3
-% load([data_directory data_filename '_phithree.mat']);
-% phi_threes = phis;
-% 
-% % Phi-star
-% load([data_directory data_filename '_phistar.mat']);
-% phi_stars = phis;
-% 
-% disp('loaded');
-% 
-% for nChannels_counter = 1 : length(phi_threes)
-%     phi_threes{nChannels_counter}.phis = phi_threes{nChannels_counter}.phi_threes;
-%     phi_stars{nChannels_counter}.phis = phi_stars{nChannels_counter}.phi_stars;
-% end
+disp('loading');
+% Phi-3
+load([data_directory data_filename '_phithree.mat']);
+phi_threes = phis;
+
+% Phi-star
+load([data_directory data_filename '_phistar.mat']);
+phi_stars = phis;
+
+disp('loaded');
+
+for nChannels_counter = 1 : length(phi_threes)
+    phi_threes{nChannels_counter}.phis = phi_threes{nChannels_counter}.phi_threes;
+    phi_stars{nChannels_counter}.phis = phi_stars{nChannels_counter}.phi_stars;
+end
 
 %% Sort channel sets by phi
 % Sort, within channels-used, by air phi
