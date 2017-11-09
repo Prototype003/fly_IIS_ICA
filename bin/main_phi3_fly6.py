@@ -6,6 +6,7 @@ import numpy as np
 import scipy.signal as sp_signal
 import scipy.stats as sp_stats
 import pyphi
+import pyphi_mimic
 import itertools
 from fly_phi import *
 
@@ -31,6 +32,7 @@ flies = np.array([5])
 nChannels = np.arange(4, 5)#(2, 16)
 nBins = np.array([1]) # Script currently only supports the case of 1 bin
 taus = np.array([4, 8, 16])
+possible_partitions = np.array([2, 6, 14])
 
 nFlies = np.size(flies);
 
@@ -42,7 +44,7 @@ results_file = data_file + \
 	"_detrend" + str(prep_detrend) + \
 	"_zscore" + str(prep_zscore) + \
 	"_nChannels" + str(nChannels[0]) + "t" + str(nChannels[-1]) + \
-	"_phithree" + "fly" + str(flies[0])
+	"_phithree_allPartitions"  + "fly" + str(flies[0])
 
 # Load data ############################################################################
 
@@ -82,20 +84,27 @@ for nChannels_counter in range(0, len(nChannels)):
 	phis[nChannels_counter]['channel_sets'] = channel_sets
 	phis[nChannels_counter]['taus'] = taus
 	phis[nChannels_counter]['nBins'] = nBins
-	phis[nChannels_counter]['mips'] = []
 	
 	# Initialise phi_matrix (channel sets x trials x flies x conditions x taus x nBins)
 	phi_threes = np.zeros((len(channel_sets), fly_data.shape[2], 1, fly_data.shape[4], len(taus), len(nBins)))
+	
+	# Initialise MIP matrix (states x channel sets x flies x conditions x taus x nBins)
+	mips = np.empty((n_states, len(channel_sets), 1, fly_data.shape[4], len(taus)), dtype=tuple)
 	
 	# Storage of state counts (states x channel sets x trials x flies x conditions x taus x nBins) and phis (-trials and -nBins dimensions)
 	state_counter = np.zeros((n_states, len(channel_sets), fly_data.shape[2], 1, fly_data.shape[4], len(taus), len(nBins)))
 	state_phis = np.zeros((n_states, len(channel_sets), 1, fly_data.shape[4], len(taus), len(nBins))) # This will hold the phi values of each state
 	
 	# Storage of state trajectory (samples x channel sets x trials x flies x conditions x taus x nBins)
-	#state_trajectories = np.zeros((fly_data.shape[0], len(channel_sets), fly_data.shape[2], 1, fly_data.shape[4], len(taus), len(nBins)))
+	#state_trajectories = np.zeros((fly_data.shape[0], len(channel_sets), fly_data.shape[2], fly_data.shape[3], fly_data.shape[4], len(taus), len(nBins)))
 	
 	# Storage of TPMs (states x states x channel sets x flies x conditions x taus)
 	tpms = np.zeros((n_states, n_states, len(channel_sets), 1, fly_data.shape[4], len(taus)))
+	
+	# Initialies partition phi matrix (holds phi values for all partitions at all parameters)
+	# (states x possible partitions x channel sets x flies x conditions x taus x nBins)
+	state_partitions = np.empty((n_states, possible_partitions[nChannels_counter], len(channel_sets), 1, fly_data.shape[4], len(taus)), dtype=tuple)
+	state_partitions_phis = np.zeros((n_states, possible_partitions[nChannels_counter], len(channel_sets), 1, fly_data.shape[4], len(taus)))
 	
 	for fly_counter in range(0, len(flies)):
 		fly = flies[fly_counter]
@@ -121,17 +130,28 @@ for nChannels_counter in range(0, len(nChannels)):
 					
 					# Calculate all possible phi values (number of phi values is limited by the number of possible states)
 					for state_index in range(0, n_states):
-						print('State ' + str(state_index))
+						#print('State ' + str(state_index))
 						# Figure out the state
 						state = pyphi.convert.loli_index2state(state_index, nChannels[nChannels_counter])
 						
 						# As the network is already limited to the channel set, the subsystem would have the same nodes as the full network
 						subsystem = pyphi.Subsystem(network, state, network.node_indices)
 						
-						# Compute phi (via mip)
-						big_mip = pyphi.compute.big_mip(subsystem)
-						state_phis[state_index, channel_set_counter, fly_counter, condition, tau_counter] = big_mip.phi
-						phis[nChannels_counter]['mips'].append(big_mip.cut)
+						#sys.exit()
+						
+						# Compute phi values for all partitions
+						big_mip = pyphi_mimic.big_mip(subsystem)
+						
+						# Store phi and associated MIP
+						state_phis[state_index, channel_set_counter, fly_counter, condition, tau_counter] = big_mip[0].phi
+						mips[state_index, channel_set_counter, fly_counter, condition, tau_counter] = big_mip[0].cut
+						
+						# Store phis for all partition schemes
+						for partition_counter in range(0, possible_partitions[nChannels_counter]):
+							state_partitions_phis[state_index, partition_counter, channel_set_counter, fly_counter, condition, tau_counter] = big_mip[1][partition_counter].phi
+							state_partitions[state_index, partition_counter, channel_set_counter, fly_counter, condition, tau_counter] = big_mip[1][partition_counter].cut
+						
+						print('State ' + str(state_index) + ' Phi=' + str(big_mip[0].phi))
 					
 					for bins_counter in range(0, len(nBins)):
 						bins = nBins[bins_counter]
@@ -158,12 +178,15 @@ for nChannels_counter in range(0, len(nChannels)):
 								if state_counter[state_index, channel_set_counter, trial, fly_counter, condition, tau_counter, bins_counter] > 0:
 									# Add phi to total, weighted by the number of times the state occurred
 									phi_total += state_phis[state_index, channel_set_counter, fly_counter, condition, tau_counter, bins_counter] * state_counter[state_index, channel_set_counter, trial, fly_counter, condition, tau_counter, bins_counter]
-							phi_threes[channel_set_counter, trial, fly_counter, condition, tau_counter, bins_counter] = phi_total / np.sum(state_counter[:, channel_set_counter, trial, fly, condition, tau_counter, bins_counter])
+							phi_threes[channel_set_counter, trial, fly_counter, condition, tau_counter, bins_counter] = phi_total / np.sum(state_counter[:, channel_set_counter, trial, fly_counter, condition, tau_counter, bins_counter])
 	phis[nChannels_counter]['phi_threes'] = phi_threes
 	phis[nChannels_counter]['state_counters'] = state_counter
 	phis[nChannels_counter]['state_phis'] = state_phis
 	#phis[nChannels_counter]['state_trajectories'] = state_trajectories
 	phis[nChannels_counter]['tpms'] = tpms
+	phis[nChannels_counter]['mips'] = mips
+	phis[nChannels_counter]['state_partitions'] = state_partitions
+	phis[nChannels_counter]['state_partitions_phis'] = state_partitions_phis
 
 # Save ###########################################################################
 
@@ -171,7 +194,7 @@ save_mat(results_directory+results_file, {'phis': phis})
 
 # # Old code #######################################################################
 # # This builds the entire TPM, then marginalises out irrelevant nodes
-# # This takes too long because of network validation by pyphi
+# # This takes too long because of network validation by pyphi, also requires a lot of memory (tpm for the full network)
 # # Thus it's better to build separate TPMs (and networks) for each channel set, where the subsystem is the whole network
 # # rather than building the whole network and then limiting it to the relevant subsystem
 # # Because of the long running time, sections after (and during) network creation have not been properly tested
@@ -245,5 +268,5 @@ save_mat(results_directory+results_file, {'phis': phis})
 									# # Compute phi
 									# phis[state] = pyphi.compute.big_phi(subsystem)
 									# phi_total += phis[state] * state_counter[state_index]
-							# phi = phi_total / np.sum(state_counter[:, channel_set_counter, trial, fly, condition, tau_counter, bins_counter])
+							# phi = phi_total / np.sum(state_counter)
 							# print(phi)

@@ -29,7 +29,7 @@ binarise_method = "binarise_global_median"
 # Second parameter is exclusive (e.g. (x, y) gives from x to y-1)
 # Third parameter of np.arange give sthe step size
 flies = np.arange(0, 13)
-nChannels = np.arange(2, 3)#(2, 16)
+nChannels = np.arange(3, 4)#(2, 16)
 nBins = np.array([1]) # Script currently only supports the case of 1 bin
 taus = np.array([4, 8, 16])
 possible_partitions = np.array([2, 6, 14])
