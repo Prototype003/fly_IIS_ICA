@@ -32,7 +32,7 @@ flies = np.array([4])
 nChannels = np.arange(4, 5)#(2, 16)
 nBins = np.array([1]) # Script currently only supports the case of 1 bin
 taus = np.array([4, 8, 16])
-possible_partitions = np.array([2, 6, 14])
+possible_partitions = np.array([None, None, 2, 6, 14])
 
 nFlies = np.size(flies);
 
@@ -75,6 +75,7 @@ phis = [dict() for n in range(nChannels.size)]
 # Following is repeated for each fly, bin count, tau lag, channel set, condition and trial (like in computation of phi-star)
 for nChannels_counter in range(0, len(nChannels)):
 	channel_sets = channel_combinations[nChannels_counter]
+	partitions_n = possible_partitions[nChannels[nChannels_counter]]
 	
 	# Determine number of system states
 	n_states = n_values ** len(channel_sets[0])
@@ -103,8 +104,8 @@ for nChannels_counter in range(0, len(nChannels)):
 	
 	# Initialies partition phi matrix (holds phi values for all partitions at all parameters)
 	# (states x possible partitions x channel sets x flies x conditions x taus x nBins)
-	state_partitions = np.empty((n_states, possible_partitions[nChannels_counter], len(channel_sets), 1, fly_data.shape[4], len(taus)), dtype=tuple)
-	state_partitions_phis = np.zeros((n_states, possible_partitions[nChannels_counter], len(channel_sets), 1, fly_data.shape[4], len(taus)))
+	state_partitions = np.empty((n_states, partitions_n, len(channel_sets), 1, fly_data.shape[4], len(taus)), dtype=tuple)
+	state_partitions_phis = np.zeros((n_states, partitions_n, len(channel_sets), 1, fly_data.shape[4], len(taus)))
 	
 	for fly_counter in range(0, len(flies)):
 		fly = flies[fly_counter]
@@ -147,7 +148,7 @@ for nChannels_counter in range(0, len(nChannels)):
 						mips[state_index, channel_set_counter, fly_counter, condition, tau_counter] = big_mip[0].cut
 						
 						# Store phis for all partition schemes
-						for partition_counter in range(0, possible_partitions[nChannels_counter]):
+						for partition_counter in range(0, partitions_n):
 							state_partitions_phis[state_index, partition_counter, channel_set_counter, fly_counter, condition, tau_counter] = big_mip[1][partition_counter].phi
 							state_partitions[state_index, partition_counter, channel_set_counter, fly_counter, condition, tau_counter] = big_mip[1][partition_counter].cut
 						
@@ -191,82 +192,3 @@ for nChannels_counter in range(0, len(nChannels)):
 # Save ###########################################################################
 
 save_mat(results_directory+results_file, {'phis': phis})
-
-# # Old code #######################################################################
-# # This builds the entire TPM, then marginalises out irrelevant nodes
-# # This takes too long because of network validation by pyphi, also requires a lot of memory (tpm for the full network)
-# # Thus it's better to build separate TPMs (and networks) for each channel set, where the subsystem is the whole network
-# # rather than building the whole network and then limiting it to the relevant subsystem
-# # Because of the long running time, sections after (and during) network creation have not been properly tested
-# for fly in flies:
-	# for condition in range(0, fly_data.shape[4]):
-		# for tau in taus:
-			# # Build transition probability matrix (we can build the whole matrix, for all channels, once, then later extract the relevant parts of it)
-			# # For now we will build across all trials, for all channels
-			# # We can marginalise out irrelevant channels (nodes) using pyphi.utils.marginalize_out
-			# tpm_whole = build_tpm(fly_data_discretised[:, :, :, fly, condition], tau, n_values)
-			# print('tpm built for fly' + str(fly) + ' condition ' + str(condition) + ' tau ' + str(tau))
-			# channels_all = np.arange(0, fly_data.shape[1])
-			# network = pyphi.Network(tpm_whole)
-			# print('network built')
-			# for nChannels_counter in range(0, len(nChannels)):
-				# channel_sets = channel_combinations[nChannels_counter]
-				# print('Channels in subsystem: ' + str(len(channel_sets[0])))
-				# for channel_set in channel_sets:
-					
-					# channel_set = list(channel_set) # For indexing purposes
-					# """ Unnecessary because this should be done by pyphi itself, when setting the subsystem
-					# # Find channels which are not included in the current set
-					# unincluded_channels = np.setdiff1d(channels_all, channel_set)
-					
-					# # Marginalise out unincluded channels from TPM
-					# # Current version of pyphi only removes a single node at a time (future version will be able to remove a list of nodes)
-					# # Seems like marginalize_out takes a state-by-node TPM: http://pyphi.readthedocs.io/en/stable/examples/conditional_independence.html?highlight=margin
-					# tpm = pyphi.convert.state_by_state2state_by_node(np.copy(tpm_whole))
-					# for channel in unincluded_channels:
-						# tpm = pyphi.utils.marginalize_out(channel, tpm)
-					# tpm = np.squeeze(tpm[:, :, :, channel_set]) # Restrict purview to relevant channels
-					# """
-					
-					# # Determine number of system states
-					# n_states = n_values ** len(channel_set)
-					
-					# for bins in nBins:
-						# for trial in range(0, fly_data.shape[2]):
-							
-							# # To avoid calculating phi for every sample, we calculate it for each state which has occurred (e.g. 2^8 calculations for 8 channels, instead of 2250)
-							# # Then when averaging across samples, we weight by the number of times each state has occurred
-							
-							# # Store how many times each state occurs within a trial
-							# state_counter = np.zeros((n_states, 1))
-							
-							# for sample_counter in range(0, fly_data.shape[0]):
-								# sample = fly_data[sample_counter, channel_set, trial, fly, condition]
-								
-								# # Determine the state
-								# state = state2loli_index(tuple(sample))
-								
-								# # Add to state_counter
-								# state_counter[state] += 1
-								
-							# # Calculate phi for each state which occurred
-							# phis = np.zeros((n_states, 1))
-							# phi_total = 0
-							# for state_index in range(0, len(state_counter)):
-								# if frequency > 0:
-									# # Figure out the state
-									# state = loli_index2state(state_index)
-									# # Pad in other nodes (states given to Subsystem are of the network)
-									# # I'm assuming that nodes not in channel_set are marginalised out, such that the state of these nodes is irrelevant
-									# network_state = np.zeros((1, fly_data.shape[1]))
-									# channel_counter = 0
-									# for channel in channel_set:
-										# network_state[channel] = state[channel_counter]
-										# channel_counter += 1
-									# # Limit the network to the set of channels being considered, and provide the relevant state
-									# subsystem = pyphi.Subsystem(network, tuple(network_state), channel_set)
-									# # Compute phi
-									# phis[state] = pyphi.compute.big_phi(subsystem)
-									# phi_total += phis[state] * state_counter[state_index]
-							# phi = phi_total / np.sum(state_counter)
-							# print(phi)
