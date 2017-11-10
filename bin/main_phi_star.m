@@ -12,10 +12,10 @@ Note: it only supports 1 bin per epoch, i.e. the bin length = epoch length
 
 prep_detrend = 0;
 prep_zscore = 0;
-prep_medianSplit = 1;
+prep_medianSplit = 0;
 
 flies = (1:13); % This will be parallelised
-nChannels = (2:4); % This determines how many channels to consider at a time
+nChannels = (4:4); % This determines how many channels to consider at a time
 nBins = [1]; % Script currently only supports the case of 1 bin (i.e. epoch length - tau)
 taus = [4, 8, 16];
 
@@ -25,7 +25,7 @@ data_directory = 'workspace_results/';
 data_file = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim';
 
 results_directory = 'results/';
-results_filename = [data_file '_detrend' num2str(prep_detrend) '_zscore' num2str(prep_zscore) '_nChannels' num2str(nChannels(1)) 't' num2str(nChannels(end)) '_medianSplit' num2str(prep_medianSplit) '_phistar']; %flies' num2str(flies(1)) 't' num2str(flies(end))];
+results_filename = [data_file '_detrend' num2str(prep_detrend) '_zscore' num2str(prep_zscore) '_nChannels' num2str(nChannels(1)) 't' num2str(nChannels(end)) '_medianSplit' num2str(prep_medianSplit) '_phistar_allPartitions']; %flies' num2str(flies(1)) 't' num2str(flies(end))];
 
 %% LOAD
 
@@ -72,6 +72,7 @@ for nChannels_counter = 1 : length(nChannels)
     channels = nChannels(nChannels_counter);
     channel_sets = nchoosek((1:size(fly_data, 2)), channels);
     
+    % Storage
     % channels sets x trials x flies x conditions x taus x nBins
     phi_stars = zeros(size(channel_sets, 1), size(fly_data, 3), size(fly_data, 4), size(fly_data, 5), length(taus), length(nBins));
     phi_stars_normalised = zeros(size(channel_sets, 1), size(fly_data, 3), size(fly_data, 4), size(fly_data, 5), length(taus), length(nBins));
@@ -80,6 +81,15 @@ for nChannels_counter = 1 : length(nChannels)
     hs = zeros(size(channel_sets, 1), size(fly_data, 3), size(fly_data, 4), size(fly_data, 5), length(taus), length(nBins));
     mi_stars = zeros(size(channel_sets, 1), size(fly_data, 3), size(fly_data, 4), size(fly_data, 5), length(taus), length(nBins));
     mips = cell(size(channel_sets, 1), size(fly_data, 3), size(fly_data, 4), size(fly_data, 5), length(taus), length(nBins));
+    
+    % Storage for every partition
+    partitions = cell(Bell(channels)-1, size(channel_sets, 1), size(fly_data, 3), size(fly_data, 4), size(fly_data, 5), length(taus), length(nBins));
+    partitions_phi_stars = zeros(Bell(channels)-1, size(channel_sets, 1), size(fly_data, 3), size(fly_data, 4), size(fly_data, 5), length(taus), length(nBins));
+    partitions_phi_stars_normalised = zeros(Bell(channels)-1, size(channel_sets, 1), size(fly_data, 3), size(fly_data, 4), size(fly_data, 5), length(taus), length(nBins));
+    partitions_mis = zeros(Bell(channels)-1, size(channel_sets, 1), size(fly_data, 3), size(fly_data, 4), size(fly_data, 5), length(taus), length(nBins));
+    partitions_mi_stars = zeros(Bell(channels)-1, size(channel_sets, 1), size(fly_data, 3), size(fly_data, 4), size(fly_data, 5), length(taus), length(nBins));
+    partitions_hs = zeros(Bell(channels)-1, size(channel_sets, 1), size(fly_data, 3), size(fly_data, 4), size(fly_data, 5), length(taus), length(nBins));
+    partitions_hconds = zeros(Bell(channels)-1, size(channel_sets, 1), size(fly_data, 3), size(fly_data, 4), size(fly_data, 5), length(taus), length(nBins));
     
     for fly_counter = 1 : nFlies
         fly = flies(fly_counter);
@@ -101,10 +111,20 @@ for nChannels_counter = 1 : length(nChannels)
                                 hconds(channel_set, trial, fly, condition, tau_counter, nBins_counter),...
                                 mis(channel_set, trial, fly, condition, tau_counter, nBins_counter),...
                                 mi_stars(channel_set, trial, fly, condition, tau_counter, nBins_counter),...
-                                mips{channel_set, trial, fly, condition, tau_counter, nBins_counter}] = phistar_mip(cov_past_past, cov_present_past, cov_present_present, channel_sets(channel_set, :));
+                                mips{channel_set, trial, fly, condition, tau_counter, nBins_counter},...
+                                partitions(:, channel_set, trial, fly, condition, tau_counter, nBins_counter),...
+                                partitions_phi_tmp,...
+                                partitions_mis(:, channel_set, trial, fly, condition, tau_counter, nBins_counter),...
+                                partitions_mi_stars(:, channel_set, trial, fly, condition, tau_counter, nBins_counter),...
+                                partitions_hs(:, channel_set, trial, fly, condition, tau_counter, nBins_counter),...
+                                partitions_hconds(:, channel_set, trial, fly, condition, tau_counter, nBins_counter)...
+                                ] = phistar_mip(cov_past_past, cov_present_past, cov_present_present, channel_sets(channel_set, :));
                             
                             phi_stars(channel_set, trial, fly, condition, tau_counter, nBins_counter) = phi_tmp(1);
                             phi_stars_normalised(channel_set, trial, fly, condition, tau_counter, nBins_counter) = phi_tmp(2);
+                            
+                            partitions_phi_stars(:, channel_set, trial, fly, condition, tau_counter, nBins_counter) = partitions_phi_tmp(:, 1);
+                            partitions_phi_stars_normalised(:, channel_set, trial, fly, condition, tau_counter, nBins_counter) = partitions_phi_tmp(:, 2);
                             
                         end
                     end

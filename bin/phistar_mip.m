@@ -1,4 +1,4 @@
-function [phi_star, H, H_cond, MI, MI_star, MIP] = phistar_mip(cov_past_past, cov_past_present, cov_present_present, channels)
+function [phi_star, H, H_cond, MI, MI_star, MIP, partitions, partitions_phis, partitions_H, partitions_H_cond, partitions_MI, partitions_MI_star] = phistar_mip(cov_past_past, cov_past_present, cov_present_present, channels)
 % Finds phi-star and associated metrics corresponding to the MIP
 %
 % To do this, calculates phi-star for every possible partition
@@ -13,21 +13,35 @@ channel_map = (1:nChannels);
 
 % Get all possible partitions
 partitions = SetPartition(channel_map);
+partitions = partitions(2:end); % The first partitioning is the unpartitioned system, so we ignore that
+
+% Setup storage of values for each partition
+partitions_phis = zeros(size(partitions, 1), 2);
+partitions_H = zeros(size(partitions));
+partitions_H_cond = zeros(size(partitions));
+partitions_MI = zeros(size(partitions));
+partitions_MI_star = zeros(size(partitions));
 
 % For each partition, find phi-star
 % MIP is where phi-star is the smallest
 
 % Get phi for the first partition as baseline
-partition = partitions{2}; % The first partitioning is the unpartitioned system, so we ignore that
+partition = partitions{1};
 partition_formatted = zeros(nChannels, 1);
 for group = 1 : length(partition)
     partition_formatted(partition{group}) = group;
 end
 [phi_star, ~, ~, ~, MI, ~, ~, H_cond, H, MI_star] = phi_comp(cov_present_present, cov_past_present, cov_past_past, [], partition_formatted);
 MIP = partition;
+% Save values for partition
+partitions_phis(1, :) = phi_star;
+partitions_H(1) = H;
+partitions_H_cond(1) = H_cond;
+partitions_MI(1) = MI;
+partitions_MI_star(1) = MI_star;
 
 % Repeat for each partition and update if phi is smaller
-for partition_counter = 3 : length(partitions) % We're ignoring the 1st partition (unpartitioned), and we've already done the 2nd partitioning, so start from the 3rd
+for partition_counter = 2 : length(partitions) % Already checked the first partition, so start from the second
     partition = partitions{partition_counter};
     
     % Reformat partition for input to phi_star_Gauss()
@@ -46,6 +60,13 @@ for partition_counter = 3 : length(partitions) % We're ignoring the 1st partitio
         MI = MI_new;
         MI_star = MI_star_new;
     end
+    
+    % Save values for partition
+    partitions_phis(partition_counter, :) = phi_star;
+    partitions_H(partition_counter) = H;
+    partitions_H_cond(partition_counter) = H_cond;
+    partitions_MI(partition_counter) = MI;
+    partitions_MI_star(partition_counter) = MI_star;
 end
 
 % MIP is mapped (to consecutive channels), so unmap (to original labels)
