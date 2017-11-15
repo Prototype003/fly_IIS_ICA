@@ -15,7 +15,7 @@ prep_zscore = 0;
 prep_medianSplit = 0;
 
 flies = (1:13); % This will be parallelised
-nChannels = (4:4); % This determines how many channels to consider at a time
+nChannels = (2:4); % This determines how many channels to consider at a time
 nBins = [1]; % Script currently only supports the case of 1 bin (i.e. epoch length - tau)
 taus = [4, 8, 16];
 
@@ -142,6 +142,14 @@ for nChannels_counter = 1 : length(nChannels)
     phis{nChannels_counter}.mi_stars = mi_stars;
     phis{nChannels_counter}.mips = mips;
     
+    phis{nChannels_counter}.partitions = partitions;
+    phis{nChannels_counter}.partitions_phi_stars = partitions_phi_stars;
+    phis{nChannels_counter}.partitions_phi_stars_normalised = partitions_phi_stars_normalised;
+    phis{nChannels_counter}.partitions_mis = partitions_mis;
+    phis{nChannels_counter}.partitions_mi_stars = partitions_mi_stars;
+    phis{nChannels_counter}.partitions_hs = partitions_hs;
+    phis{nChannels_counter}.partitions_hconds = partitions_hconds;
+    
     phis{nChannels_counter}.nChannels = channels;
     phis{nChannels_counter}.channel_sets = channel_sets;
     phis{nChannels_counter}.taus = taus;
@@ -154,7 +162,7 @@ end
 if ~isdir(results_directory)
     mkdir(results_directory)
 end
-save([results_directory results_filename '.mat'], 'phis');
+save([results_directory results_filename '.mat'], 'phis', '-v7.3');
 
 % %% Function: global median split
 % 
