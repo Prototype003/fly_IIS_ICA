@@ -62,11 +62,11 @@ for partition_counter = 2 : length(partitions) % Already checked the first parti
     end
     
     % Save values for partition
-    partitions_phis(partition_counter, :) = phi_star;
-    partitions_H(partition_counter) = H;
-    partitions_H_cond(partition_counter) = H_cond;
-    partitions_MI(partition_counter) = MI;
-    partitions_MI_star(partition_counter) = MI_star;
+    partitions_phis(partition_counter, :) = phi_star_new;
+    partitions_H(partition_counter) = H_new;
+    partitions_H_cond(partition_counter) = H_cond_new;
+    partitions_MI(partition_counter) = MI_new;
+    partitions_MI_star(partition_counter) = MI_star_new;
 end
 
 % MIP is mapped (to consecutive channels), so unmap (to original labels)
