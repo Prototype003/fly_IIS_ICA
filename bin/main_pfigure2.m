@@ -31,44 +31,44 @@ data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim'.
 
 %% LOAD
 
-disp('loading');
-% Phi-3
-load([data_directory data_filename '_phithree.mat']);
-phi_threes = phis;
-
-% Phi-star
-load([data_directory data_filename '_phistar.mat']);
-phi_stars = phis;
-
-disp('loaded');
-
-for nChannels_counter = 1 : length(phi_threes)
-    phi_threes{nChannels_counter}.phis = phi_threes{nChannels_counter}.phi_threes;
-    phi_stars{nChannels_counter}.phis = phi_stars{nChannels_counter}.phi_stars;
-end
+% disp('loading');
+% % Phi-3
+% load([data_directory data_filename '_phithree.mat']);
+% phi_threes = phis;
+% 
+% % Phi-star
+% load([data_directory data_filename '_phistar.mat']);
+% phi_stars = phis;
+% 
+% disp('loaded');
+% 
+% for nChannels_counter = 1 : length(phi_threes)
+%     phi_threes{nChannels_counter}.phis = phi_threes{nChannels_counter}.phi_threes;
+%     phi_stars{nChannels_counter}.phis = phi_stars{nChannels_counter}.phi_stars;
+% end
 
 %% Average across trials and flies, calculate deltas and associated standard error
 
 for nChannels_counter = 1 : numel(phi_threes)
     % Raw
     phi_threes{nChannels_counter}.phis_raw = phi_threes{nChannels_counter}.phi_threes(:, :, flies, :, :);
-    phi_stars{nChannels_counter}.phis_raw = phi_stars{nChannels_counter}.(phi_stars)(:, :, flies, :, :);
+    phi_stars{nChannels_counter}.phis_raw = phi_stars{nChannels_counter}.phi_stars(:, :, flies, :, :);
     
     % Average 
     phi_threes{nChannels_counter}.phis = squeeze(mean(mean(phi_threes{nChannels_counter}.phi_threes(:, :, flies, :, :), 2), 3));
-    phi_stars{nChannels_counter}.phis = squeeze(mean(mean(phi_stars{nChannels_counter}.(phi_stars)(:, :, flies, :, :), 2), 3));
+    phi_stars{nChannels_counter}.phis = squeeze(mean(mean(phi_stars{nChannels_counter}.phi_stars(:, :, flies, :, :), 2), 3));
     
     % Standard error (across flies)
     phi_threes{nChannels_counter}.phis_std = squeeze(std(mean(phi_threes{nChannels_counter}.phi_threes(:, :, flies, :, :), 2), [], 3)) / sqrt(length(flies));
-    phi_stars{nChannels_counter}.phis_std = squeeze(std(mean(phi_stars{nChannels_counter}.(phi_stars)(:, :, flies, :, :), 2), [], 3)) / sqrt(length(flies));
+    phi_stars{nChannels_counter}.phis_std = squeeze(std(mean(phi_stars{nChannels_counter}.phi_stars(:, :, flies, :, :), 2), [], 3)) / sqrt(length(flies));
     
     % Delta (air - iso) (absolute)
     phi_threes{nChannels_counter}.phis_delta = squeeze(mean(mean(phi_threes{nChannels_counter}.phi_threes(:, :, flies, 1, :) - phi_threes{nChannels_counter}.phi_threes(:, :, flies, 2, :), 2), 3));
-    phi_stars{nChannels_counter}.phis_delta = squeeze(mean(mean(phi_stars{nChannels_counter}.(phi_stars)(:, :, flies, 1, :) - phi_stars{nChannels_counter}.(phi_stars)(:, :, flies, 2, :), 2), 3));
+    phi_stars{nChannels_counter}.phis_delta = squeeze(mean(mean(phi_stars{nChannels_counter}.phi_stars(:, :, flies, 1, :) - phi_stars{nChannels_counter}.phi_stars(:, :, flies, 2, :), 2), 3));
     
     % Delta std (air - iso)
     phi_threes{nChannels_counter}.phis_delta_std = squeeze(std(mean(phi_threes{nChannels_counter}.phi_threes(:, :, flies, 1, :) - phi_threes{nChannels_counter}.phi_threes(:, :, flies, 2, :), 2), [], 3)) / sqrt(length(flies));
-    phi_stars{nChannels_counter}.phis_delta_std = squeeze(std(mean(phi_stars{nChannels_counter}.(phi_stars)(:, :, flies, 1, :) - phi_stars{nChannels_counter}.(phi_stars)(:, :, flies, 2, :), 2), [], 3)) / sqrt(length(flies));
+    phi_stars{nChannels_counter}.phis_delta_std = squeeze(std(mean(phi_stars{nChannels_counter}.phi_stars(:, :, flies, 1, :) - phi_stars{nChannels_counter}.phi_stars(:, :, flies, 2, :), 2), [], 3)) / sqrt(length(flies));
     
 %     % Delta (air - iso / air) (relative)
 %     phi_threes{nChannels_counter}.phis_delta = squeeze(mean(mean((phi_threes{nChannels_counter}.phi_threes(:, :, flies, 1, :) - phi_threes{nChannels_counter}.phi_threes(:, :, flies, 2, :)) ./ phi_threes{nChannels_counter}.phi_threes(:, :, flies, 1, :), 2), 3));

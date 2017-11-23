@@ -211,7 +211,7 @@ y = ylabel([char(981) '*'], 'FontSize', 15, 'rotation', 0);
 set(y, 'Units', 'Normalized', 'Position', [-0.1, 0.5, 0]);
 xlabel('channels in set');
 xticks(channel_ticks); xticklabels(channel_labels)
-curtick = get(gca, 'YTick');7
+curtick = get(gca, 'YTick');
 set(gca, 'YTickLabel', cellstr(num2str(curtick(:))));
 
 
