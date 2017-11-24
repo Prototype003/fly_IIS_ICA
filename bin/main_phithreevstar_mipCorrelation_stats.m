@@ -212,7 +212,7 @@ for nChannels = 1 : length(set_sizes)
     
     errorbar(taus+nChannels_offsets(nChannels), correlations{nChannels}.trial_averaged.([metric mean_suffix]), correlations{nChannels}.trial_averaged.([metric std_suffix]), ['k' nChannels_markers(nChannels) '--'], 'CapSize', 10, 'LineWidth', nChannels_widths(nChannels)); hold on;
     
-    title([num2str(nChannels+2) ' channels']);
+    %title([num2str(nChannels+2) ' channels']);
     ylabel('r');
     xlabel('tau');
     %set(gca, 'XTickLabel', taus);
