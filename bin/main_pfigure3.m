@@ -9,7 +9,7 @@ main_phithreevstar_mipCorrelation_stats.m
 
 %}
 
-%% SETUP
+%% SETUP for correlations
 
 star_metric = 'phi_stars';
 
@@ -113,7 +113,7 @@ end
 
 %% Plot
 
-nChannels_widths = [1 1.5 2];
+nChannels_widths = [0.5 1.5 2.5];
 nChannels_markers = 'x^o';
 nChannels_offsets = [-0.5 0 0.5];
 
@@ -123,33 +123,68 @@ for nChannels_counter = 1 : size(correlations_mean, 1)
     errorbar(taus+nChannels_offsets(nChannels_counter),...
         correlations_mean(nChannels_counter, :),...
         correlations_stderr(nChannels_counter, :),...
-        ['k' nChannels_markers(nChannels_counter) ':'], 'CapSize', 10, 'LineWidth', nChannels_widths(nChannels_counter)); hold on;
+        ['k' '.' ':'],...
+        'CapSize', 10,...
+        'LineWidth', nChannels_widths(nChannels_counter),...
+        'MarkerSize', 20);
+    hold on;
 end
 legend('    2ch', '    3ch', '    4ch', 'Location', 'southeast');
+
+set(gca, 'YTick', [0.2 0.4 0.6], 'FontSize', 12);
+set(gca, 'XTick', taus, 'FontSize', 12);
+y = ylabel('r', 'FontSize', 15, 'rotation', 90);
+xlabel('\tau', 'FontSize', 15);
+axis([2 18 0.15 0.65]);
+title('Corr.');
+
+%{
 set(gca, 'YTick', [0.4 0.5 0.6], 'FontSize', 12);
 set(gca, 'XTick', taus, 'FontSize', 12);
 y = ylabel('r', 'FontSize', 15, 'rotation', 90);
 xlabel('\tau', 'FontSize', 15);
 axis([2 18 0.31 0.64]);
+%}
 
 %% Stats
 
-% % ANOVA
-% anova_data = []; % flies*nChannels x taus
-% for nChannels_counter = 1 : length(correlations)
-%     anova_data = [anova_data; permute(correlations_z(nChannels_counter, :, :), [3 2 1])];
-% end
-% anova_results = struct();
-% [anova_results.p, anova_results.table, anova_results.stats] = anova2(anova_data, size(correlations_z, 3));
+% ANOVA
+anova_data = []; % (flies*nChannels) x taus
+for nChannels_counter = 1 : length(correlations)
+    anova_data = [anova_data; permute(correlations_z(nChannels_counter, :, :), [3 2 1])];
+end
+anova_results = struct();
+[anova_results.p, anova_results.table, anova_results.stats] = anova2(anova_data, size(correlations_z, 3));
 
-%% Setup
+%% Post-hoc tests - effect of network size
+
+% Effect of network size (average across tau lags)
+foo = squeeze(mean(correlations_z, 2));
+[p, h, stats] = signrank(foo(2,:), foo(3,:), 'method', 'exact');
+
+%% Post-hoc tests - effect of tau lag
+
+% Effect of tau lag (average across network sizes)
+foo = zeros(size(correlations_z, 2), size(correlations_z, 3));
+for tau_counter = 1 : size(correlations_z, 2)
+    for fly = 1 : size(correlations_z, 3)
+        foo(tau_counter, fly) =...
+            ((correlations_z(1, tau_counter, fly) * 105)...
+            +(correlations_z(2, tau_counter, fly) * 455)...
+            +(correlations_z(3, tau_counter, fly) * 1365))...
+            /(105+455+1365);
+    end
+end
+[p, h, stats] = signrank(foo(2,:), foo(3,:), 'method', 'exact');
+
+%% Setup for MIP Correlations
 
 set_sizes = (3:4);
 flies = (1:13);
-conditions = (1);
+conditions = (1:2);
 taus = [4 8 16];
 
-conditionSplit = 0;
+conditionSplit = 1;
 
 
 data_directory = 'analysis_results/';
@@ -188,56 +223,56 @@ sig_suffix = '_sigs';
 q = 0.05;
 
 % Get logical indexes of significant correlations
-for nChannels = 1 : length(correlations)
-    for metric_counter = 1 : length(correlation_matrices)
-        metric = correlation_matrices{metric_counter};
-        
-        correlations{nChannels}.([metric sig_suffix]) = zeros(size(correlations{nChannels}.(metric)));
-        correlations{nChannels}.trial_averaged.([metric sig_suffix]) = zeros(size(correlations{nChannels}.(metric)));
-        
-        % FDR within each fly and tau
-        for fly = 1 : length(flies)
-            for condition = 1 : size(correlations{nChannels}.(metric), 3)
-                for tau = 1 : length(taus)
-                    p_vector = correlations{nChannels}.([metric p_suffix])(:, fly, condition, tau);
-                    [threshold_para, threshold_nonpara] = FDR(p_vector, q);
-                    if numel(threshold_para) == 0
-                        threshold_para = 0;
-                    end
-                    correlations{nChannels}.([metric sig_suffix])(:, fly, condition, tau) = correlations{nChannels}.([metric p_suffix])(:, fly, condition, tau) < threshold_para;
-                    
-                    % repeat for trial averaged
-                    p_vector = correlations{nChannels}.trial_averaged.([metric p_suffix])(:, fly, condition, tau);
-                    [threshold_para, threshold_nonpara] = FDR(p_vector, q);
-                    if numel(threshold_para) == 0
-                        threshold_para = 0;
-                    end
-                    correlations{nChannels}.trial_averaged.([metric sig_suffix])(:, fly, condition, tau) = correlations{nChannels}.trial_averaged.([metric p_suffix])(:, fly, condition, tau) < threshold_para;
-                end
-            end
-        end
-        
-    end
-end
-
-% Replace non-significant correlations with 0
-for nChannels = 1 : length(correlations)
-    for metric_counter = 1 : length(correlation_matrices)
-        metric = correlation_matrices{metric_counter};
-        
-        for element = 1 : numel(correlations{nChannels}.(metric))
-            if correlations{nChannels}.([metric sig_suffix])(element) == 0
-                correlations{nChannels}.(metric)(element) = 0;
-            end
-        end
-        for element = 1 : numel(correlations{nChannels}.trial_averaged.(metric))
-            if correlations{nChannels}.trial_averaged.([metric sig_suffix])(element) == 0
-                correlations{nChannels}.trial_averaged.(metric)(element) = 0;
-            end
-        end
-        
-    end
-end
+% for nChannels = 1 : length(correlations)
+%     for metric_counter = 1 : length(correlation_matrices)
+%         metric = correlation_matrices{metric_counter};
+%         
+%         correlations{nChannels}.([metric sig_suffix]) = zeros(size(correlations{nChannels}.(metric)));
+%         correlations{nChannels}.trial_averaged.([metric sig_suffix]) = zeros(size(correlations{nChannels}.(metric)));
+%         
+%         % FDR within each fly and tau
+%         for fly = 1 : length(flies)
+%             for condition = 1 : size(correlations{nChannels}.(metric), 3)
+%                 for tau = 1 : length(taus)
+%                     p_vector = correlations{nChannels}.([metric p_suffix])(:, fly, condition, tau);
+%                     [threshold_para, threshold_nonpara] = FDR(p_vector, q);
+%                     if numel(threshold_para) == 0
+%                         threshold_para = 0;
+%                     end
+%                     correlations{nChannels}.([metric sig_suffix])(:, fly, condition, tau) = correlations{nChannels}.([metric p_suffix])(:, fly, condition, tau) < threshold_para;
+%                     
+%                     % repeat for trial averaged
+%                     p_vector = correlations{nChannels}.trial_averaged.([metric p_suffix])(:, fly, condition, tau);
+%                     [threshold_para, threshold_nonpara] = FDR(p_vector, q);
+%                     if numel(threshold_para) == 0
+%                         threshold_para = 0;
+%                     end
+%                     correlations{nChannels}.trial_averaged.([metric sig_suffix])(:, fly, condition, tau) = correlations{nChannels}.trial_averaged.([metric p_suffix])(:, fly, condition, tau) < threshold_para;
+%                 end
+%             end
+%         end
+%         
+%     end
+% end
+% 
+% % Replace non-significant correlations with 0
+% for nChannels = 1 : length(correlations)
+%     for metric_counter = 1 : length(correlation_matrices)
+%         metric = correlation_matrices{metric_counter};
+%         
+%         for element = 1 : numel(correlations{nChannels}.(metric))
+%             if correlations{nChannels}.([metric sig_suffix])(element) == 0
+%                 correlations{nChannels}.(metric)(element) = 0;
+%             end
+%         end
+%         for element = 1 : numel(correlations{nChannels}.trial_averaged.(metric))
+%             if correlations{nChannels}.trial_averaged.([metric sig_suffix])(element) == 0
+%                 correlations{nChannels}.trial_averaged.(metric)(element) = 0;
+%             end
+%         end
+%         
+%     end
+% end
 
 %% Average correlations across channel sets and flies
 
@@ -290,24 +325,63 @@ end
 
 %% Plot average correlations
 
-metric = 'phi_v_mistar';
+metric = 'phi_v_phistar';
 nChannels_colours = {};
-nChannels_widths = [1.5 2];
-nChannels_markers = '^o';
-nChannels_offsets = [-0.4 0.4];
+nChannels_widths = [1 2];
+condition_markers = 'ox';
+condition_offsets = [-0.4 0.4];
 
 subplot(1, 2, 2);
 for nChannels = 1 : length(set_sizes)
     %subplot(1, length(nChannels), nChannels);
     %bar(correlations{nChannels}.trial_averaged.([metric mean_suffix])); hold on;
-    
-    errorbar(taus+nChannels_offsets(nChannels),...
-        correlations{nChannels}.trial_averaged.([metric mean_suffix]),...
-        correlations{nChannels}.trial_averaged.([metric std_suffix]),...
-        ['k' nChannels_markers(nChannels) ':'], 'CapSize', 10, 'LineWidth', nChannels_widths(nChannels)); hold on;
+    for condition_counter = 1 : length(conditions)
+    errorbar(taus+nChannels_offsets(condition_counter),...
+        correlations{nChannels}.trial_averaged.([metric mean_suffix])(:, condition_counter),...
+        correlations{nChannels}.trial_averaged.([metric std_suffix])(:, condition_counter),...
+        ['k' condition_markers(condition_counter) ':'],...
+        'CapSize', 10,...
+        'LineWidth', nChannels_widths(nChannels),...
+        'MarkerSize', 7.5);
+    hold on;
+    end
 end
-set(gca, 'YTick', [0.4 0.6 0.8], 'FontSize', 12);
-set(gca, 'XTick', taus, 'FontSize', 12);
+
 y = ylabel('r', 'FontSize', 15, 'rotation', 90);
+set(gca, 'YTick', [0.2 0.4 0.6], 'FontSize', 12);
 xlabel('\tau', 'FontSize', 15);
+set(gca, 'XTick', taus, 'FontSize', 12);
+axis([2 18 0.15 0.65]);
+title('Part. Corr.');
+
+%{
+set(gca, 'YTick', [0.4 0.6 0.8], 'FontSize', 12);
 axis([2 18 0.37 0.81]);
+%}
+
+%% MIP Correlation post-hoc tests - effect of network size
+
+% Effect of network size
+foo = zeros(length(correlations), size(correlations{1}.trial_averaged.(metric), 2));
+for setSize_counter = 1 : length(correlations)
+    tmp = correlations{setSize_counter}.trial_averaged.(metric);
+    for element = 1 : numel(tmp)
+        tmp(element) = fisher_rz(tmp(element));
+    end
+    foo(setSize_counter, :) = squeeze(mean(mean(mean(tmp, 1), 3), 4));
+end
+[p, h, stats] = signrank(foo(1,:), foo(2,:), 'method', 'exact');
+
+%% MIP Correlation post-hoc tests - effect of lag
+foo = zeros(size(correlations{1}.trial_averaged.(metric), 4), size(correlations{1}.trial_averaged.(metric), 2));
+set_count = 0;
+for setSize_counter = 1 : length(correlations)
+    tmp = correlations{setSize_counter}.trial_averaged.(metric);
+    for element = 1 : numel(tmp)
+        tmp(element) = fisher_rz(tmp(element));
+    end
+    foo(:, :) = foo(:, :) + permute(sum(mean(tmp, 3), 1), [4 2 1 3]);
+    set_count = set_count + size(correlations{setSize_counter}.trial_averaged.(metric), 1);
+end
+foo = foo / set_count;
+[p, h, stats] = signrank(foo(2,:), foo(3,:), 'method', 'exact');

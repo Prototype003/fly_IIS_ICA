@@ -25,7 +25,7 @@ data_directory = 'workspace_results/';
 data_file = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim';
 
 results_directory = 'results/';
-results_filename = [data_file '_detrend' num2str(prep_detrend) '_zscore' num2str(prep_zscore) '_nChannels' num2str(nChannels(1)) 't' num2str(nChannels(end)) '_medianSplit' num2str(prep_medianSplit) '_phistar_allPartitions']; %flies' num2str(flies(1)) 't' num2str(flies(end))];
+results_filename = [data_file '_detrend' num2str(prep_detrend) '_zscore' num2str(prep_zscore) '_nChannels' num2str(nChannels(1)) 't' num2str(nChannels(end)) '_medianSplit' num2str(prep_medianSplit) '_phistar'];% '_allPartitions']; %flies' num2str(flies(1)) 't' num2str(flies(end))];
 
 %% LOAD
 
@@ -103,7 +103,7 @@ for nChannels_counter = 1 : length(nChannels)
                         for trial = 1 : size(fly_data, 3)
                             %disp(['fly' num2str(fly) ' tau' num2str(taus(tau_counter)), ' combo' num2str(channel_set) ' condition' num2str(condition) ' trial' num2str(trial)]); % Keep in mind this is slow
                             % Compute covariances
-                            [cov_present_present, cov_present_past, cov_past_past] = Cov_comp_sample(fly_data(:, channel_sets(channel_set, :), trial, fly, condition)', tau);
+                            [cov_past_past, cov_past_present, cov_present_present] = Cov_comp(fly_data(:, channel_sets(channel_set, :), trial, fly, condition)', tau);
 
                             % Compute phi (find the MIP)
                             [phi_tmp,...
@@ -118,7 +118,7 @@ for nChannels_counter = 1 : length(nChannels)
                                 partitions_hconds(:, channel_set, trial, fly, condition, tau_counter, nBins_counter),...
                                 partitions_mis(:, channel_set, trial, fly, condition, tau_counter, nBins_counter),...
                                 partitions_mi_stars(:, channel_set, trial, fly, condition, tau_counter, nBins_counter)...
-                                ] = phistar_mip(cov_past_past, cov_present_past, cov_present_present, channel_sets(channel_set, :));
+                                ] = phistar_mip(cov_past_past, cov_past_present, cov_present_present, channel_sets(channel_set, :));
                             
                             phi_stars(channel_set, trial, fly, condition, tau_counter, nBins_counter) = phi_tmp(1);
                             phi_stars_normalised(channel_set, trial, fly, condition, tau_counter, nBins_counter) = phi_tmp(2);
@@ -162,7 +162,7 @@ end
 if ~isdir(results_directory)
     mkdir(results_directory)
 end
-save([results_directory results_filename '.mat'], 'phis', '-v7.3');
+save([results_directory results_filename '_phiToolbox.mat'], 'phis');
 
 % %% Function: global median split
 % 

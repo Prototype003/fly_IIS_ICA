@@ -13,6 +13,9 @@ data_nChannels = '2t4';
 data_detrended = 0;
 data_zscored = 0;
 
+nChannels = (2:4);
+taus = [4 8 16];
+
 filter_percent = 5; % 0 to 100 %
 
 condition_shapes{1} = 'o'; condition_shapes{2} = 'x';
@@ -31,29 +34,29 @@ share_pairs = 0;
 
 %% LOAD
 
-% disp('loading');
-% 
-% % Phi-3
-% load([data_directory data_filename '_phithree.mat']);
-% phi_threes = phis;
-% 
-% % Phi-star
-% load([data_directory data_filename '_phistar.mat']);
-% phi_stars = phis;
-% if numel(phi_stars) == length(phi_stars) && size(phi_stars, 1) ~= 1
-%     phi_stars = phi_stars';
-% end
-% 
-% disp('loaded');
+disp('loading');
+
+% Phi-3
+load([data_directory data_filename '_phithree.mat']);
+phi_threes = phis;
+
+% Phi-star
+load([data_directory data_filename '_phistar_phiToolbox.mat']);
+phi_stars = phis;
+if numel(phi_stars) == length(phi_stars) && size(phi_stars, 1) ~= 1
+    phi_stars = phi_stars';
+end
+
+disp('loaded');
 
 %% Filter for non-sharing/sharing channel sets
 
-% First row contains sets with no pairs of channels sharing an electrode
-% Second row contains sets with at least one pair of channels sharing an electrode
-% So use option+1: (0+1)=no-share, (1+1)=share
-
-phi_threes = phi_threes(share_pairs+1, :);
-phi_stars = phi_stars(share_pairs+1, :);
+% % First row contains sets with no pairs of channels sharing an electrode
+% % Second row contains sets with at least one pair of channels sharing an electrode
+% % So use option+1: (0+1)=no-share, (1+1)=share
+% 
+% phi_threes = phi_threes(share_pairs+1, :);
+% phi_stars = phi_stars(share_pairs+1, :);
 
 %% Extract top and bottom 5% of phi values, and top/bottom 5% of delta phi
 % % We sort both phi-3 and phi-star using sorted phi-3 indexes
@@ -190,8 +193,10 @@ end
 
 % Correlate for each fly, condition, tau level
 correlations = cell(length(phi_threes), 1);
+correlations_ps = cell(length(phi_threes), 1);
 for nChannels_counter = 1 : length(phi_threes_avg)
     correlations{nChannels_counter} = zeros(size(phi_threes_avg{nChannels_counter}, 2), size(phi_threes_avg{nChannels_counter}, 3), size(phi_threes_avg{nChannels_counter}, 4));
+    correlations_p{nChannels_counter} = zeros(size(phi_threes_avg{nChannels_counter}, 2), size(phi_threes_avg{nChannels_counter}, 3), size(phi_threes_avg{nChannels_counter}, 4));
 end
 figure;
 subplot_counter = 1;
@@ -225,6 +230,7 @@ for tau_counter = 1 : size(phi_threes_avg{nChannels_counter}, 4)
                 % Compute and store correlation
                 [correlation, p] = corrcoef((three), (star));
                 correlations{nChannels_counter}(fly_counter, condition, tau_counter) = correlation(1, 2);
+                correlations_ps{nChannels_counter}(fly_counter, condition, tau_counter) = p(1, 2);
             end
         end
         subplot_counter = subplot_counter + 1;
@@ -232,6 +238,7 @@ for tau_counter = 1 : size(phi_threes_avg{nChannels_counter}, 4)
     
 end
 
+%%
 % Plot correlations per fly
 figure;
 for nChannels_counter = 1 : length(correlations)
@@ -254,7 +261,30 @@ for nChannels_counter = 1 : length(correlations)
     end
 
 end
-    
+
+% ANOVA for effects of condition, nChannels, and tau
+% Create anovan vector and grouping labels
+anovan_vector = zeros(numel(correlations{1})*length(correlations), 1);
+group_nChannels = zeros(numel(correlations{1})*length(correlations), 1);
+group_condition = zeros(numel(correlations{1})*length(correlations), 1);
+group_tau = zeros(numel(correlations{1})*length(correlations), 1);
+counter = 1;
+for nChannels_counter = 1 : length(correlations)
+    for fly_counter = 1 : size(correlations{nChannels_counter}, 1)
+        for condition = 1 : size(correlations{nChannels_counter}, 2)
+            for tau_counter = 1 : size(correlations{nChannels_counter}, 3)
+                anovan_vector(counter) = correlations{nChannels_counter}(fly_counter, condition, tau_counter);
+                group_nChannels(counter) = nChannels(nChannels_counter);
+                group_condition(counter) = condition;
+                group_tau(counter) = taus(tau_counter);
+                counter = counter + 1;
+            end
+        end
+    end
+end
+
+[p, anovan_table] = anovan(anovan_vector, {group_nChannels, group_condition, group_tau});
+
 %% Plot figure
 % Top row: relationship between phis for one fly
 % Bottom row: coeffs for all flies
@@ -293,7 +323,7 @@ for nChannels_counter = 1 : length(correlations)
     end
 end
 
-% Correlations for each fly
+% Correlations for each fly (across conditions
 correlations = cell(length(phi_threes), 1);
 correlations_ps = cell(length(phi_threes), 1);
 for nChannels_counter = 1 : length(phi_threes_avg)

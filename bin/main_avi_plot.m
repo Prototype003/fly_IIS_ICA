@@ -15,9 +15,17 @@ nChannels = (2:4);
 taus = [4 8 16];
 conditions = (1:2);
 
+ylabel_text = struct();
+ylabel_text.three = '\Phi';
+ylabel_text.star = '\Phi*';
+
+condition_shapes = 'ox';
+condition_offset = [-0.1 0.1];
+tau_colours = 'rgb';
+
 %% Load
 
-phi_type = 'star'; % 'three' or 'star'
+phi_type = 'three'; % 'three' or 'star'
 
 data_nChannels = '2t4';
 data_detrended = 0;
@@ -49,6 +57,9 @@ phi_values = array2table(phi_values);
 phi_table(:, 7) = phi_values;
 
 %% Get data to plot
+
+
+
 % Average and std across flies
 
 plot_data = struct();
@@ -76,6 +87,46 @@ for nChannels_counter = 1 : length(nChannels)
         end
     end
 end
+
+%% Plot
+% Scheme: one subplot per condition
+% Within each condition, plot for each nChannels and tau
+
+figure;
+
+nChannels_xpos = [2 5 8];
+nChannels_ypos = -0.005;
+figure_compress = 0.05;
+
+x_pos = 1;
+for nChannels_counter = 1 : length(nChannels)
+    for tau_counter = 1 : length(taus)
+        for condition_counter = 1 : length(conditions)
+            errorbar(x_pos + condition_offset(condition_counter),...
+                plot_data.means(condition_counter, tau_counter, nChannels_counter),...
+                plot_data.stds(condition_counter, tau_counter, nChannels_counter),...
+                ['k' condition_shapes(condition_counter)]);
+            hold on;
+            axis([0 10 0 0.03]);
+        end
+        x_pos = x_pos + 1;
+    end
+    % nChannels grouping xlabels
+    h = text(nChannels_xpos(nChannels_counter), nChannels_ypos, [num2str(nChannels(nChannels_counter)) 'ch'], 'Fontweight', 'bold');
+    pos = get(h, 'Position');
+    ext = get(h, 'Extent');
+    pos(1) = pos(1) - ext(3)/2;
+    set(h, 'Position', pos);
+end
+
+pos = get(gca, 'position');
+pos(2) = pos(2) + figure_compress;
+set(gca, 'Position', pos);
+
+set(gca,...
+    'XTick', (1:length(taus)*length(nChannels)),...
+    'XTickLabel', [4 8 16 4 8 16 4 8 16],...
+    'YTick', [0 0.015 0.03]);
 
 %% Plot
 % Scheme: treat nChannels as independent, so show how each condition
@@ -115,3 +166,81 @@ for tau_counter = 1 : length(taus)
     set(bars(3), 'FaceColor', 'g');
     legend('2ch', '3ch', '4ch');
 end
+
+
+
+%% Focus on main effect of condition
+
+%{
+Purpose of this plot is to show that phi decreases for ALL flies
+
+For each fly, size, average across all channel sets
+
+x axis must be 13 flies
+y axis should be phi
+shape/colour axis can be condition/tau
+errorbars can be std across channel sets
+subplot axis can be number of channels
+%}
+
+plot_tau = 2;
+plot_nChannels = 3;
+
+% Obtain data and average across sets
+plot_data = struct();
+plot_data.means = zeros(length(flies), length(conditions), length(taus), length(nChannels));
+plot_data.stds = zeros(length(flies), length(conditions), length(taus), length(nChannels));
+for nChannels_counter = 1 : length(nChannels)
+    for tau_counter = 1 : length(taus)
+        for condition_counter = 1 : length(conditions)
+            for fly_counter = 1 : length(flies)
+                rows = phi_table(...
+                    phi_table.nChannels == nChannels(nChannels_counter) &...
+                    phi_table.tau == tau_counter &...
+                    phi_table.condition == conditions(condition_counter) &...
+                    phi_table.fly == fly_counter,...
+                    :);
+                % Average across sets
+                phi_values = table2array(rows(:, 7));
+                %phi_values_iso = table2array(rows_iso(:, 7));
+                plot_data.means(fly_counter, condition_counter, tau_counter, nChannels_counter) = mean(phi_values);
+                plot_data.stds(fly_counter, condition_counter, tau_counter, nChannels_counter) = std(phi_values);
+            end
+        end
+    end
+end
+
+figure;
+for nChannels_counter = 1 : length(nChannels)
+    subplot(1, length(nChannels), nChannels_counter);
+    for tau_counter = 1:length(taus)
+        for fly_counter = 1 : length(flies)
+            for condition_counter = 1 : length(conditions)
+%                 errorbar(fly_counter + condition_offset(condition_counter),...
+%                     plot_data.means(fly_counter, condition_counter, tau_counter, nChannels_counter),...
+%                     plot_data.stds(fly_counter, condition_counter, tau_counter, nChannels_counter),...
+%                     ['k' condition_shapes(condition_counter)]); hold on;
+                scatter(fly_counter,...
+                    plot_data.means(fly_counter, condition_counter, tau_counter, nChannels_counter),...
+                    ['k' condition_shapes(condition_counter)]); hold on;
+                axis([0 14 0 0.08]);
+                set(gca, 'XTick', (1:13), 'XTickLabel', [], 'YTick', [0 0.04 0.08]);
+                xlabel('fly'); ylabel(ylabel_text.(phi_type));
+            end
+        end
+    end
+end
+
+% Stats test
+ps = zeros(length(nChannels), length(taus));
+stats = cell(length(nChannels), length(taus));
+for nChannels_counter = 1 : length(nChannels)
+    for tau_counter = 1 : length(taus)
+        air = plot_data.means(:, 1, tau_counter, nChannels_counter);
+        iso = plot_data.means(:, 2, tau_counter, nChannels_counter);
+        [ps(nChannels_counter, tau_counter), ~, stats{nChannels_counter, tau_counter}]= signrank(air, iso);
+    end
+end
+
+% Bonferroni correction
+ps = ps * numel(ps);

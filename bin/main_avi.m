@@ -11,7 +11,8 @@ Test is conducted using LME with model comparisons (to the null)
 
 %% SETUP
 
-phi_type = 'three';
+phi_type = 'star';
+file_suffix = '';
 
 data_nChannels = '2t4';
 data_detrended = 0;
@@ -32,7 +33,7 @@ results_filename = [data_filename '_lmeStats'];
 
 disp('loading');
 
-load([data_directory data_filename '.mat']);
+load([data_directory data_filename file_suffix '.mat']);
 
 disp('loaded');
 
@@ -67,23 +68,33 @@ table_raw.condition = zeros(table_length, 1);
 table_raw.tau = zeros(table_length, 1);
 table_raw.phi = zeros(table_length, 1);
 row_counter = 1;
+set_label_starts = [1 106 456];
+tau_labels = [4 8 16];
 % Loop is based on natural ordering: fly, condition, tau, nChannels, set, trial
 % Assumes same number of flies, conditions and taus for all nChannels
 for fly = 1 : size(phis{1}.phis, 3)
     for condition = 1 : size(phis{1}.phis, 4)
         for tau = 1 : size(phis{1}.phis, 5)
             for nChannels = 1 : length(phis)
-                for set = 1 : size(phis{nChannels}.phis, 1)
+                set_label = set_label_starts(nChannels_counter);
+                for set_counter = 1 : size(phis{nChannels}.phis, 1)
                     for trial = 1 : size(phis{nChannels}.phis, 2)
                         table_raw.nChannels(row_counter) = phis{nChannels}.nChannels;
-                        table_raw.set(row_counter) = set;
+                        table_raw.set(row_counter) = set_counter;
                         table_raw.trial(row_counter) = trial;
                         table_raw.fly(row_counter) = fly;
                         table_raw.condition(row_counter) = condition;
-                        table_raw.tau(row_counter) = tau;
-                        table_raw.phi(row_counter) = log(phis{nChannels}.phis(set, trial, fly, condition, tau));
+                        table_raw.tau(row_counter) = phis{nChannels}.taus(tau);
+                        if phis{nChannels}.phis(set_counter, trial, fly, condition, tau) <= 0
+                            tmp = phis{nChannels}.phis(:);
+                            tmp(tmp <= 0) = inf;
+                            table_raw.phi(row_counter) = log(min(tmp));
+                        else
+                            table_raw.phi(row_counter) = log(phis{nChannels}.phis(set_counter, trial, fly, condition, tau));
+                        end
                         row_counter = row_counter + 1;
                     end
+                    set_label = set_label + 1;
                 end
             end
         end
@@ -118,9 +129,10 @@ disp('full model built');
 %% Build null models for comparison
 
 model_null_specs = {...
-    'phi ~ condition + tau + (1|fly) + (1|fly:set)',... % nChannels null model
     'phi ~ nChannels + tau + (1|fly) + (1|fly:set)',... % condition null model
+    'phi ~ condition + tau + (1|fly) + (1|fly:set)',... % nChannels null model
     'phi ~ nChannels + condition + (1|fly) + (1|fly:set)'... % tau null model
+    'phi ~ nChannels + condition + tau + (1|fly) + (1|fly:set)'... % full main effect null model
     };
 
 % Build null models

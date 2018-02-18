@@ -31,7 +31,8 @@ partition_formatted = zeros(nChannels, 1);
 for group = 1 : length(partition)
     partition_formatted(partition{group}) = group;
 end
-[phi_star, ~, ~, ~, MI, ~, ~, H_cond, H, MI_star] = phi_comp(cov_present_present, cov_past_present, cov_past_past, [], partition_formatted);
+%[phi_star, ~, ~, ~, MI, ~, ~, H_cond, H, MI_star] = phi_comp(cov_present_present, cov_past_present, cov_past_past, [], partition_formatted);
+[phi_star, H, H_cond, MI, MI_star] = phi_star_Gauss(cov_past_past, cov_past_present, cov_present_present, partition_formatted); phi_star = [phi_star phi_star/phi2_normFactor(partition_formatted, cov_past_past)];
 MIP = partition;
 % Save values for partition
 partitions_phis(1, :) = phi_star;
@@ -50,7 +51,8 @@ for partition_counter = 2 : length(partitions) % Already checked the first parti
         partition_formatted(partition{group}) = group;
     end
     
-    [phi_star_new, ~, ~, ~, MI_new, ~, ~, H_cond_new, H_new, MI_star_new] = phi_comp(cov_present_present, cov_past_present, cov_past_past, [], partition_formatted);
+    %[phi_star_new, ~, ~, ~, MI_new, ~, ~, H_cond_new, H_new, MI_star_new] = phi_comp(cov_present_present, cov_past_present, cov_past_past, [], partition_formatted);
+    [phi_star_new, H_new, H_cond_new, MI_new, MI_star_new] = phi_star_Gauss(cov_past_past, cov_past_present, cov_present_present, partition_formatted); phi_star_new = [phi_star_new phi_star_new/phi2_normFactor(partition_formatted, cov_past_past)];
     
     if phi_star_new(2) < phi_star(2)
         MIP = partition;

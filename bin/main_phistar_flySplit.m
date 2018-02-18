@@ -7,13 +7,13 @@ Splits large phis structure into several - 1 per fly
 %% Setup
 
 data_directory = 'results/';
-data_file = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels2t4_medianSplit0_phistar_allPartitions.mat';
+data_file = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels2t4_medianSplit0_phistar_allPartitions_phiToolbox.mat';
 
 prefix_common = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels2t4_medianSplit0_phistar_allPartitions';
 infix = 'fly';
 suffix_common = '.mat';
 
-results_directory = 'results/';
+results_directory = 'results/preformatted_results/';
 
 %% Load
 

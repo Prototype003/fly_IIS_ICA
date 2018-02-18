@@ -83,6 +83,8 @@ if conditionSplit == 1
             % Correlation storage matrices
             phi_v_phistar = zeros(nSets, 1, length(conditions), length(taus));
             phi_v_phistar_ps = zeros(nSets, 1, length(conditions), length(taus));
+            phi_v_phistarNormalised = zeros(nSets, 1, length(conditions), length(taus));
+            phi_v_phistarNormalised_ps = zeros(nSets, 1, length(conditions), length(taus));
             phi_v_mi = zeros(nSets, 1, length(conditions), length(taus));
             phi_v_mi_ps = zeros(nSets, 1, length(conditions), length(taus));
             phi_v_mistar = zeros(nSets, 1, length(conditions), length(taus));
@@ -91,6 +93,8 @@ if conditionSplit == 1
             trial_averaged = struct();
             trial_averaged.phi_v_phistar = zeros(nSets, 1, length(conditions), length(taus));
             trial_averaged.phi_v_phistar_ps = zeros(nSets, 1, length(conditions), length(taus));
+            trial_averaged.phi_v_phistarNormalised = zeros(nSets, 1, length(conditions), length(taus));
+            trial_averaged.phi_v_phistarNormalised_ps = zeros(nSets, 1, length(conditions), length(taus));
             trial_averaged.phi_v_mi = zeros(nSets, 1, length(conditions), length(taus));
             trial_averaged.phi_v_mi_ps = zeros(nSets, 1, length(conditions), length(taus));
             trial_averaged.phi_v_mistar = zeros(nSets, 1, length(conditions), length(taus));
@@ -104,6 +108,7 @@ if conditionSplit == 1
                         % First get trial-averaged phi-star values (this will be same
                         % for all phi-3 states), and get partition order
                         phi_star_partition_phistars = zeros(size(phi_stars{nChannels_counter}.partitions, 3), 2*nPartitions); % trials x bidirectional partitions
+                        phi_star_partition_phistars_normalised = zeros(size(phi_stars{nChannels_counter}.partitions, 3), 2*nPartitions);
                         phi_star_partition_mis = zeros(size(phi_stars{nChannels_counter}.partitions, 3), 2*nPartitions);
                         phi_star_partition_mistars = zeros(size(phi_stars{nChannels_counter}.partitions, 3), 2*nPartitions);
                         value_counter = 1; % Used to keep track of phi_star_partition_xxx position, as partition_counter increase by 1, value_counter increases by 2
@@ -123,15 +128,18 @@ if conditionSplit == 1
                                 
                                 % Get values across trials
                                 phistars = squeeze(phi_stars{nChannels_counter}.partitions_phi_stars(partition_counter, channel_set, :, 1, condition, tau_counter));
+                                phistars_normalised = squeeze(phi_stars{nChannels_counter}.partitions_phi_stars_normalised(partition_counter, channel_set, :, 1, condition, tau_counter));
                                 mis = squeeze(phi_stars{nChannels_counter}.partitions_mis(partition_counter, channel_set, :, 1, condition, tau_counter));
                                 mi_stars = squeeze(phi_stars{nChannels_counter}.partitions_mi_stars(partition_counter, channel_set, :, 1, condition, tau_counter));
                                 
                                 % Add trial values (x2)
                                 phi_star_partition_phistars(:, value_counter) = phistars;
+                                phi_star_partition_phistars_normalised(:, value_counter) = phistars_normalised;
                                 phi_star_partition_mis(:, value_counter) = mis;
                                 phi_star_partition_mistars(:, value_counter) = mi_stars;
                                 value_counter = value_counter + 1;
                                 phi_star_partition_phistars(:, value_counter) = phistars;
+                                phi_star_partition_phistars_normalised(:, value_counter) = phistars_normalised;
                                 phi_star_partition_mis(:, value_counter) = mis;
                                 phi_star_partition_mistars(:, value_counter) = mi_stars;
                                 value_counter = value_counter + 1;
@@ -146,7 +154,7 @@ if conditionSplit == 1
                         for partition_counter = 1 : length(partition_order)
                             partition = partition_order{partition_counter};
                             
-                            state_phis = zeros(2, size(phi_threes{nChannels_counter}.state_partitions, 1));
+                            state_phis = zeros(2, size(phi_threes{nChannels_counter}.state_partitions, 1)); % 2 of the same partition (due to directionality) x states
                             
                             % Get values for all states (average across states)
                             for state = 1 : size(phi_threes{nChannels_counter}.state_partitions, 1)
@@ -196,6 +204,10 @@ if conditionSplit == 1
                         phi_v_phistar(channel_set, 1, condition, tau_counter) = r(1, 2);
                         phi_v_phistar_ps(channel_set, 1, condition, tau_counter) = p(1, 2);
                         
+                        [r, p] = corrcoef(phi_star_partition_phistars_normalised(:), phi_three_partition_phis(:));
+                        phi_v_phistarNormalised(channel_set, 1, condition, tau_counter) = r(1, 2);
+                        phi_v_phistarNormalised_ps(channel_set, 1, condition, tau_counter) = p(1, 2);
+                        
                         [r, p] = corrcoef(phi_star_partition_mis(:), phi_three_partition_phis(:));
                         phi_v_mi(channel_set, 1, condition, tau_counter) = r(1, 2);
                         phi_v_mi_ps(channel_set, 1, condition, tau_counter) = p(1, 2);
@@ -208,6 +220,10 @@ if conditionSplit == 1
                         [r, p] = corrcoef(mean(phi_star_partition_phistars, 1), mean(phi_three_partition_phis, 1));
                         trial_averaged.phi_v_phistar(channel_set, 1, condition, tau_counter) = r(1, 2);
                         trial_averaged.phi_v_phistar_ps(channel_set, 1, condition, tau_counter) = p(1, 2);
+                        
+                        [r, p] = corrcoef(mean(phi_star_partition_phistars_normalised, 1), mean(phi_three_partition_phis, 1));
+                        trial_averaged.phi_v_phistarNormalised(channel_set, 1, condition, tau_counter) = r(1, 2);
+                        trial_averaged.phi_v_phistarNormalised_ps(channel_set, 1, condition, tau_counter) = p(1, 2);
                         
                         [r, p] = corrcoef(mean(phi_star_partition_mis, 1), mean(phi_three_partition_phis, 1));
                         trial_averaged.phi_v_mi(channel_set, 1, condition, tau_counter) = r(1, 2);
@@ -225,6 +241,8 @@ if conditionSplit == 1
             correlations{nChannels_counter} = struct();
             correlations{nChannels_counter}.phi_v_phistar = phi_v_phistar;
             correlations{nChannels_counter}.phi_v_phistar_ps = phi_v_phistar_ps;
+            correlations{nChannels_counter}.phi_v_phistarNormalised = phi_v_phistarNormalised;
+            correlations{nChannels_counter}.phi_v_phistarNormalised_ps = phi_v_phistarNormalised_ps;
             correlations{nChannels_counter}.phi_v_mi = phi_v_mi;
             correlations{nChannels_counter}.phi_v_mi_ps = phi_v_mi_ps;
             correlations{nChannels_counter}.phi_v_mistar = phi_v_mistar;
@@ -275,6 +293,8 @@ if conditionSplit == 0
             % Correlation storage matrices
             phi_v_phistar = zeros(nSets, 1, length(taus));
             phi_v_phistar_ps = zeros(nSets, 1, length(taus));
+            phi_v_phistarNormalised = zeros(nSets, 1, length(taus));
+            phi_v_phistarNormalised_ps = zeros(nSets, 1, length(taus));
             phi_v_mi = zeros(nSets, 1, length(taus));
             phi_v_mi_ps = zeros(nSets, 1, length(taus));
             phi_v_mistar = zeros(nSets, 1, length(taus));
@@ -283,6 +303,8 @@ if conditionSplit == 0
             trial_averaged = struct();
             trial_averaged.phi_v_phistar = zeros(nSets, 1, length(taus));
             trial_averaged.phi_v_phistar_ps = zeros(nSets, 1, length(taus));
+            trial_averaged.phi_v_phistarNormalised = zeros(nSets, 1, length(taus));
+            trial_averaged.phi_v_phistarNormalised_ps = zeros(nSets, 1, length(taus));
             trial_averaged.phi_v_mi = zeros(nSets, 1, length(taus));
             trial_averaged.phi_v_mi_ps = zeros(nSets, 1, length(taus));
             trial_averaged.phi_v_mistar = zeros(nSets, 1, length(taus));
@@ -295,6 +317,7 @@ if conditionSplit == 0
                     % First get trial-averaged phi-star values (this will be same
                     % for all phi-3 states), and get partition order
                     phi_star_partition_phistars = zeros(size(phi_stars{nChannels_counter}.partitions, 3)*length(conditions) , 2*nPartitions); % trials*conditions x bidirectional partitions
+                    phi_star_partition_phistars_normalised = zeros(size(phi_stars{nChannels_counter}.partitions, 3)*length(conditions) , 2*nPartitions);
                     phi_star_partition_mis = zeros(size(phi_stars{nChannels_counter}.partitions, 3)*length(conditions), 2*nPartitions);
                     phi_star_partition_mistars = zeros(size(phi_stars{nChannels_counter}.partitions, 3)*length(conditions), 2*nPartitions);
                     value_counter = 1; % Used to keep track of phi_star_partition_xxx position, as partition_counter increase by 1, value_counter increases by 2
@@ -314,15 +337,18 @@ if conditionSplit == 0
                             
                             % Get values across trials
                             phistars = squeeze(phi_stars{nChannels_counter}.partitions_phi_stars(partition_counter, channel_set, :, 1, :, tau_counter));
+                            phistars_normalised = squeeze(phi_stars{nChannels_counter}.partitions_phi_stars(partition_counter, channel_set, :, 1, :, tau_counter));
                             mis = squeeze(phi_stars{nChannels_counter}.partitions_mis(partition_counter, channel_set, :, 1, :, tau_counter));
                             mi_stars = squeeze(phi_stars{nChannels_counter}.partitions_mi_stars(partition_counter, channel_set, :, 1, :, tau_counter));
                             
                             % Add trial values (x2)
                             phi_star_partition_phistars(:, value_counter) = phistars(:);
+                            phi_star_partition_phistars_normalised(:, value_counter) = phistars_normalised(:);
                             phi_star_partition_mis(:, value_counter) = mis(:);
                             phi_star_partition_mistars(:, value_counter) = mi_stars(:);
                             value_counter = value_counter + 1;
                             phi_star_partition_phistars(:, value_counter) = phistars(:);
+                            phi_star_partition_phistars_normalised(:, value_counter) = phistars_normalised(:);
                             phi_star_partition_mis(:, value_counter) = mis(:);
                             phi_star_partition_mistars(:, value_counter) = mi_stars(:);
                             value_counter = value_counter + 1;
@@ -393,6 +419,10 @@ if conditionSplit == 0
                     phi_v_phistar(channel_set, 1, tau_counter) = r(1, 2);
                     phi_v_phistar_ps(channel_set, 1, tau_counter) = p(1, 2);
                     
+                    [r, p] = corrcoef(phi_star_partition_phistars_normalised(:), phi_three_partition_phis(:));
+                    phi_v_phistarNormalised(channel_set, 1, tau_counter) = r(1, 2);
+                    phi_v_phistarNormalised_ps(channel_set, 1, tau_counter) = p(1, 2);
+                    
                     [r, p] = corrcoef(phi_star_partition_mis(:), phi_three_partition_phis(:));
                     phi_v_mi(channel_set, 1, tau_counter) = r(1, 2);
                     phi_v_mi_ps(channel_set, 1, tau_counter) = p(1, 2);
@@ -410,6 +440,10 @@ if conditionSplit == 0
                     phi_star_partition_phistars = permute(phi_star_partition_phistars, [1 3 2]);
                     % mean across trials
                     phi_star_partition_phistars = mean(phi_star_partition_phistars, 3);
+                    
+                    phi_star_partition_phistars_normalised = reshape(phi_star_partition_phistars_normalised', [nPartitions*2, nTrials, length(conditions)]);
+                    phi_star_partition_phistars_normalised = permute(phi_star_partition_phistars_normalised, [1 3 2]);
+                    phi_star_partition_phistars_normalised = mean(phi_star_partition_phistars_normalised, 3);
                     
                     phi_star_partition_mis = reshape(phi_star_partition_mis', [nPartitions*2, nTrials, length(conditions)]);
                     phi_star_partition_mis = permute(phi_star_partition_mis, [1 3 2]);
@@ -429,6 +463,10 @@ if conditionSplit == 0
                     trial_averaged.phi_v_phistar(channel_set, 1, tau_counter) = r(1, 2);
                     trial_averaged.phi_v_phistar_ps(channel_set, 1, tau_counter) = p(1, 2);
                     
+                    [r, p] = corrcoef(phi_star_partition_phistars_normalised(:), phi_three_partition_phis(:));
+                    trial_averaged.phi_v_phistarNormalised(channel_set, 1, tau_counter) = r(1, 2);
+                    trial_averaged.phi_v_phistarNormalised_ps(channel_set, 1, tau_counter) = p(1, 2);
+                    
                     [r, p] = corrcoef(phi_star_partition_mis(:), phi_three_partition_phis(:));
                     trial_averaged.phi_v_mi(channel_set, 1, tau_counter) = r(1, 2);
                     trial_averaged.phi_v_mi_ps(channel_set, 1, tau_counter) = p(1, 2);
@@ -444,6 +482,8 @@ if conditionSplit == 0
             correlations{nChannels_counter} = struct();
             correlations{nChannels_counter}.phi_v_phistar = phi_v_phistar;
             correlations{nChannels_counter}.phi_v_phistar_ps = phi_v_phistar_ps;
+            correlations{nChannels_counter}.phi_v_phistarNormalised = phi_v_phistarNormalised;
+            correlations{nChannels_counter}.phi_v_phistarNormalised_ps = phi_v_phistarNormalised_ps;
             correlations{nChannels_counter}.phi_v_mi = phi_v_mi;
             correlations{nChannels_counter}.phi_v_mi_ps = phi_v_mi_ps;
             correlations{nChannels_counter}.phi_v_mistar = phi_v_mistar;
@@ -462,6 +502,7 @@ end
 
 correlation_matrices = {...
     'phi_v_phistar',...
+    'phi_v_phistarNormalised',...
     'phi_v_mi',...
     'phi_v_mistar',...
     };
