@@ -1,11 +1,11 @@
 
 import pyphi as pyphi
-import numpy as np
+#import numpy as np
 import scipy.io as sio
 #import matplotlib.pyplot as plt
 #import sklearn.preprocessing as skp
-import copy
-import itertools
+#import copy
+#import itertools
 
 print("inside")
 
@@ -76,7 +76,7 @@ def binarise_global_median(fly_data):
 	
 	return fly_data_binarised, 2, channel_medians
 
-def binarise_epoch_median(fly_data):
+def binarise_trial_median(fly_data):
 	"""
 	Finds the median for each channel, at each epoch-trial
 	Binarises samples based on this median: 1 if greater than median, 0 otherwise
@@ -250,197 +250,197 @@ def build_tpm_sbn(fly_data, tau, n_values):
 
 # Old functions which may no longer be useful ################################################################################
 
-def concat_arrays_in_array(matrix_array):
-	"""
-	Concatenates each matrix (numpy array, as stored in a numpy array) into a large matrix along the 1st dimension (number of elements in the 1st dimension stays the same; concatenates the other dimensions)
-	Inputs:
-		numpy array of numpy arrays - the first dimension of these arrays should be constant
-			e.g. matrix_array[0] gives the first array
-			e.g. matrix_array[1] gives the second array, etc.
-	Outputs:
-	"""
-	import numpy as np
+# def concat_arrays_in_array(matrix_array):
+	# """
+	# Concatenates each matrix (numpy array, as stored in a numpy array) into a large matrix along the 1st dimension (number of elements in the 1st dimension stays the same; concatenates the other dimensions)
+	# Inputs:
+		# numpy array of numpy arrays - the first dimension of these arrays should be constant
+			# e.g. matrix_array[0] gives the first array
+			# e.g. matrix_array[1] gives the second array, etc.
+	# Outputs:
+	# """
+	# import numpy as np
 	
-	# Take first trial
-	concatenated = matrix_array[0]
+	# # Take first trial
+	# concatenated = matrix_array[0]
 	
-	# Concatenate remaining trials
-	for matrix in range(1, matrix_array.shape[0]):
-		concatenated = np.concatenate((concatenated, matrix_array[matrix]), axis=1)
+	# # Concatenate remaining trials
+	# for matrix in range(1, matrix_array.shape[0]):
+		# concatenated = np.concatenate((concatenated, matrix_array[matrix]), axis=1)
 	
-	return concatenated
+	# return concatenated
 
-# Binarising functions
-def threshold_binarise_arrays_in_array(matrix_array, thresholds):
-	"""
-	Binarises matrices of an array, using the provided thresholds - each threshold corresponds to each element in the first dimension
-	Each element in the second dimension is binarised using the threshold for their position in the first dimension
-	Inputs:
-		matrix_array - array of 2D matrices, all with the same number of elements in the first dimension
-		thresholds - 1D vector which holds the thresholds to binarise by
-			Should have the same number of elements as the first dimensions of the matrices
-	Outputs:
-	"""
-	import sklearn.preprocessing as skp
-	import copy
+# # Binarising functions
+# def threshold_binarise_arrays_in_array(matrix_array, thresholds):
+	# """
+	# Binarises matrices of an array, using the provided thresholds - each threshold corresponds to each element in the first dimension
+	# Each element in the second dimension is binarised using the threshold for their position in the first dimension
+	# Inputs:
+		# matrix_array - array of 2D matrices, all with the same number of elements in the first dimension
+		# thresholds - 1D vector which holds the thresholds to binarise by
+			# Should have the same number of elements as the first dimensions of the matrices
+	# Outputs:
+	# """
+	# import sklearn.preprocessing as skp
+	# import copy
 	
-	matrix_array = copy.deepcopy(matrix_array) # We don't want affect scope outside the function
+	# matrix_array = copy.deepcopy(matrix_array) # We don't want affect scope outside the function
 	
-	for matrix in range(matrix_array.shape[0]): # i.e. for each matrix
-		for threshold_dimension in range(thresholds.shape[0]): # i.e. for each row (threshold_dimension is a D1 (row) counter)
-			matrix_array[matrix][threshold_dimension, :] = skp.binarize(matrix_array[matrix][threshold_dimension, :].reshape(1, -1), thresholds[threshold_dimension]).astype(int)
+	# for matrix in range(matrix_array.shape[0]): # i.e. for each matrix
+		# for threshold_dimension in range(thresholds.shape[0]): # i.e. for each row (threshold_dimension is a D1 (row) counter)
+			# matrix_array[matrix][threshold_dimension, :] = skp.binarize(matrix_array[matrix][threshold_dimension, :].reshape(1, -1), thresholds[threshold_dimension]).astype(int)
 	
-	return matrix_array
+	# return matrix_array
 
-# TPM functions
-def tpm_window(matrix_array, window_start_sample, window_end_sample):
-	"""
-	For a given time range (from window_start to window_end, inclusive), build a transitional probability matrix (TPM)
-	Iterates through each matrix in the array
-	Extracts values at each dimension-1 element, and at each dimension-2 element (corresponding to all channels, and the limited time window, respectively)
-	Inputs:
-		window_start_sample - which sample (column) to start building from
-			If negative, all samples are used (and window_end is ignored)
-		window_end_sample - which sample (column) to end building at (it is assumed that window_end doesn't transition to a future state)
-	Outputs:
-	"""
-	import pyphi as pyphi
-	import numpy as np
+# # TPM functions
+# def tpm_window(matrix_array, window_start_sample, window_end_sample):
+	# """
+	# For a given time range (from window_start to window_end, inclusive), build a transitional probability matrix (TPM)
+	# Iterates through each matrix in the array
+	# Extracts values at each dimension-1 element, and at each dimension-2 element (corresponding to all channels, and the limited time window, respectively)
+	# Inputs:
+		# window_start_sample - which sample (column) to start building from
+			# If negative, all samples are used (and window_end is ignored)
+		# window_end_sample - which sample (column) to end building at (it is assumed that window_end doesn't transition to a future state)
+	# Outputs:
+	# """
+	# import pyphi as pyphi
+	# import numpy as np
 	
-	# Determine number of states
-	n_states = 2**matrix_array[0].shape[0] # This assumes binarisation - a node is either ON or OFF
+	# # Determine number of states
+	# n_states = 2**matrix_array[0].shape[0] # This assumes binarisation - a node is either ON or OFF
 	
-	# Declare TPM (all zeros)
-	tpm = np.zeros((n_states, n_states))
+	# # Declare TPM (all zeros)
+	# tpm = np.zeros((n_states, n_states))
 	
-	"""
-	TPM Indexing (LOLI):
-	e.g. for 4x4 TPM:
+	# """
+	# TPM Indexing (LOLI):
+	# e.g. for 4x4 TPM:
 	
-	0 = 00
-	1 = 10
-	2 = 01
-	3 = 11
+	# 0 = 00
+	# 1 = 10
+	# 2 = 01
+	# 3 = 11
 	
-	Use pyphi.convert.state2loli_index(tuple) to get the index
-	"""
+	# Use pyphi.convert.state2loli_index(tuple) to get the index
+	# """
 	
-	# Declare transition counter (0)
-	transition_counter = np.zeros((n_states, 1))
+	# # Declare transition counter (0)
+	# transition_counter = np.zeros((n_states, 1))
 	
-	for matrix_counter in range(matrix_array.shape[0]): # For each matrix
-		matrix = matrix_array[matrix_counter]
-		last_sample = matrix.shape[1] - 1 # Last sample which transitions (i.e. the second last sample)
+	# for matrix_counter in range(matrix_array.shape[0]): # For each matrix
+		# matrix = matrix_array[matrix_counter]
+		# last_sample = matrix.shape[1] - 1 # Last sample which transitions (i.e. the second last sample)
 		
-		if window_start_sample == -1:
-			window_start = 0
-			window_end = last_sample - 1
-		else:
-			window_start = window_start_sample
-			window_end = window_end_sample
+		# if window_start_sample == -1:
+			# window_start = 0
+			# window_end = last_sample - 1
+		# else:
+			# window_start = window_start_sample
+			# window_end = window_end_sample
 		
-		for sample_counter in range(window_start, window_end): # For each sample in the matrix (with a future sample)
-			sample_current = matrix[:, sample_counter] # Current state (given by the column, assuming that each row is the time series of a channel)
-			sample_future = matrix[:, sample_counter+1] # Future state
+		# for sample_counter in range(window_start, window_end): # For each sample in the matrix (with a future sample)
+			# sample_current = matrix[:, sample_counter] # Current state (given by the column, assuming that each row is the time series of a channel)
+			# sample_future = matrix[:, sample_counter+1] # Future state
 			
-			# Identify current state
-			state_current = pyphi.convert.state2loli_index(tuple(np.ndarray.tolist(sample_current)))
+			# # Identify current state
+			# state_current = pyphi.convert.state2loli_index(tuple(np.ndarray.tolist(sample_current)))
 			
-			# Identify the following state
-			state_future = pyphi.convert.state2loli_index(tuple(np.ndarray.tolist(sample_future)))
+			# # Identify the following state
+			# state_future = pyphi.convert.state2loli_index(tuple(np.ndarray.tolist(sample_future)))
 			
-			# Increment TPM transition by 1
-			tpm[state_current, state_future] += 1
+			# # Increment TPM transition by 1
+			# tpm[state_current, state_future] += 1
 			
-			# Increment transition counter
-			transition_counter[state_current] += 1
+			# # Increment transition counter
+			# transition_counter[state_current] += 1
 	
-	# Divide elements in TPM by transition counter
-	tpm /= transition_counter
+	# # Divide elements in TPM by transition counter
+	# tpm /= transition_counter
 	
-	return pyphi.convert.state_by_state2state_by_node(tpm)
+	# return pyphi.convert.state_by_state2state_by_node(tpm)
 
-# Phi functions
-def nchannel_phi(matrix_array, n_channels):
-	"""
-	For each combination of n_channels (n_channels <= number of rows/channels in each matrix), calculates
-	the TPM across all trials using all samples, then calculates phi at each transitioning sample
+# # Phi functions
+# def nchannel_phi(matrix_array, n_channels):
+	# """
+	# For each combination of n_channels (n_channels <= number of rows/channels in each matrix), calculates
+	# the TPM across all trials using all samples, then calculates phi at each transitioning sample
 
-	Assumes that all channels are connected
+	# Assumes that all channels are connected
 	
-	Inputs:
-		matrix_array - array of 2D matrices, all with the same number of elements in the first dimension
-		n_channels - how many channels to calculate phi over
-	Outputs:
-	"""
-	import pyphi as pyphi
-	import numpy as np
-	import itertools
+	# Inputs:
+		# matrix_array - array of 2D matrices, all with the same number of elements in the first dimension
+		# n_channels - how many channels to calculate phi over
+	# Outputs:
+	# """
+	# import pyphi as pyphi
+	# import numpy as np
+	# import itertools
 	
-	combo_phis = dict()
+	# combo_phis = dict()
 	
-	# Get the combinations of channels
-	channels = np.arange(matrix_array[0].shape[0]) # Get list of channels
-	channel_combos = [tuple(combination) for combination in itertools.combinations(channels, n_channels)] # Get combos of channels
+	# # Get the combinations of channels
+	# channels = np.arange(matrix_array[0].shape[0]) # Get list of channels
+	# channel_combos = [tuple(combination) for combination in itertools.combinations(channels, n_channels)] # Get combos of channels
 	
-	for combo in channel_combos:
-		print(combo)
-		# Extract relevant channels (i.e. channels specificed by the combo) across all trials
-		samples_all = matrix_array[0][combo, :]
-		for matrix_counter in range(1, matrix_array.size):
-			np.concatenate((samples_all, matrix_array[matrix_counter][combo, :]), axis=1)
-		# Build the TPM from those channels
-		tpm_input = np.empty((1), dtype=object)
-		tpm_input[0] = samples_all
-		tpm = tpm_window(tpm_input, -1, 0) # We place the concatenated matrix into an array as input for tpm_window(), which takes an array of matrices
+	# for combo in channel_combos:
+		# print(combo)
+		# # Extract relevant channels (i.e. channels specificed by the combo) across all trials
+		# samples_all = matrix_array[0][combo, :]
+		# for matrix_counter in range(1, matrix_array.size):
+			# np.concatenate((samples_all, matrix_array[matrix_counter][combo, :]), axis=1)
+		# # Build the TPM from those channels
+		# tpm_input = np.empty((1), dtype=object)
+		# tpm_input[0] = samples_all
+		# tpm = tpm_window(tpm_input, -1, 0) # We place the concatenated matrix into an array as input for tpm_window(), which takes an array of matrices
 		
-		#print("computing phi")
-		# Compute phi at each trial sample
-		network = pyphi.Network(tpm)
-		phis = np.empty((matrix_array.size), dtype=object)
-		for trial_counter in range(1, 2):#matrix_array.size):
-			phis[trial_counter] = np.empty(matrix_array[trial_counter].shape[1])
-			trial = matrix_array[trial_counter]
-			for sample_counter in range(matrix_array[trial].shape[1]):
-				print("trial" + str(trial_counter) + " sample" + str(sample_counter))
-				sample = trial[combo, sample_counter]
-				#print(sample)
-				state = tuple(np.ndarray.tolist(sample))
-				#print("state done")
-				subsystem = pyphi.Subsystem(network, state, range(network.size))
-				#print("subsystem done")
-				phis[trial_counter][sample_counter] = pyphi.compute.big_phi(subsystem)
-				#print("phi = " + str(phis[trial_counter][sample_counter]))
+		# #print("computing phi")
+		# # Compute phi at each trial sample
+		# network = pyphi.Network(tpm)
+		# phis = np.empty((matrix_array.size), dtype=object)
+		# for trial_counter in range(1, 2):#matrix_array.size):
+			# phis[trial_counter] = np.empty(matrix_array[trial_counter].shape[1])
+			# trial = matrix_array[trial_counter]
+			# for sample_counter in range(matrix_array[trial].shape[1]):
+				# print("trial" + str(trial_counter) + " sample" + str(sample_counter))
+				# sample = trial[combo, sample_counter]
+				# #print(sample)
+				# state = tuple(np.ndarray.tolist(sample))
+				# #print("state done")
+				# subsystem = pyphi.Subsystem(network, state, range(network.size))
+				# #print("subsystem done")
+				# phis[trial_counter][sample_counter] = pyphi.compute.big_phi(subsystem)
+				# #print("phi = " + str(phis[trial_counter][sample_counter]))
 		
-		# Add combo results to dictionary
-		combo_phis[combo] = phis
+		# # Add combo results to dictionary
+		# combo_phis[combo] = phis
 	
-	return combo_phis
+	# return combo_phis
 
-# Plotting functions
-def plot_mean(matrix):
-	"""
-	Calculates the mean and standard deviation across the first dimension (axis 0), and plots across the second dimension (axis 1)
-	Inputs: numpy 2D array
-	"""
-	import numpy as np
-	import matplotlib.pyplot as plt
+# # Plotting functions
+# def plot_mean(matrix):
+	# """
+	# Calculates the mean and standard deviation across the first dimension (axis 0), and plots across the second dimension (axis 1)
+	# Inputs: numpy 2D array
+	# """
+	# import numpy as np
+	# import matplotlib.pyplot as plt
 	
-	if len(matrix.shape) > 2:
-		return
+	# if len(matrix.shape) > 2:
+		# return
 	
-	if len(matrix.shape) == 2: # two dimensions provided
-		x_values = np.arange(0, matrix.shape[1])
-		mean_values = matrix.mean(axis=0)
-		std_values = matrix.std(axis=0)
-	else: # only one dimension was provided
-		x_values = np.arange(0, matrix.shape[0])
-		mean_values = matrix
-		std_values = matrix
+	# if len(matrix.shape) == 2: # two dimensions provided
+		# x_values = np.arange(0, matrix.shape[1])
+		# mean_values = matrix.mean(axis=0)
+		# std_values = matrix.std(axis=0)
+	# else: # only one dimension was provided
+		# x_values = np.arange(0, matrix.shape[0])
+		# mean_values = matrix
+		# std_values = matrix
 	
-	plt.plot(x_values, mean_values)
-	if len(matrix.shape) == 2: # two dimensions provided
-		plt.fill_between(x_values, mean_values - std_values, mean_values + std_values, alpha=0.5, linewidth=0)
-	plt.autoscale(enable=True, axis='x', tight=True)
-	plt.show(block=False)
+	# plt.plot(x_values, mean_values)
+	# if len(matrix.shape) == 2: # two dimensions provided
+		# plt.fill_between(x_values, mean_values - std_values, mean_values + std_values, alpha=0.5, linewidth=0)
+	# plt.autoscale(enable=True, axis='x', tight=True)
+	# plt.show(block=False)
 
