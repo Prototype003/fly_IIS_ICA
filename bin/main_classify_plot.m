@@ -515,7 +515,11 @@ for nChannels_counter = 1 : length(accuracies)
     ylabel('%'); xlabel('channel'); title('Mean accuracy across sets containing channel X');
 end
 
-%% LOAD Phi-three values ACROSS/WITHIN FLIES 2D, 3D, and 4D plots LOAD
+%% LOAD Phi-three values GLOBAL/NON-GLOBAL FLIES 2D, 3D, and 4D plots LOAD
+
+% Global TPM (18s) was used in across fly analysis
+% Non-global TPM (2.25s per trial) was used in within fly analysis
+% All classification analyses were conducted at tau = 4ms
 
 global_tpm = 0; % 0: 2.25s TPMs; 1: 18s TPMs
 
@@ -1008,7 +1012,7 @@ for nChannels_counter = 1 : length(accuracies)
     line([1 size(accuracies{nChannels_counter}.accuracies, 1)], [100/nConditions 100/nConditions]);
 end
 
-%% Phi-three classification ACROSS FLIES 2D (2-channel) plot
+%% Phi-star classification ACROSS FLIES 2D (2-channel) plot
 
 results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_global_classification_across1.mat';
 load([results_directory results_filename]);
@@ -1038,7 +1042,7 @@ colorbar;
 caxis([min(values) max(values)]);
 axis([0 16 0 16]);
 
-%% Phi-three classifiation ACROSS FLIES 3D (3-channel) plot
+%% Phi-star classifiation ACROSS FLIES 3D (3-channel) plot
 
 results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_global_classification_across1.mat';
 load([results_directory results_filename]);
@@ -1057,7 +1061,7 @@ colorbar;
 caxis([min(values) max(values)]);
 view([4 25]); % [azimuth elevation]
 
-%% Phi-three classification ACROSS FLIES 4D (4-channel) plot
+%% Phi-star classification ACROSS FLIES 4D (4-channel) plot
 
 results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_global_classification_across1.mat';
 load([results_directory results_filename]);
@@ -1088,7 +1092,7 @@ for fourth_d = min(channels_4d) : max(channels_4d)
     view([6 25]); % [azimuth elevation]
 end
 
-%% Phi-three classification ACROSS FLIES bar graph collapse
+%% Phi-star classification ACROSS FLIES bar graph collapse
 
 % Bar graph:
 %   x-axis: channel sets which contain this channel
@@ -1142,51 +1146,37 @@ for nChannels_counter = 1 : length(accuracies)
     ylabel('%'); xlabel('channel'); title('Mean accuracy across sets containing channel X');
 end
 
-%% LOAD Phi-star values ACROSS/WITHIN FLIES 2D, 3D, and 4D plots LOAD
+%% LOAD Phi-star values GLOBAL/NON-GLOBAL FLIES 2D, 3D, and 4D plots LOAD
+
+% Global TPM (18s) was used in across fly analysis
+% Non-global TPM (2.25s per trial) was used in within fly analysis
+% All classification analyses were conducted at tau = 4ms
 
 global_cov = 0; % 0: covariance over 2.25s; 1: covariance of 18s
 
-if global_tpm == 1
+if global_cov == 1
     % For across fly analysis we want one value per fly, so we use global covariance (first trial)
     disp('loading');
     data_directory = 'results/';
     data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels2t4_phistar.mat'];
     load([data_directory data_filename]);
     disp('loaded');
-else % global_tpm == 0
+else % global_cov == 0
     % For within fly analysis we use 16 values per fly (8 awake and 8 anest), so we used 2.25s TPMs
     disp('loading');
     data_directory = 'results/';
     data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels2t4_phistar.mat'];
     load([data_directory data_filename]);
     disp('loaded');
-    
-    data_directory = 'results/';
-    data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels2t2_phithree_nonGlobal.mat'];
-    disp('loading 2ch');
-    tmp = load([data_directory data_filename]);
-    phis{1} = tmp.phis{1};
-    data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels3t3_phithree_nonGlobal_tau4.mat'];
-    disp('loading 3ch');
-    tmp = load([data_directory data_filename]);
-    phis{2} = tmp.phis{1};
-    data_directory = 'results_split/';
-    data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels4t4_phithree_nonGlobal_tau4.mat'];
-    disp('loading 4ch');
-    tmp = load([data_directory data_filename]);
-    phis{3} = tmp;
-    phis{3}.channel_sets = phis{3}.phis{1}.channel_sets-1; % Make indexing consistent with other nChannels (python indexing)
-    clear tmp
-    disp('loaded');
 end
 tau = 1;
 
-%% Phi-three values ACROSS FLIES 2D plot
+%% Phi-star values ACROSS FLIES 2D plot
 
 % Build visual matrix
-channel_sets = phis{1}.channel_sets + 1;
+channel_sets = phis{1}.channel_sets;
 value_map = zeros(max(channel_sets(:)));
-values = permute(mean(mean(phis{1}.phi_threes(:, :, :, :, tau), 2), 3), [1 4 2 3]);
+values = permute(mean(mean(phis{1}.phi_stars(:, :, :, :, tau), 2), 3), [1 4 2 3]);
 for value = 1 : size(values, 1)
     value_map(channel_sets(value, 1), channel_sets(value, 2)) = values(value, 1) - values(value, 2);
 end
@@ -1196,10 +1186,10 @@ imagesc(value_map); cbar = colorbar; ylabel(cbar, '\Deltaphi3');
 xlabel('channel'); ylabel('channel');
 title('Awake - Anest');
 
-%% Phi-three values ACROSS FLIES 3D plot
+%% Phi-star values ACROSS FLIES 3D plot
 
-values = permute(mean(mean(phis{2}.phi_threes(:, :, :, :, tau), 2), 3), [1 4 2 3]);
-channel_sets = phis{2}.channel_sets + 1;
+values = permute(mean(mean(phis{2}.phi_stars(:, :, :, :, tau), 2), 3), [1 4 2 3]);
+channel_sets = phis{2}.channel_sets;
 figure;
 scatter3(channel_sets(:, 1), channel_sets(:, 2), channel_sets(:, 3), 75, values(:, 1) - values(:, 2), '.');
 cbar = colorbar; ylabel(cbar, '\Deltaphi3');
@@ -1207,10 +1197,42 @@ xlabel('channel'); ylabel('channel'); zlabel('channel');
 axis([0 16 0 16 0 16]);
 view([4 25]); % [azimuth elevation]
 
-%% Phi-three values ACROSS FLIES 4D plot
+%% Phi-star values 4D plot
 
-values = permute(mean(mean(phis{3}.phi_threes(:, :, :, :, tau), 2), 3), [1 4 2 3]);
-channel_sets = double(phis{3}.channel_sets) + 1;
+values = permute(mean(mean(phis{3}.phi_stars(:, :, :, :, tau), 2), 3), [1 4 2 3]);
+channel_sets = double(phis{3}.channel_sets);
+
+% 4D to 2D PCA space projection
+[coeff, score, latent] = pca(channel_sets);
+figure;
+colormap('jet');
+scatter(score(:, 1), score(:, 2), [], (1:size(channel_sets, 1)), '.'); colorbar; % Map
+figure;
+colormap('jet');
+plot_values = values(:, 1) - values(:, 2); % awake - anest
+%plot_values = values(:, 1); % awake
+%plot_values = values(:, 2); % anest
+value_sizes = (rescale(plot_values, 1, 2000));
+scatter(score(:, 1), score(:, 2), value_sizes, (1:size(channel_sets, 1)), '.'); colorbar;
+set(gca,'Color','k'); % black background
+
+% 4D+1 (4D space + phi measurement dimension) to 2D PCA projection
+phi_dimension = (values(:, 1) - values(:, 2));
+channel_sets_scaled = rescale(channel_sets, min(phi_dimension), max(phi_dimension));
+[coeff, score, latent, ~, explained] = pca([channel_sets_scaled phi_dimension]);
+figure;
+colormap('jet');
+scatter(score(:, 1), score(:, 2), [], (1:size(channel_sets, 1)), '.'); colorbar;
+
+% 4D to 1D PCA projection against phi-dimension
+[coeff, score, latent] = pca(channel_sets);
+phi_dimension = values(:, 1) - values(:, 2); % awake - anest
+phi_dimension = zeros(size(values(:, 1)));%values(:, 1); % awake
+%phi_dimension = values(:, 2); % anest
+figure;
+colormap('jet');
+scatter(score(:, 1), phi_dimension, [], (1:size(channel_sets, 1)), '.'); colorbar;
+%set(gca,'Color','k'); % black background
 
 % AWAKE - ANEST
 figure;
@@ -1266,7 +1288,7 @@ for fourth_d = min(channels_4d) : max(channels_4d)
     view([6 25]); % [azimuth elevation]
 end
 
-%% Phi-three values ACROSS FLIES bar graph collapse
+%% Phi-star values bar graph collapse
 
 % Bar graph:
 %   x-axis: channel sets which contain this channel
@@ -1276,9 +1298,9 @@ figure;
 colours = 'rgb';
 for nChannels_counter = 1 : length(phis)
     nChannels = phis{nChannels_counter}.nChannels;
-    channel_sets = double(phis{nChannels_counter}.channel_sets) + 1;
-    values = permute(mean(mean(phis{nChannels_counter}.phi_threes(:, :, :, :, tau), 2), 3), [1 4 2 3]);
-    values = values(:, 2);% - values(:, 2);
+    channel_sets = double(phis{nChannels_counter}.channel_sets);
+    values = permute(mean(mean(phis{nChannels_counter}.phi_stars(:, :, :, :, tau), 2), 3), [1 4 2 3]);
+    values = values(:, 1) - values(:, 2);
     
     % Sum accuracies for each channel (sum across networks which contain the channel)
     values_collapsed = zeros(1, max(channel_sets(:)));
@@ -1318,7 +1340,7 @@ for nChannels_counter = 1 : length(phis)
     ylabel('\Phi'); xlabel('channel'); title('Mean phi3 across sets containing channel X');
 end
 
-%% Phi-three values WITHIN FLIES bar graph collapse
+%% Phi-star values WITHIN FLIES bar graph collapse
 
 % Bar graph:
 %   x-axis: channel sets which contain this channel
@@ -1330,8 +1352,8 @@ for fly = 1 : 13
     subplot(4, 4, fly);
     for nChannels_counter = 1 : length(phis)
         nChannels = phis{nChannels_counter}.nChannels;
-        channel_sets = double(phis{nChannels_counter}.channel_sets) + 1;
-        values = permute(mean(mean(phis{nChannels_counter}.phi_threes(:, :, fly, :, tau), 2), 3), [1 4 2 3]);
+        channel_sets = double(phis{nChannels_counter}.channel_sets);
+        values = permute(mean(mean(phis{nChannels_counter}.phi_stars(:, :, fly, :, tau), 2), 3), [1 4 2 3]);
         values = values(:, 2);% - values(:, 2);
         
         % Sum accuracies for each channel (sum across networks which contain the channel)
@@ -1367,19 +1389,19 @@ for fly = 1 : 13
         plot((1:length(values_collapsed)), values_collapsed, colours(nChannels_counter)); hold on;
         %bar((1:length(values_collapsed)), values_collapsed);
         %errorbar((1:length(values_collapsed)), values_collapsed, values_collapsed_stderr, colours(nChannels_counter)); hold on;
-        axis([0 16 0 0.05]);
+        axis([0 16 0 0.02]);
         legend('2ch', '3ch', '4ch', 'Location', 'northeastoutside');
         ylabel('\Phi'); xlabel('channel'); title('Mean phi3 across sets containing channel X');
     end
 end
 
-%% Phi-three values ACROSS FLIES 4ch vs mean of channel means
+%% Phi-star values ACROSS FLIES 4ch vs mean of channel means
 
 % Get average 2-channel phi for each channel
 nChannels_counter = 2;
 nChannels = phis{nChannels_counter}.nChannels;
-channel_sets = double(phis{nChannels_counter}.channel_sets) + 1;
-values = permute(mean(mean(phis{nChannels_counter}.phi_threes(:, :, :, :, tau), 2), 3), [1 4 2 3]);
+channel_sets = double(phis{nChannels_counter}.channel_sets);
+values = permute(mean(mean(phis{nChannels_counter}.phi_stars(:, :, :, :, tau), 2), 3), [1 4 2 3]);
 values = values(:, 1) - values(:, 2);
 
 % Sum accuracies for each channel (sum across networks which contain the channel)
@@ -1412,13 +1434,14 @@ values_collapsed_stderr = values_collapsed_std ./ set_counters.^0.5;
 
 figure;
 colours = 'rb';
+shapes = 'ox';
 subplot_counter = 1;
 for nChannels_counter = 2 : length(phis)
     subplot(1, 2, nChannels_counter - 1);
     for condition = 1 : 2
         nChannels = phis{nChannels_counter}.nChannels;
-        channel_sets = double(phis{nChannels_counter}.channel_sets) + 1;
-        values = mean(mean(phis{nChannels_counter}.phi_threes(:, :, :, condition, tau), 2), 3);
+        channel_sets = double(phis{nChannels_counter}.channel_sets);
+        values = mean(mean(phis{nChannels_counter}.phi_stars(:, 1, :, condition, tau), 2), 3);
         
         % Find mean of mean 2-channel phis for each network
         values_2ch_mean = zeros(size(values));
@@ -1428,7 +1451,7 @@ for nChannels_counter = 2 : length(phis)
         end
         
         % Plot
-        scatter(values_2ch_mean, values, 100, colours(condition), '.'); hold on;
+        scatter(values_2ch_mean, values, [], colours(condition), shapes(condition)); hold on;
         disp([num2str(nChannels_counter+1) 'Ch, condition ' num2str(condition)]);
         [r, p] = corr(values_2ch_mean, values)
     end
