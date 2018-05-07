@@ -1,5 +1,6 @@
 function [phi_star, H, H_cond, MI, MI_star, MIP, partitions, partitions_phis, partitions_H, partitions_H_cond, partitions_MI, partitions_MI_star] = phistar_mip(cov_past_past, cov_past_present, cov_present_present, channels)
 % Finds phi-star and associated metrics corresponding to the MIP
+% Uses Hauns' Feb2014 toolbox
 %
 % To do this, calculates phi-star for every possible partition
 %
