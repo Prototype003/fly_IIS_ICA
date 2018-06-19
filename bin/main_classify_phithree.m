@@ -21,8 +21,8 @@ data_nChannels = {'2t2', '3t3', '4t4'}; %, '3t3', '4t4'};
 data_detrended = 0;
 data_zscored = 0;
 
-across_flies = 0;
-global_tpm = 'global';
+across_flies = 1;
+global_tpm = 'global'; %  global/nonGlobal
 
 results_directory = 'workspace_results/';
 results_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_phithree_' global_tpm '_classification_across' num2str(across_flies) '.mat'];
@@ -61,7 +61,7 @@ for nChannels_counter = 1 : length(data_nChannels)
         end
     else
         data_directory = 'results/';
-        data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels2t4_phithree.mat'];
+        data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels2t4_phithree_global.mat'];
         load([data_directory data_filename]);
         phis = phis{nChannels_counter};
     end

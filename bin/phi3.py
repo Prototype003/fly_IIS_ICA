@@ -36,7 +36,7 @@ channel_sets = loaded_data['channel_sets'];
 nChannels = loaded_data['nChannels'][0][0];
 
 results_directory = "results_split/"
-results_file_suffix = "_f" + "{0:0>2}".format(fly) + "c" + str(condition) + "tau" + str(tau) + "s" + "{0:0>4}".format(set) + "t" + str(trial) 
+results_file_suffix = "_f" + "{0:0>2}".format(fly) + "c" + str(condition) + "tau" + str(tau) + "s" + "{0:0>4}".format(set) + "t" + str(trial)
 results_file = data_file_prefix + \
 	"_nChannels" + str(nChannels) + \
 	"_phithree_allPartitions" + results_file_suffix
@@ -134,3 +134,4 @@ phi['state_partitions_phis'] = state_partitions_phis
 # Save ###########################################################################
 
 save_mat(results_directory+results_file, {'phi': phi})
+print('saved ' + results_directory + results_file)

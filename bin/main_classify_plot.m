@@ -9,7 +9,118 @@ For showing classification results
 results_directory = 'workspace_results/';
 nConditions = 2;
 
+freq_range = (1:42); %(1:83); % corresponding to ~10Hz, check the 'frequencies' vector
+freq_range_string = '0-5Hz'; %'0-10Hz';
+
 accuracy_lims = [45 100];
+
+%% Box pot summaries WITHIN
+% Mean, median, min, max, for power, coherence, phi-three(2,3,4ch), and phi-star(2,3,4ch), for both within and across flies
+% Within - average across channels/sets, variance is across flies
+
+measure_accuracies = []; measure_groups = [];
+
+% Power
+results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_power_classification.mat';
+load([results_directory results_filename]);
+measure_accuracies = permute(mean(mean(accuracies(freq_range, :, :), 1), 2), [3 1 2]); % average across frequency range and channels
+measure_groups = zeros(size(measure_accuracies)) + 1;
+
+% Coherence
+results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_coherence_classification.mat';
+load([results_directory results_filename]);
+measure_accuracies = [measure_accuracies; permute(mean(mean(accuracies(freq_range, :, :), 1), 2), [3 1 2])]; % average across frequency range and sets
+measure_groups = [measure_groups; zeros(size(accuracies, 3), 1) + 2];
+
+% Phi-three
+results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phithree_nonGlobal_classification.mat';
+load([results_directory results_filename]);
+group_counter = 3;
+for nChannels = 1 : length(accuracies)
+    values = accuracies{nChannels}.accuracies;
+    measure_accuracies = [measure_accuracies; permute(mean(values, 1), [2 1])];
+    measure_groups = [measure_groups; zeros(size(values, 2), 1) + group_counter];
+    group_counter = group_counter + 1;
+end
+
+% Phi-star
+results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_nonGlobal_classification.mat';
+load([results_directory results_filename]);
+for nChannels = 1 : length(accuracies)
+    values = accuracies{nChannels}.accuracies;
+    measure_accuracies = [measure_accuracies; permute(mean(values, 1), [2 1])];
+    measure_groups = [measure_groups; zeros(size(values, 2), 1) + group_counter];
+    group_counter = group_counter + 1;
+end
+
+figure;
+boxplot(measure_accuracies, measure_groups);
+ylim([49 81]);
+ylabel('%');
+title('Classification within flies (N=13)');
+xticklabels({'1ch P', '2ch C', '2ch Phi3', '3ch Phi3', '4ch Phi3', '2ch Phi*', '3ch Phi*', '4ch Phi*'});
+
+% Plot mean, max, min
+hold on;
+for measure = 1 : max(measure_groups)
+    scatter(measure, mean(measure_accuracies(measure_groups==measure)), 'bx');
+    scatter(measure, min(measure_accuracies(measure_groups==measure)), 'b^');
+    scatter(measure, max(measure_accuracies(measure_groups==measure)), 'bo');
+end
+
+%% Box pot summaries ACROSS
+% Mean, median, min, max, for power, coherence, phi-three(2,3,4ch), and phi-star(2,3,4ch), for both within and across flies
+% Across - variance is across channels/sets
+
+measure_accuracies = []; measure_groups = [];
+
+% Power
+results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_power_classification_across1.mat';
+load([results_directory results_filename]);
+measure_accuracies = permute(mean(accuracies(freq_range, :), 1), [2 1]); % average across frequency range
+measure_groups = zeros(size(measure_accuracies)) + 1;
+
+% Coherence
+results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_coherence_classification_across1.mat';
+load([results_directory results_filename]);
+measure_accuracies = [measure_accuracies; permute(mean(accuracies(freq_range, :, :), 1), [2 1])]; % average across frequency range and sets
+measure_groups = [measure_groups; zeros(size(accuracies, 2), 1) + 2];
+
+% Phi-three
+results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phithree_global_classification_across1.mat';
+load([results_directory results_filename]);
+group_counter = 3;
+for nChannels = 1 : length(accuracies)
+    values = accuracies{nChannels}.accuracies;
+    measure_accuracies = [measure_accuracies; values];
+    measure_groups = [measure_groups; zeros(size(values, 1), 1) + group_counter];
+    group_counter = group_counter + 1;
+end
+
+% Phi-star
+results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_global_classification_across1.mat';
+load([results_directory results_filename]);
+for nChannels = 1 : length(accuracies)
+    values = accuracies{nChannels}.accuracies;
+    measure_accuracies = [measure_accuracies; values];
+    measure_groups = [measure_groups; zeros(size(values, 1), 1) + group_counter];
+    group_counter = group_counter + 1;
+end
+
+figure;
+boxplot(measure_accuracies, measure_groups);
+ylim([20 90]);
+ylabel('%');
+title('Classification across flies (N=number of channels/sets)');
+xticklabels({'1ch P', '2ch C', '2ch Phi3', '3ch Phi3', '4ch Phi3', '2ch Phi*', '3ch Phi*', '4ch Phi*'});
+
+% Plot mean, max, min
+hold on;
+for measure = 1 : max(measure_groups)
+    scatter(measure, mean(measure_accuracies(measure_groups==measure)), 'bx');
+    scatter(measure, min(measure_accuracies(measure_groups==measure)), 'b^');
+    scatter(measure, max(measure_accuracies(measure_groups==measure)), 'bo');
+end
 
 %% Power classification WITHIN FLIES
 
@@ -32,9 +143,18 @@ title('Classification (anest/awake) using power (N=13)');
 xlabel('frequency (Hz)');
 ylabel('% correct');
 axis([chronux_params.fpass accuracy_lims]);
-
 % Chance level
 line(chronux_params.fpass, [100/nConditions 100/nConditions]);
+
+% Get average per channel at set frequency range
+figure;
+values = permute(mean(mean(accuracies(freq_range, :, :), 1), 3), [2 1 3]);
+values_err = permute(std(mean(accuracies(freq_range, :, :), 1), [], 3), [2, 1, 3]) / sqrt(size(accuracies, 3));
+%values = permute(mean(mean(mean(powers(freq_range, :, :, 1, :) - powers(freq_range, :, :, 2, :), 1), 2), 5), [3 1 2 4 5]);
+errorbar((1:size(accuracies, 2)), values, values_err/2);
+xlim([0 16]);
+title(['mean accuracy across ' freq_range_string ' (N=13)']);
+xlabel('channel'); ylabel('%');
 
 %% Power classification ACROSS FLIES
 
@@ -46,7 +166,128 @@ imagesc(mean(accuracies, 3)); colorbar;
 axis('xy');
 yticklabels(frequencies([50 100 150 200 250 300 350 400]));
 xlabel('channel'); ylabel('frequency bin (range: 0-50Hz)');
-title('Mean classification accuracy using power (N=13)');
+title('Mean classification accuracy using power');
+
+figure;
+errorbar(...
+    frequencies,...
+    mean(accuracies, 2),... % Average across channels
+    0.5*std(mean(accuracies, 2), [], 3) / sqrt(size(accuracies, 2))); % standard error across flies
+title('Classification (anest/awake) using power (N=15 channels)');
+xlabel('frequency (Hz)');
+ylabel('% correct');
+axis([chronux_params.fpass accuracy_lims]);
+% Chance level
+line(chronux_params.fpass, [100/nConditions 100/nConditions]);
+
+% Get average per channel at set frequency range
+figure;
+values = permute(mean(mean(accuracies(freq_range, :, :), 1), 3), [2 1 3]);
+values_err = permute(std(mean(accuracies(freq_range, :, :), 1), [], 3), [2, 1, 3]) / sqrt(size(accuracies, 3));
+errorbar((1:size(accuracies, 2)), values, values_err/2);
+xlim([0 16]);
+title(['mean accuracy across ' freq_range_string]);
+xlabel('channel'); ylabel('%');
+
+%% Plot density-normalised values on center/distance mapping
+
+results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_coherence_classification.mat';
+load([results_directory results_filename]);
+
+figure;
+set(gcf, 'Position', [0 0 0.3*2100/1.5 300]);
+colormap('jet');
+for nChannels_counter = 1 : length(phis)
+    nChannels = phis{nChannels_counter}.nChannels;
+    
+    channel_sets = phis{nChannels_counter}.channel_sets;
+    
+    % Get values
+    if strcmp(measure_type, 'value')
+        values = permute(mean(mean(phis{nChannels_counter}.phis(:, :, flies, :, tau), 2), 3), [1 4 2 3]);
+        
+        % Select 1
+        plot_values = values(:, 1) - values(:, 2); fig_tit = 'diff'; cbar_title = [measure_string '_W - ' measure_string '_A']; % Awake - Anest
+        %plot_values = values(:, 1)./values(:, 2); fig_tit = 'diff_rel'; cbar_title = [measure_string '_W/' measure_string '_N'];
+        %plot_values = values(:, 1); fig_tit = 'wake'; cbar_title = [measure_string '_W']; % Awake
+        %plot_values = values(:, 2); fig_tit = 'anest'; cbar_title = [measure_string '_N']; % Anest
+        
+    else % strcmp(measure_type, 'class');
+        values = mean(accuracies{nChannels_counter}.accuracies, 2); fig_tit = 'class'; cbar_title = 'class. acc. %';
+        %values(values<58) = NaN;
+        plot_values = values;
+    end
+    
+    % Set center / set path distance mapping
+    centers = mean(channel_sets, 2); % Mean across channels in each set
+    distances = channel_set_distances(channel_sets);
+    
+    % Find minimum delta among map values
+    centers_deltas = pdist2(unique(centers), unique(centers));
+    centers_deltas(centers_deltas==0) = NaN; % remove 0 distances
+    centers_delta = min(centers_deltas(:));
+    distances_deltas = pdist2(unique(distances), unique(distances));
+    distances_deltas(distances_deltas==0) = NaN; % remove 0 distances
+    distances_delta = min(distances_deltas(:));
+    
+    % Create space mapping (used for indexing into the mapped space)
+    centers_axis = (min(centers) - (2*centers_delta) : centers_delta : max(centers) + (2*centers_delta)); % - and + delta is for padding
+    distances_axis = (min(distances) - (2*distances_delta) : distances_delta : max(distances) + (2*distances_delta)); % - and + delta is for padding
+    [centers_map, distances_map] = meshgrid(centers_axis, distances_axis);
+    
+    % Create mapped space
+    values_map = zeros(size(centers_map)); % Will sum all values with the same coordinates
+    values_map_counter = zeros(size(centers_map)); % Keeps count in each coordinate as to how many values have that coordinate
+    
+    % Populate mapped space
+    for value_counter = 1 : length(plot_values)
+        x = find(abs(centers_axis - centers(value_counter)) < 0.00001, 1); % This gives the mapped x location
+        y = find(distances_axis == distances(value_counter), 1); % This gives the mapped y location
+        values_map(y, x) = values_map(y, x) + plot_values(value_counter); % matrix is (rows, columns), corresponding to (y, x)
+        values_map_counter(y, x) = values_map_counter(y, x) + 1;
+    end
+    
+    values_map_plot = values_map ./ values_map_counter; % We will use the NaN values for the black background (and maybe interpolation)
+    
+    % Interpolate values (linearly - each NaN will turn into the average of the cells immediately adjacent to it, excluding diagonals)
+    min_value = min(values_map_plot(:)); % We will remove interpolations which are less than the original min value in the plot (to avoid 'ghost/shadow interpolations');
+    values_adjacent = zeros(4, 1);
+    for y = 2 : size(values_map_plot, 1) - 1
+        for x = 2 : size(values_map_plot, 2) - 1
+            if isnan(values_map_plot(y, x))
+                values_adjacent(1) = values_map_plot(y, x-1);
+                values_adjacent(2) = values_map_plot(y, x+1);
+                values_adjacent(3) = values_map_plot(y-1, x);
+                values_adjacent(4) = values_map_plot(y+1, x);
+                if sum(~isnan(values_adjacent)) > 2
+                    %values_adjacent(isnan(values_adjacent)) = 0; % Deal with NaNs
+                    %values_adjacent(values_adjacent < min_value) = 0; % Don't include 'shadow' interpolations
+                    interpolated = mean(values_adjacent(~isnan(values_adjacent)));
+                    if interpolated == 0
+                        values_map_plot(y, x) = NaN; % Place NaN instead of 0 to avoid affecting the color scaling
+                    else
+                        values_map_plot(y, x) = interpolated;
+                    end
+                end
+            end
+        end
+    end
+    %values_map_plot(values_map_plot < min_value) = NaN; % Remove ghost interpolation (which will affect the colorscale)
+    
+    subplot(1, length(phis), nChannels_counter);
+    %imagesc(values_map_plot); c = colorbar;
+    plot = pcolor(values_map_plot); c = colorbar;
+    set(gca, 'color', [0 0 0]); % black background
+    set(plot, 'EdgeColor', 'none'); % remove grid outline
+    %axis('xy');
+    
+    title([num2str(nChannels) 'Ch']);
+    title(c, cbar_title);
+    xlabel('set center'); ylabel('set path distance');
+end
+
+figure_name = ['figures_20180606/' fig_tit];
+print(figure_name, '-dpng'); % PNG
 
 %% Coherence classification WITHIN FLIES
 
@@ -79,49 +320,83 @@ line(chronux_params.fpass, [100/nConditions 100/nConditions]); % Chance level
 %     scatter(set_distances, mean(accuracies(f, :, :), 3), '.'); hold on;
 % end
 
-figure;
-for fly = 1 : 1%size(coherencies, 5)
-    for trial = 1 : size(coherencies, 2)
-        scatter((1:410), coherencies(:, trial, 70, 1, fly), 'r.'); hold on;
-        scatter((1:410), coherencies(:, trial, 70, 2, fly), 'b.');
-    end
-end
+% % Plot actual values to see rough separation between conditions
+% figure;
+% for fly = 1 : 1%size(coherencies, 5)
+%     for trial = 1 : size(coherencies, 2)
+%         scatter((1:410), coherencies(:, trial, 70, 1, fly), 'r.'); hold on;
+%         scatter((1:410), coherencies(:, trial, 70, 2, fly), 'b.');
+%     end
+% end
 
 %% Coherence classification WITHIN FLIES bar graph collapse
 
 results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_coherence_classification.mat';
 load([results_directory results_filename]);
 
+% % Collapse at all frequencies
+% channel_sets = networks;
+% values_collapsed = zeros(max(channel_sets(:)), size(accuracies, 3), size(accuracies, 1));
+% for fly = 1 : size(accuracies, 3)
+%     
+%     for frequency = 1 : size(accuracies, 1)
+%         
+%         values = permute(accuracies(frequency, :, fly), [2 1 3]);
+%         
+%         % Sum accuracies for each channel (sum across networks which contain the channel)
+%         set_counters = zeros(max(channel_sets(:)), 1);
+%         for channel = 1 : max(channel_sets(:))
+%             for channel_set = 1 : size(channel_sets, 1)
+%                 if any(channel_sets(channel_set, :) == channel)
+%                     set_counters(channel) = set_counters(channel) + 1;
+%                     values_collapsed(channel, fly, frequency) = values_collapsed(channel, fly, frequency) + values(channel_set);
+%                 end
+%             end
+%         end
+%         
+%         % Average accuracies
+%         values_collapsed(:, fly, frequency) = values_collapsed(:, fly, frequency) ./ set_counters;
+%         
+%     end
+%     
+% end
+
+% Collapse after averaging across frequency range
 channel_sets = networks;
-values_collapsed = zeros(max(channel_sets(:)), size(accuracies, 3), size(accuracies, 1));
-for fly = 1 : size(accuracies, 3)
-    
-    for frequency = 1 : size(accuracies, 1)
-        
-        values = permute(accuracies(frequency, :, fly), [2 1 3]);
-        
-        % Sum accuracies for each channel (sum across networks which contain the channel)
-        set_counters = zeros(max(channel_sets(:)), 1);
-        for channel = 1 : max(channel_sets(:))
-            for channel_set = 1 : size(channel_sets, 1)
-                if any(channel_sets(channel_set, :) == channel)
-                    set_counters(channel) = set_counters(channel) + 1;
-                    values_collapsed(channel, fly, frequency) = values_collapsed(channel, fly, frequency) + values(channel_set);
-                end
-            end
+freq_range_values = permute(mean(accuracies(freq_range, :, :)), [2 3 1]);
+channel_values = zeros(max(channel_sets(:)), size(accuracies, 3));
+set_counters = zeros(size(channel_values));
+for channel = 1 : size(channel_values, 1)
+    for channel_set = 1 : size(channel_sets, 1)
+        if any(channel_sets(channel_set, :) == channel)
+            set_counters(channel, :) = set_counters(channel) + 1;
+            channel_values(channel, :) = channel_values(channel, :) + freq_range_values(channel_set, :);
         end
-        
-        % Average accuracies
-        values_collapsed(:, fly, frequency) = values_collapsed(:, fly, frequency) ./ set_counters;
-        
     end
-    
 end
+% Average accuracies
+channel_values = channel_values ./ set_counters;
 
 % Plot average per channel (averaged across flies)
 figure;
-imagesc(permute(mean(values_collapsed, 2), [3 1 2])); colorbar;
-axis('xy');
+values = mean(channel_values, 2);
+values_err = std(channel_values, [], 2) / sqrt(size(channel_values, 2));
+errorbar((1:size(channel_values, 1)), values, values_err/2);
+xlim([0 16]);
+title(['mean accuracy across ' freq_range_string]);
+xlabel('channel'); ylabel('%');
+
+% Path distance plot
+figure; colormap('jet');
+centers = mean(channel_sets, 2); % Mean across channels in each set
+distances = channel_set_distances(channel_sets);
+centers_offset_rand = (-0.1+(0.1--0.1).*rand(length(centers), 1)); % Values can vary by just under +- half of the minimum difference in centers
+distances_offset_rand = (-0.4+(0.4--0.4).*rand(length(distances), 1)); % Values can vary by just under +- half of the minimum difference in distances
+scatter(centers+centers_offset_rand, distances+distances_offset_rand, 100, mean(freq_range_values, 2), nChannels_shapes(nChannels_counter)); c = colorbar;hold on;
+ax = gca; ax.Color = 'k';
+xlabel('set center');
+ylabel('set path distance');
+title(c, 'class. acc. %');
 
 %% Coherence classification ACROSS FLIES
 
@@ -134,6 +409,55 @@ axis('xy');
 yticklabels(frequencies([50 100 150 200 250 300 350 400]));
 xlabel('channel pair'); ylabel('frequency bin (range: 0-50Hz)');
 title('Mean classification accuracy using coherency (N=13)');
+
+figure;
+errorbar(...
+    frequencies,...
+    mean(accuracies, 2),... % Average across channel pairs
+    0.5*std(accuracies, [], 2) / sqrt(size(accuracies, 2))... % standard error across channel sets
+    );
+title('Classification (anest/awake) using coherence (N=105 channel pairs)');
+xlabel('frequency (Hz)');
+ylabel('% correct');
+axis([chronux_params.fpass accuracy_lims(1) accuracy_lims(2)]);
+line(chronux_params.fpass, [100/nConditions 100/nConditions]); % Chance level
+
+% Collapse after averaging across frequency range
+channel_sets = networks;
+freq_range_values = permute(mean(accuracies(freq_range, :, :)), [2 3 1]);
+channel_values = zeros(max(channel_sets(:)), size(accuracies, 3));
+set_counters = zeros(size(channel_values));
+for channel = 1 : size(channel_values, 1)
+    for channel_set = 1 : size(channel_sets, 1)
+        if any(channel_sets(channel_set, :) == channel)
+            set_counters(channel, :) = set_counters(channel) + 1;
+            channel_values(channel, :) = channel_values(channel, :) + freq_range_values(channel_set, :);
+        end
+    end
+end
+% Average accuracies
+channel_values = channel_values ./ set_counters;
+
+% Plot average per channel (averaged across flies)
+figure;
+values = mean(channel_values, 2);
+values_err = std(channel_values, [], 2) / sqrt(size(channel_values, 2));
+errorbar((1:size(channel_values, 1)), values, values_err/2);
+xlim([0 16]);
+title(['mean accuracy across ' freq_range_string]);
+xlabel('channel'); ylabel('%');
+
+% Path distance plot
+figure; colormap('jet');
+centers = mean(channel_sets, 2); % Mean across channels in each set
+distances = channel_set_distances(channel_sets);
+centers_offset_rand = (-0.1+(0.1--0.1).*rand(length(centers), 1)); % Values can vary by just under +- half of the minimum difference in centers
+distances_offset_rand = (-0.4+(0.4--0.4).*rand(length(distances), 1)); % Values can vary by just under +- half of the minimum difference in distances
+scatter(centers+centers_offset_rand, distances+distances_offset_rand, 100, mean(freq_range_values, 2), nChannels_shapes(nChannels_counter)); c = colorbar;hold on;
+ax = gca; ax.Color = 'k';
+xlabel('set center');
+ylabel('set path distance');
+title(c, 'class. acc. %');
 
 %% Coherence classification ACROSS FLIES bar graph collapse
 
@@ -560,21 +884,21 @@ channel_sets = phis{1}.channel_sets + 1;
 value_map = zeros(max(channel_sets(:)));
 values = permute(mean(mean(phis{1}.phi_threes(:, :, :, :, tau), 2), 3), [1 4 2 3]);
 for value = 1 : size(values, 1)
-    value_map(channel_sets(value, 1), channel_sets(value, 2)) = values(value, 1) - values(value, 2);
+    value_map(channel_sets(value, 1), channel_sets(value, 2)) = values(value, 1); % - values(value, 2)
 end
 figure;
 colormap('jet');
-imagesc(value_map); cbar = colorbar; ylabel(cbar, '\Deltaphi3');
+imagesc(value_map); cbar = colorbar; ylabel(cbar, '\Phi');
 xlabel('channel'); ylabel('channel');
-title('Awake - Anest');
+title('Wake');
 
 %% Phi-three values ACROSS FLIES 3D plot
 
 values = permute(mean(mean(phis{2}.phi_threes(:, :, :, :, tau), 2), 3), [1 4 2 3]);
 channel_sets = phis{2}.channel_sets + 1;
-figure;
-scatter3(channel_sets(:, 1), channel_sets(:, 2), channel_sets(:, 3), 75, values(:, 1) - values(:, 2), '.');
-cbar = colorbar; ylabel(cbar, '\Deltaphi3');
+figure; colormap('jet');
+scatter3(channel_sets(:, 1), channel_sets(:, 2), channel_sets(:, 3), 75, values(:, 1), '.');
+cbar = colorbar; ylabel(cbar, '\Phi');
 xlabel('channel'); ylabel('channel'); zlabel('channel');
 axis([0 16 0 16 0 16]);
 view([4 25]); % [azimuth elevation]
@@ -603,7 +927,7 @@ for fourth_d = min(channels_4d) : max(channels_4d)
 end
 
 % AWAKE
-figure;
+figure; colormap('jet');
 channels_4d = channel_sets(:, 4);
 for fourth_d = min(channels_4d) : max(channels_4d)
     subplot(3, 4, fourth_d + 1 - min(channels_4d));
@@ -616,7 +940,7 @@ for fourth_d = min(channels_4d) : max(channels_4d)
     scatter3(channel_sets_sliced(:, 1), channel_sets_sliced(:, 2), channel_sets_sliced(:, 3), 75, values_sliced(:, 1), '.');
     xlabel('channel'); ylabel('channel'); zlabel('channel'); title(fourth_d);
     axis([0 16 0 16 0 16]);
-    caxis([min(values(:, 2)) max(values(:, 1))]);
+    %caxis([min(values(:, 2)) max(values(:, 1))]);
     view([6 25]); % [azimuth elevation]
 end
 
@@ -752,7 +1076,7 @@ nChannels_counter = 2;
 nChannels = phis{nChannels_counter}.nChannels;
 channel_sets = double(phis{nChannels_counter}.channel_sets) + 1;
 values = permute(mean(mean(phis{nChannels_counter}.phi_threes(:, :, :, :, tau), 2), 3), [1 4 2 3]);
-values = values(:, 1) - values(:, 2);
+values = values(:, 1) - values(:, 2); % WHY?????
 
 % Sum accuracies for each channel (sum across networks which contain the channel)
 values_collapsed = zeros(1, max(channel_sets(:)));
@@ -1217,9 +1541,10 @@ scatter(score(:, 1), score(:, 2), value_sizes, (1:size(channel_sets, 1)), '.'); 
 set(gca,'Color','k'); % black background
 
 % 4D+1 (4D space + phi measurement dimension) to 2D PCA projection
+% Perhaps not so good because the spatial dimensions could be prioritised over the phi dimension
 phi_dimension = (values(:, 1) - values(:, 2));
-channel_sets_scaled = rescale(channel_sets, min(phi_dimension), max(phi_dimension));
-[coeff, score, latent, ~, explained] = pca([channel_sets_scaled phi_dimension]);
+%channel_sets_scaled = rescale(channel_sets, min(phi_dimension), max(phi_dimension));
+[coeff, score, latent, ~, explained] = pca(zscore([channel_sets_scaled phi_dimension]));
 figure;
 colormap('jet');
 scatter(score(:, 1), score(:, 2), [], (1:size(channel_sets, 1)), '.'); colorbar;
@@ -1227,7 +1552,7 @@ scatter(score(:, 1), score(:, 2), [], (1:size(channel_sets, 1)), '.'); colorbar;
 % 4D to 1D PCA projection against phi-dimension
 [coeff, score, latent] = pca(channel_sets);
 phi_dimension = values(:, 1) - values(:, 2); % awake - anest
-phi_dimension = zeros(size(values(:, 1)));%values(:, 1); % awake
+phi_dimension = values(:, 1);%values(:, 1); % awake
 %phi_dimension = values(:, 2); % anest
 figure;
 colormap('jet');

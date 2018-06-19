@@ -11,7 +11,7 @@ Test is conducted using LME with model comparisons (to the null)
 
 %% SETUP
 
-phi_type = 'star';
+phi_type = 'three';
 file_suffix = '';
 
 data_nChannels = '2t4';
@@ -85,13 +85,14 @@ for fly = 1 : size(phis{1}.phis, 3)
                         table_raw.fly(row_counter) = fly;
                         table_raw.condition(row_counter) = condition;
                         table_raw.tau(row_counter) = phis{nChannels}.taus(tau);
-                        if phis{nChannels}.phis(set_counter, trial, fly, condition, tau) <= 0
-                            tmp = phis{nChannels}.phis(:);
-                            tmp(tmp <= 0) = inf;
-                            table_raw.phi(row_counter) = log(min(tmp));
-                        else
-                            table_raw.phi(row_counter) = log(phis{nChannels}.phis(set_counter, trial, fly, condition, tau));
-                        end
+%                         if phis{nChannels}.phis(set_counter, trial, fly, condition, tau) <= 0
+%                             tmp = phis{nChannels}.phis(:);
+%                             tmp(tmp <= 0) = inf;
+%                             table_raw.phi(row_counter) = log(min(tmp));
+%                         else
+%                             table_raw.phi(row_counter) = log(phis{nChannels}.phis(set_counter, trial, fly, condition, tau));
+%                         end
+                        table_raw.phi(row_counter) = phis{nChannels}.phis(set_counter, trial, fly, condition, tau);
                         row_counter = row_counter + 1;
                     end
                     set_label = set_label + 1;
@@ -164,20 +165,20 @@ end
 % 
 % delete(compute_pool);
 
-%% Save results
+% Save results
 
-% disp('Saving');
-% if ~isdir(results_directory)
-%     mkdir(results_directory)
-% end
-% save([results_directory results_filename '.mat'],...
-%     'phi_table',...
-%     'model_spec',...
-%     'model_full',...
-%     'model_null_specs',...
-%     'model_nulls',...
-%     'model_comparisons',...
-%     'model_comparisons_sim'...
-%     );
-% 
-% disp('Saved');
+disp('Saving');
+if ~isdir(results_directory)
+    mkdir(results_directory)
+end
+save([results_directory results_filename '.mat'],...
+    'phi_table',...
+    'model_spec',...
+    'model_full',...
+    'model_null_specs',...
+    'model_nulls',...
+    'model_comparisons',...
+    'model_comparisons_sim'...
+    );
+
+disp('Saved');

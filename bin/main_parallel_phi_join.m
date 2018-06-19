@@ -15,7 +15,7 @@ nSets = 1365;
 nTrials = 8;
 channels = (1:15);
 nChannels = 4;
-nStates = nChannels^2;
+nStates = 2^nChannels;
 nPartitions = 14; % Number of bipartitions for a set of 4
 
 data_detrended = 0;
