@@ -1,0 +1,767 @@
+state by state tpm:
+[[ 0.18013699  0.33972603  0.33082192  0.14931507]
+ [ 0.17327629  0.3760079   0.29142669  0.15928912]
+ [ 0.15166968  0.29659483  0.38345123  0.16828426]
+ [ 0.14280822  0.34212329  0.34589041  0.16917808]]
+
+state by node tpm:
+[[[ 0.4890411   0.48013699]
+  [ 0.46487909  0.55173548]]
+
+ [[ 0.53529702  0.45071581]
+  [ 0.51130137  0.51506849]]]
+
+state (0, 0)
+
+BigMip
+======
+phi: 0.000342
+subsystem: Subsystem((n0, n1))
+cut: Cut (1,) --//--> (0,)
+unpartitioned_constellation: 
+
+  Concept
+  -------
+  phi: 0.02317
+  mechanism: (0,)
+  cause: 
+    phi: 0.023176
+    purview: (0,)
+    partition:
+      []   0 
+      -- X --
+      0    []
+    unpartitioned_repertoire:
+      [[ 0.52317556]
+       [ 0.47682444]]
+    partitioned_repertoire:
+      [[ 0.5]
+       [ 0.5]]
+  effect: 
+    phi: 0.02317
+    purview: (0,)
+    partition:
+      []   0 
+      -- X --
+      0    []
+    unpartitioned_repertoire:
+      [[ 0.52303991]
+       [ 0.47696009]]
+    partitioned_repertoire:
+      [[ 0.49987036]
+       [ 0.50012964]]
+  
+  Concept
+  -------
+  phi: 0.033948
+  mechanism: (1,)
+  cause: 
+    phi: 0.033948
+    purview: (1,)
+    partition:
+      []   1 
+      -- X --
+      1    []
+    unpartitioned_repertoire:
+      [[ 0.53394802  0.46605198]]
+    partitioned_repertoire:
+      [[ 0.5  0.5]]
+  effect: 
+    phi: 0.033988
+    purview: (1,)
+    partition:
+      []   1 
+      -- X --
+      1    []
+    unpartitioned_repertoire:
+      [[ 0.5345736  0.4654264]]
+    partitioned_repertoire:
+      [[ 0.50058581  0.49941419]]
+  
+  Concept
+  -------
+  phi: 0.012007
+  mechanism: (0, 1)
+  cause: 
+    phi: 0.012007
+    purview: (1,)
+    partition:
+      0    1
+      -- X -
+      []   1
+    unpartitioned_repertoire:
+      [[ 0.52194136  0.47805864]]
+    partitioned_repertoire:
+      [[ 0.53394802  0.46605198]]
+  effect: 
+    phi: 0.014711
+    purview: (1,)
+    partition:
+      0    1
+      -- X -
+      []   1
+    unpartitioned_repertoire:
+      [[ 0.51986301  0.48013699]]
+    partitioned_repertoire:
+      [[ 0.5345736  0.4654264]]
+  
+partitioned_constellation: 
+
+  Concept
+  -------
+  phi: 0.00682
+  mechanism: (0, 1)
+  cause: 
+    phi: 0.00682
+    purview: (0, 1)
+    partition:
+      []   0,1
+      -- X ---
+      0     1 
+    unpartitioned_repertoire:
+      [[ 0.27207758  0.2346055 ]
+       [ 0.26200645  0.23131047]]
+    partitioned_repertoire:
+      [[ 0.26697401  0.23302599]
+       [ 0.26697401  0.23302599]]
+  effect: 
+    phi: 0.014711
+    purview: (1,)
+    partition:
+      0    1
+      -- X -
+      []   1
+    unpartitioned_repertoire:
+      [[ 0.51986301  0.48013699]]
+    partitioned_repertoire:
+      [[ 0.5345736  0.4654264]]
+  
+  Concept
+  -------
+  phi: 0.02317
+  mechanism: (0,)
+  cause: 
+    phi: 0.023176
+    purview: (0,)
+    partition:
+      []   0 
+      -- X --
+      0    []
+    unpartitioned_repertoire:
+      [[ 0.52317556]
+       [ 0.47682444]]
+    partitioned_repertoire:
+      [[ 0.5]
+       [ 0.5]]
+  effect: 
+    phi: 0.02317
+    purview: (0,)
+    partition:
+      []   0 
+      -- X --
+      0    []
+    unpartitioned_repertoire:
+      [[ 0.52303991]
+       [ 0.47696009]]
+    partitioned_repertoire:
+      [[ 0.49987036]
+       [ 0.50012964]]
+  
+  Concept
+  -------
+  phi: 0.033948
+  mechanism: (1,)
+  cause: 
+    phi: 0.033948
+    purview: (1,)
+    partition:
+      []   1 
+      -- X --
+      1    []
+    unpartitioned_repertoire:
+      [[ 0.53394802  0.46605198]]
+    partitioned_repertoire:
+      [[ 0.5  0.5]]
+  effect: 
+    phi: 0.033988
+    purview: (1,)
+    partition:
+      []   1 
+      -- X --
+      1    []
+    unpartitioned_repertoire:
+      [[ 0.5345736  0.4654264]]
+    partitioned_repertoire:
+      [[ 0.50058581  0.49941419]]
+  
+
+
+state (1, 0)
+
+BigMip
+======
+phi: 0.002383
+subsystem: Subsystem((n0, n1))
+cut: Cut (1,) --//--> (0,)
+unpartitioned_constellation: 
+
+  Concept
+  -------
+  phi: 0.023164
+  mechanism: (0,)
+  cause: 
+    phi: 0.023164
+    purview: (0,)
+    partition:
+      []   0 
+      -- X --
+      0    []
+    unpartitioned_repertoire:
+      [[ 0.47683646]
+       [ 0.52316354]]
+    partitioned_repertoire:
+      [[ 0.5]
+       [ 0.5]]
+  effect: 
+    phi: 0.02317
+    purview: (0,)
+    partition:
+      []   0 
+      -- X --
+      0    []
+    unpartitioned_repertoire:
+      [[ 0.4767008]
+       [ 0.5232992]]
+    partitioned_repertoire:
+      [[ 0.49987036]
+       [ 0.50012964]]
+  
+  Concept
+  -------
+  phi: 0.033948
+  mechanism: (1,)
+  cause: 
+    phi: 0.033948
+    purview: (1,)
+    partition:
+      []   1 
+      -- X --
+      1    []
+    unpartitioned_repertoire:
+      [[ 0.53394802  0.46605198]]
+    partitioned_repertoire:
+      [[ 0.5  0.5]]
+  effect: 
+    phi: 0.033988
+    purview: (1,)
+    partition:
+      []   1 
+      -- X --
+      1    []
+    unpartitioned_repertoire:
+      [[ 0.5345736  0.4654264]]
+    partitioned_repertoire:
+      [[ 0.50058581  0.49941419]]
+  
+  Concept
+  -------
+  phi: 0.026708
+  mechanism: (0, 1)
+  cause: 
+    phi: 0.028138
+    purview: (0, 1)
+    partition:
+      0   1
+      - X -
+      0   1
+    unpartitioned_repertoire:
+      [[ 0.25307038  0.2074347 ]
+       [ 0.29268399  0.24681093]]
+    partitioned_repertoire:
+      [[ 0.25460588  0.22223057]
+       [ 0.27934214  0.24382141]]
+  effect: 
+    phi: 0.026708
+    purview: (0, 1)
+    partition:
+      0   1
+      - X -
+      0   1
+    unpartitioned_repertoire:
+      [[ 0.255254    0.20944898]
+       [ 0.29403019  0.24126683]]
+    partitioned_repertoire:
+      [[ 0.25483167  0.22186914]
+       [ 0.27974193  0.24355726]]
+  
+partitioned_constellation: 
+
+  Concept
+  -------
+  phi: 0.014711
+  mechanism: (0, 1)
+  cause: 
+    phi: 0.016577
+    purview: (0, 1)
+    partition:
+      0   1
+      - X -
+      0   1
+    unpartitioned_repertoire:
+      [[ 0.24722153  0.21317277]
+       [ 0.28659096  0.25301473]]
+    partitioned_repertoire:
+      [[ 0.25460588  0.22223057]
+       [ 0.27934214  0.24382141]]
+  effect: 
+    phi: 0.014711
+    purview: (0, 1)
+    partition:
+      0   1
+      - X -
+      0   1
+    unpartitioned_repertoire:
+      [[ 0.26184421  0.21485659]
+       [ 0.28743997  0.23585922]]
+    partitioned_repertoire:
+      [[ 0.25483167  0.22186914]
+       [ 0.27974193  0.24355726]]
+  
+  Concept
+  -------
+  phi: 0.023164
+  mechanism: (0,)
+  cause: 
+    phi: 0.023164
+    purview: (0,)
+    partition:
+      []   0 
+      -- X --
+      0    []
+    unpartitioned_repertoire:
+      [[ 0.47683646]
+       [ 0.52316354]]
+    partitioned_repertoire:
+      [[ 0.5]
+       [ 0.5]]
+  effect: 
+    phi: 0.02317
+    purview: (0,)
+    partition:
+      []   0 
+      -- X --
+      0    []
+    unpartitioned_repertoire:
+      [[ 0.4767008]
+       [ 0.5232992]]
+    partitioned_repertoire:
+      [[ 0.49987036]
+       [ 0.50012964]]
+  
+  Concept
+  -------
+  phi: 0.033948
+  mechanism: (1,)
+  cause: 
+    phi: 0.033948
+    purview: (1,)
+    partition:
+      []   1 
+      -- X --
+      1    []
+    unpartitioned_repertoire:
+      [[ 0.53394802  0.46605198]]
+    partitioned_repertoire:
+      [[ 0.5  0.5]]
+  effect: 
+    phi: 0.033988
+    purview: (1,)
+    partition:
+      []   1 
+      -- X --
+      1    []
+    unpartitioned_repertoire:
+      [[ 0.5345736  0.4654264]]
+    partitioned_repertoire:
+      [[ 0.50058581  0.49941419]]
+  
+
+
+state (0, 1)
+
+BigMip
+======
+phi: 0.002464
+subsystem: Subsystem((n0, n1))
+cut: Cut (1,) --//--> (0,)
+unpartitioned_constellation: 
+
+  Concept
+  -------
+  phi: 0.02317
+  mechanism: (0,)
+  cause: 
+    phi: 0.023176
+    purview: (0,)
+    partition:
+      []   0 
+      -- X --
+      0    []
+    unpartitioned_repertoire:
+      [[ 0.52317556]
+       [ 0.47682444]]
+    partitioned_repertoire:
+      [[ 0.5]
+       [ 0.5]]
+  effect: 
+    phi: 0.02317
+    purview: (0,)
+    partition:
+      []   0 
+      -- X --
+      0    []
+    unpartitioned_repertoire:
+      [[ 0.52303991]
+       [ 0.47696009]]
+    partitioned_repertoire:
+      [[ 0.49987036]
+       [ 0.50012964]]
+  
+  Concept
+  -------
+  phi: 0.033988
+  mechanism: (1,)
+  cause: 
+    phi: 0.034028
+    purview: (1,)
+    partition:
+      []   1 
+      -- X --
+      1    []
+    unpartitioned_repertoire:
+      [[ 0.46597234  0.53402766]]
+    partitioned_repertoire:
+      [[ 0.5  0.5]]
+  effect: 
+    phi: 0.033988
+    purview: (1,)
+    partition:
+      []   1 
+      -- X --
+      1    []
+    unpartitioned_repertoire:
+      [[ 0.46659801  0.53340199]]
+    partitioned_repertoire:
+      [[ 0.50058581  0.49941419]]
+  
+  Concept
+  -------
+  phi: 0.028444
+  mechanism: (0, 1)
+  cause: 
+    phi: 0.028444
+    purview: (0, 1)
+    partition:
+      0   1
+      - X -
+      0   1
+    unpartitioned_repertoire:
+      [[ 0.2449047   0.29473303]
+       [ 0.20908565  0.25127662]]
+    partitioned_repertoire:
+      [[ 0.24378534  0.27939022]
+       [ 0.222187    0.25463744]]
+  effect: 
+    phi: 0.030415
+    purview: (0, 1)
+    partition:
+      0   1
+      - X -
+      0   1
+    unpartitioned_repertoire:
+      [[ 0.23987572  0.29524519]
+       [ 0.2083888   0.25649029]]
+    partitioned_repertoire:
+      [[ 0.24404938  0.27899053]
+       [ 0.22254863  0.25441146]]
+  
+partitioned_constellation: 
+
+  Concept
+  -------
+  phi: 0.016511
+  mechanism: (0, 1)
+  cause: 
+    phi: 0.016511
+    purview: (0, 1)
+    partition:
+      0   1
+      - X -
+      0   1
+    unpartitioned_repertoire:
+      [[ 0.25110553  0.28855064]
+       [ 0.21483497  0.24550886]]
+    partitioned_repertoire:
+      [[ 0.24378534  0.27939022]
+       [ 0.222187    0.25463744]]
+  effect: 
+    phi: 0.018333
+    purview: (0, 1)
+    partition:
+      0   1
+      - X -
+      0   1
+    unpartitioned_repertoire:
+      [[ 0.23446023  0.28857968]
+       [ 0.21380429  0.26315581]]
+    partitioned_repertoire:
+      [[ 0.24404938  0.27899053]
+       [ 0.22254863  0.25441146]]
+  
+  Concept
+  -------
+  phi: 0.02317
+  mechanism: (0,)
+  cause: 
+    phi: 0.023176
+    purview: (0,)
+    partition:
+      []   0 
+      -- X --
+      0    []
+    unpartitioned_repertoire:
+      [[ 0.52317556]
+       [ 0.47682444]]
+    partitioned_repertoire:
+      [[ 0.5]
+       [ 0.5]]
+  effect: 
+    phi: 0.02317
+    purview: (0,)
+    partition:
+      []   0 
+      -- X --
+      0    []
+    unpartitioned_repertoire:
+      [[ 0.52303991]
+       [ 0.47696009]]
+    partitioned_repertoire:
+      [[ 0.49987036]
+       [ 0.50012964]]
+  
+  Concept
+  -------
+  phi: 0.033988
+  mechanism: (1,)
+  cause: 
+    phi: 0.034028
+    purview: (1,)
+    partition:
+      []   1 
+      -- X --
+      1    []
+    unpartitioned_repertoire:
+      [[ 0.46597234  0.53402766]]
+    partitioned_repertoire:
+      [[ 0.5  0.5]]
+  effect: 
+    phi: 0.033988
+    purview: (1,)
+    partition:
+      []   1 
+      -- X --
+      1    []
+    unpartitioned_repertoire:
+      [[ 0.46659801  0.53340199]]
+    partitioned_repertoire:
+      [[ 0.50058581  0.49941419]]
+  
+
+
+state (1, 1)
+
+BigMip
+======
+phi: 0.000479
+subsystem: Subsystem((n0, n1))
+cut: Cut (1,) --//--> (0,)
+unpartitioned_constellation: 
+
+  Concept
+  -------
+  phi: 0.023164
+  mechanism: (0,)
+  cause: 
+    phi: 0.023164
+    purview: (0,)
+    partition:
+      []   0 
+      -- X --
+      0    []
+    unpartitioned_repertoire:
+      [[ 0.47683646]
+       [ 0.52316354]]
+    partitioned_repertoire:
+      [[ 0.5]
+       [ 0.5]]
+  effect: 
+    phi: 0.02317
+    purview: (0,)
+    partition:
+      []   0 
+      -- X --
+      0    []
+    unpartitioned_repertoire:
+      [[ 0.4767008]
+       [ 0.5232992]]
+    partitioned_repertoire:
+      [[ 0.49987036]
+       [ 0.50012964]]
+  
+  Concept
+  -------
+  phi: 0.033988
+  mechanism: (1,)
+  cause: 
+    phi: 0.034028
+    purview: (1,)
+    partition:
+      []   1 
+      -- X --
+      1    []
+    unpartitioned_repertoire:
+      [[ 0.46597234  0.53402766]]
+    partitioned_repertoire:
+      [[ 0.5  0.5]]
+  effect: 
+    phi: 0.033988
+    purview: (1,)
+    partition:
+      []   1 
+      -- X --
+      1    []
+    unpartitioned_repertoire:
+      [[ 0.46659801  0.53340199]]
+    partitioned_repertoire:
+      [[ 0.50058581  0.49941419]]
+  
+  Concept
+  -------
+  phi: 0.012
+  mechanism: (0, 1)
+  cause: 
+    phi: 0.012
+    purview: (1,)
+    partition:
+      0    1
+      -- X -
+      []   1
+    unpartitioned_repertoire:
+      [[ 0.47797254  0.52202746]]
+    partitioned_repertoire:
+      [[ 0.46597234  0.53402766]]
+  effect: 
+    phi: 0.015654
+    purview: (1,)
+    partition:
+      []   0,1
+      -- X ---
+      1    [] 
+    unpartitioned_repertoire:
+      [[ 0.48493151  0.51506849]]
+    partitioned_repertoire:
+      [[ 0.50058581  0.49941419]]
+  
+partitioned_constellation: 
+
+  Concept
+  -------
+  phi: 0.006664
+  mechanism: (0, 1)
+  cause: 
+    phi: 0.006664
+    purview: (0, 1)
+    partition:
+      []   0,1
+      -- X ---
+      0     1 
+    unpartitioned_repertoire:
+      [[ 0.22956721  0.2638005 ]
+       [ 0.23643704  0.27019525]]
+    partitioned_repertoire:
+      [[ 0.23298617  0.26701383]
+       [ 0.23298617  0.26701383]]
+  effect: 
+    phi: 0.015654
+    purview: (0, 1)
+    partition:
+      []   0,1
+      -- X ---
+      1     0 
+    unpartitioned_repertoire:
+      [[ 0.23116724  0.24553356]
+       [ 0.25376427  0.26953493]]
+    partitioned_repertoire:
+      [[ 0.23862966  0.23807115]
+       [ 0.26195615  0.26134305]]
+  
+  Concept
+  -------
+  phi: 0.023164
+  mechanism: (0,)
+  cause: 
+    phi: 0.023164
+    purview: (0,)
+    partition:
+      []   0 
+      -- X --
+      0    []
+    unpartitioned_repertoire:
+      [[ 0.47683646]
+       [ 0.52316354]]
+    partitioned_repertoire:
+      [[ 0.5]
+       [ 0.5]]
+  effect: 
+    phi: 0.02317
+    purview: (0,)
+    partition:
+      []   0 
+      -- X --
+      0    []
+    unpartitioned_repertoire:
+      [[ 0.4767008]
+       [ 0.5232992]]
+    partitioned_repertoire:
+      [[ 0.49987036]
+       [ 0.50012964]]
+  
+  Concept
+  -------
+  phi: 0.033988
+  mechanism: (1,)
+  cause: 
+    phi: 0.034028
+    purview: (1,)
+    partition:
+      []   1 
+      -- X --
+      1    []
+    unpartitioned_repertoire:
+      [[ 0.46597234  0.53402766]]
+    partitioned_repertoire:
+      [[ 0.5  0.5]]
+  effect: 
+    phi: 0.033988
+    purview: (1,)
+    partition:
+      []   1 
+      -- X --
+      1    []
+    unpartitioned_repertoire:
+      [[ 0.46659801  0.53340199]]
+    partitioned_repertoire:
+      [[ 0.50058581  0.49941419]]
+  
+
+

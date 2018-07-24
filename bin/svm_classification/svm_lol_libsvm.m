@@ -1,4 +1,4 @@
-function [classification] = svm_lol(values, leave_out_counter)
+function [classification] = svm_lol_libsvm(values, leave_out_counter)
 % Classifies using SVM, validating using leave-one-out
 % Assumes equal number of observations in each class
 %
@@ -104,8 +104,8 @@ if nargin > 1
     data_test = (data_test - means_mat) ./ stds_mat;
     
     % Normalise data (training and testing data independently)
-    data_train = zscore(data_train, [], 1);
-    data_test = zscore(data_test, [], 1);
+    %data_train = zscore(data_train, [], 1);
+    %data_test = zscore(data_test, [], 1);
     
     % Train SVM
     trained = svmtrain(data_train_labels, data_train, '-t 0'); % '-t 0' = linear; '-t 2' = rbf ('-t 2' is default)
@@ -138,6 +138,18 @@ else
             data_test(class, :) = class_data{class}(leave_out(class), :); % test data
             observation_counter = observation_counter + (nObservations-1);
         end
+        
+        % Normalise training data ([-1 1])
+        means = mean(data_train, 1);
+        stds = std(data_train, [], 1);
+        means_mat = repmat(means, [size(data_train, 1), 1]);
+        stds_mat = repmat(stds, [size(data_train, 1), 1]);
+        data_train = (data_train - means_mat) ./ stds_mat;
+        
+        % Normalise testing data (using same parameters as for training data)
+        means_mat = repmat(means, [size(data_test, 1), 1]);
+        stds_mat = repmat(stds, [size(data_test, 1), 1]);
+        data_test = (data_test - means_mat) ./ stds_mat;
         
         % Train SVM
         trained = svmtrain(data_train_labels, data_train, '-t 0'); % '-t 0' = linear; '-t 2' = rbf ('-t 2' is default)

@@ -13,7 +13,7 @@ across fly analyses (for trying to extend within fly findings across flies)
 
 %% Setup
 
-measure = 'phi_three';
+measure = 'phi_SI'; % 'phi_three' or 'phi_star' or 'phi_SI'
 tau = 1; % 1 = 4ms; 2 = 8ms; 3 = 16ms
 if tau == 1
     tau_string = '4';
@@ -242,8 +242,8 @@ end
 
 %% Print figure
 
-figure_name = 'fig3';
-
-print(figure_name, '-dsvg'); % SVG
-print(figure_name, '-dpdf', '-bestfit'); % PDF
-print(figure_name, '-dpng'); % PNG
+% figure_name = 'fig3';
+% 
+% print(figure_name, '-dsvg'); % SVG
+% print(figure_name, '-dpdf', '-bestfit'); % PDF
+% print(figure_name, '-dpng'); % PNG

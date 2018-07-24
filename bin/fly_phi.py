@@ -1,6 +1,6 @@
 
 import pyphi as pyphi
-#import numpy as np
+import numpy as np
 import scipy.io as sio
 #import matplotlib.pyplot as plt
 #import sklearn.preprocessing as skp
@@ -18,6 +18,24 @@ def load_mat(data_location):
 def save_mat(data_directory, dictionary):
 	import scipy.io as sio
 	sio.savemat(data_directory, dictionary, do_compression=True)
+
+def tau_resample(fly_data, tau):
+	"""
+	Averages across every tau samples
+	Any remaining samples are dropped
+	Source - https://stackoverflow.com/questions/30379311/fast-way-to-take-average-of-every-n-rows-in-a-npy-array
+	Inputs:
+		fly_data = data matrix with dimensions (samples x channels x trials x flies x conditions)
+		tau = number of samples to average across
+	Outputs:
+		fly_data_resampled = matrix with same dimensions as fly_data, except for samples, which has size (samples / tau)
+	"""
+	
+	cum = np.cumsum(fly_data, 0) # Sum cumulatively across samples
+	fly_data_resampled = cum[tau-1::tau, :, :, :, :] / float(tau) # Take every tau'th cumulative sum, and divide by tau
+	fly_data_resampled = fly_data_resampled[1:, :, :, :, :] - fly_data_resampled[:-1, :, :, :, :] # Subtract previous 'cumulative average'
+	
+	return fly_data_resampled
 
 def binarise(value, threshold):
 	"""
@@ -164,9 +182,12 @@ def build_tpm(fly_data, tau, n_values):
 	
 	# Divide elements in TPM by transition counter
 	# If counter is 0, then transition never occurred - to avoid dividing 0 by 0, we set the counter to 1
-	for counter in transition_counter:
+	counter_position = 0
+	for state, counter in enumerate(transition_counter):
 		if counter == 0:
-			counter = 1
+			transition_counter[state] = 1
+			tpm[state, :] = 1 / tpm.shape[1]
+		counter_position = counter_position + 1
 	tpm /= transition_counter # Check vector operation
 	
 	return tpm# pyphi.convert.state_by_state2state_by_node(tpm)
@@ -242,10 +263,25 @@ def build_tpm_sbn(fly_data, tau, n_values):
 	
 	return tpm
 
-
-
-
-
+def sort_constellation_by_mechanism(constellation):
+	"""
+	Sorts a constellation's mechanisms
+	
+	Mechanisms are sorted as to give an "ordered powerset order" (with the smallest sets first, etc)
+	Depends on stable sorting by python
+	
+	Inputs:
+		constellation: constellation dict from compute.pyphi.big_mip() ('partitioned_constellation' or 'unpartitioned_constellation')
+	Outputs:
+		sorted_const: constellation dict with sorted mechanisms
+	"""
+	
+	# Standard sorting of lists
+	sorted_const = sorted(constellation, key=lambda k: k['mechanism'])
+	# Sort by length of lists (sorting is stable so previous order is maintained within second sorting)
+	sorted_const = sorted(sorted_const, key=lambda k: len(k['mechanism']))
+	
+	return sorted_const
 
 
 # Old functions which may no longer be useful ################################################################################

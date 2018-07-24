@@ -10,10 +10,10 @@ function [features] = set_sample(channel_sets, nFeatures)
 
 nChannels = max(channel_sets);
 
-if nFeatures * size(channel_sets, 2) < nChannels
-    disp('Not enough features to cover all channels');
-    return
-end
+% if nFeatures * size(channel_sets, 2) < nChannels
+%     disp('Not enough features to cover all channels');
+%     return
+% end
 
 % Keep original copy so we can reset if required conditions aren't met
 sample_space = channel_sets;
@@ -30,23 +30,23 @@ if numel(channels) == max(nChannels)
 end
 
 % Repeat while not all channels are covered
-while covered == 0
-    
-    % Keep original copy so we can reset if required conditions aren't met
-    sample_space = channel_sets;
-    
-    % Get random sample
-    features = randperm(size(channel_sets, 1), nFeatures);
-    
-    % Check if selected sets cover all channels
-    covered = 0;
-    channels = channel_sets(features, :);
-    channels = unique(channels(:));
-    if numel(channels) == max(nChannels)
-        covered = 1;
-    end
-    
-end
+% while covered == 0
+%     
+%     % Keep original copy so we can reset if required conditions aren't met
+%     sample_space = channel_sets;
+%     
+%     % Get random sample
+%     features = randperm(size(channel_sets, 1), nFeatures);
+%     
+%     % Check if selected sets cover all channels
+%     covered = 0;
+%     channels = channel_sets(features, :);
+%     channels = unique(channels(:));
+%     if numel(channels) == max(nChannels)
+%         covered = 1;
+%     end
+%     
+% end
 
 end
 

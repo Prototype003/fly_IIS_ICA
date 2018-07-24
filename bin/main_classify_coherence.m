@@ -43,28 +43,66 @@ disp('Computing coherencies');
 networks = nchoosek((1:nChannels), network_size);
 nNetworks = size(networks, 1);
 
-% Results matrix: frequencies x trials x channel sets x condition x fly
-coherencies = zeros(410, size(fly_data, 3), nNetworks, nConditions, nFlies);
-
-for condition = 1 : nConditions
-    for fly_counter = 1 : nFlies
-        fly = flies(fly_counter);
-        
-        for network_counter = 1 : nNetworks
-            network = networks(network_counter, :);
-            disp(network);
+if across_flies == 0
+    
+    % Results matrix: frequencies x trials x channel sets x condition x fly
+    coherencies = zeros(410, size(fly_data, 3), nNetworks, nConditions, nFlies);
+    
+    for condition = 1 : nConditions
+        for fly_counter = 1 : nFlies
+            fly = flies(fly_counter);
             
-            % Get trials for the channels in the network (input dimensions to chronux function should be time x trials
-            trials = permute(fly_data(:, network, :, fly, condition), [1 3 2 4 5]);
+            for network_counter = 1 : nNetworks
+                network = networks(network_counter, :);
+                disp(network);
+                
+                % Get trials for the channels in the network (input dimensions to chronux function should be time x trials
+                trials = permute(fly_data(:, network, :, fly, condition), [1 3 2 4 5]);
+                
+                % Compute power spectrums
+                [spectrums, ~, ~, ~, ~, frequencies] = coherencyc(trials(:, :, 1), trials(:, :, 2), chronux_params);
+                
+                % Store
+                coherencies(:, :, network_counter, condition, fly_counter) = spectrums;
+            end
             
-            % Compute power spectrums
-            [spectrums, ~, ~, ~, ~, frequencies] = coherencyc(trials(:, :, 1), trials(:, :, 2), chronux_params);
-            
-            % Store
-            coherencies(:, :, network_counter, condition, fly_counter) = spectrums;
         end
-        
     end
+    
+else % across_flies == 1
+    
+    % Results matrix: frequencies x trials x channel sets x condition x fly
+    coherencies = zeros(3277, 1, nNetworks, nConditions, nFlies);
+    
+    for condition = 1 : nConditions
+        for fly_counter = 1 : nFlies
+            fly = flies(fly_counter);
+            
+            for network_counter = 1 : nNetworks
+                network = networks(network_counter, :);
+                disp(network);
+                
+                % Get trials for the channels in the network (input dimensions to chronux function should be time x trials
+                trials = permute(fly_data(:, network, :, fly, condition), [1 3 2 4 5]);
+                
+                % Concatenate trials into one big trial
+                trial = zeros(size(trials, 1) * size(trials, 2), size(trials, 3));
+                row_counter = (1:size(trials, 1));
+                for trial_counter = 1 : size(trials, 2)
+                    trial(row_counter, :) = trials(:, trial_counter, :);
+                    row_counter = row_counter + size(trials, 1);
+                end
+                
+                % Compute power spectrums
+                [spectrums, ~, ~, ~, ~, frequencies] = coherencyc(trial(:, 1), trial(:, 2), chronux_params);
+                
+                % Store
+                coherencies(:, :, network_counter, condition, fly_counter) = spectrums;
+            end
+            
+        end
+    end
+    
 end
 
 disp('Coherencies computed');

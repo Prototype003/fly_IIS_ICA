@@ -13,7 +13,7 @@ Within flies classification
 
 class_type = 'within'; % 'across' or 'within'
 
-freq_range = (1); % (1:42) = 0-5Hz; Vector of which frequency bins to use, we want to use the lowest frequency bin
+freq_range = (1:42); % (1:42) = 0-5Hz; Vector of which frequency bins to use, we want to use the lowest frequency bin
 
 % bin directory location
 bin_dir = '../';
@@ -46,8 +46,16 @@ elseif strcmp(class_type, 'within')
         classifications{fly} = svm_lol_libsvm(values);
     end
     
+    accuracy_mean = 0;
+    accuracy_flies = zeros(size(values_all, 3), 1);
+    for fly = 1 : size(values_all, 3)
+        accuracy_mean = accuracy_mean + classifications{fly}.accuracy;
+        accuracy_flies(fly) = classifications{fly}.accuracy;
+    end
+    accuracy_mean = accuracy_mean / size(values_all, 3)
+    
 end
 
 %% Save
 
-save([results_location results_file], 'classifications');
+% save([results_location results_file], 'classifications');

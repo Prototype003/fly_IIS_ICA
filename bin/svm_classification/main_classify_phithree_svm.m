@@ -38,6 +38,10 @@ end
 values_all = phi_threes{3}.phis(:, :, :, :, tau);
 channel_sets = phi_threes{3}.channel_sets;
 
+%% Sort by phi values (for classification using top values)
+
+
+
 %% Classify using SVM
 
 if strcmp(class_type, 'across')
@@ -45,7 +49,7 @@ if strcmp(class_type, 'across')
     % First classification round
     selected_sets = set_sample(channel_sets, nFeatures); % Select random set of channel sets
     values = permute(mean(values_all(selected_sets, :, :, :), 2), [3 1 4 2]); % flies x sets x conditions
-    classifications = svm_lol(values);
+    classifications = svm_lol_libsvm(values);
     
     % Store selected sets
     classifications.sets = zeros(size(classifications.leave_outs, 1), length(selected_sets));
@@ -84,7 +88,7 @@ elseif strcmp(class_type, 'within')
         % First classification round
         selected_sets = set_sample(channel_sets, nFeatures); % Select random set of channel sets
         values = permute(values_all(selected_sets, :, fly, :), [2 1 4 3]); % trials x sets x conditions
-        classifications{fly} = svm_lol(values);
+        classifications{fly} = svm_lol_libsvm(values);
         
         % Store selected sets
         classifications{fly}.sets = zeros(size(classifications{fly}.leave_outs, 1), length(selected_sets));
@@ -115,13 +119,21 @@ elseif strcmp(class_type, 'within')
         classifications{fly}.accuracy = sum(classifications{fly}.correct_total) / numel(classifications{fly}.leave_outs);
     end
     
+    accuracy_mean = 0;
+    accuracy_flies = zeros(size(values_all, 3), 1);
+    for fly = 1 : size(values_all, 3)
+        accuracy_mean = accuracy_mean + classifications{fly}.accuracy;
+        accuracy_flies(fly) = classifications{fly}.accuracy;
+    end
+    accuracy_mean = accuracy_mean / size(values_all, 3)
+    
 end
 
 %% Save
 
 %save([results_location results_file], 'classifications');
 
-%%
+%% PCA across features - for visualisation of class data in 2D
 % 
 % figure;
 % 

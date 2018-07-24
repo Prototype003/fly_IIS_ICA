@@ -35,7 +35,7 @@ Plots are 2D for 2-channels, 3D for 3-channels, and 4D for 4-channels
 
 %% Settings
 
-measure = 'phi_three'; % 'phi_three' or 'phi_star'
+measure = 'phi_star'; % 'phi_three' or 'phi_star'
 tau = 1; % 1 = 4ms; 2 = 8ms; 3 = 16ms
 if tau == 1
     tau_string = '4';
@@ -84,7 +84,7 @@ if strcmp(measure, 'phi_three') % Load phi-three results
         tmp = load([data_directory data_filename]);
         phis{2} = tmp.phis{1};
         
-        data_directory = 'results_split/';
+        data_directory = 'results/';
         data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels4t4_phithree_nonGlobal_tau4.mat'];
         disp('loading 4ch');
         tmp = load([data_directory data_filename]);
@@ -126,15 +126,27 @@ else % strcmp(measure, 'phi_star') % Load phi-star results
     else % global_tpm == 0 % Covariance per trial
         disp('loading');
         
-        data_directory = 'results/';
-        data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels2t4_phistar.mat'];
-        load([data_directory data_filename]);
+%         data_directory = 'results/';
+%         data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels2t4_phistar.mat'];
+%         load([data_directory data_filename]);
+%         
+%         % Rename measure specific variable names to generic names
+%         for nChannels_counter = 1 : length(phis)
+%             phis{nChannels_counter}.phis = phis{nChannels_counter}.phi_stars;
+%             phis{nChannels_counter} = rmfield(phis{nChannels_counter}, 'phi_stars');
+%         end
         
-        % Rename measure specific variable names to generic names
-        for nChannels_counter = 1 : length(phis)
-            phis{nChannels_counter}.phis = phis{nChannels_counter}.phi_stars;
-            phis{nChannels_counter} = rmfield(phis{nChannels_counter}, 'phi_stars');
-        end
+        data_directory = 'phi_star/results_split/';
+        phis = cell(3, 1);
+        data_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels2_phistar_nonGlobal.mat';
+        tmp = load([data_directory data_filename]);
+        phis{1} = tmp.phis{1};
+        data_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels3_phistar_nonGlobal.mat';
+        tmp = load([data_directory data_filename]);
+        phis{2} = tmp.phis{1};
+        data_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels4_phistar_nonGlobal.mat';
+        tmp = load([data_directory data_filename]);
+        phis{3} = tmp.phis{1};
         
         disp('loaded');
     end
@@ -221,8 +233,8 @@ for nChannels_counter = 1 : length(accuracies)
 end
 
 % Save channel means
-save_location = ['workspace_results/channelMeanPhis_globalTPM' num2str(global_tpm) '_tau' tau_string '.mat'];
-save(save_location, 'channel_means');
+% save_location = ['workspace_results/channelMeanPhis_globalTPM' num2str(global_tpm) '_tau' tau_string '.mat'];
+% save(save_location, 'channel_means');
 
 %% t-SNE and PCA mapping (for consistency across plots)
 % We do this separately, first, because t-SNE is an iterative technique
@@ -379,6 +391,7 @@ for nChannels_counter = 1 : length(phis)
     nChannels = phis{nChannels_counter}.nChannels;
     
     channel_sets = phis{nChannels_counter}.channel_sets;
+    %channel_sets = nchoosek((1:15), nChannels_counter+1);
     
     % Set centers
     centers = mean(channel_sets, 2); % Mean across channels in each set
@@ -392,8 +405,8 @@ for nChannels_counter = 1 : length(phis)
         values = permute(mean(mean(phis{nChannels_counter}.phis(:, :, flies, :, tau), 2), 3), [1 4 2 3]);
         
         plot_values = values(:, 1) - values(:, 2); cbar_title = [measure_string '_W - ' measure_string '_A']; % Awake - Anest
-        plot_values = values(:, 1)./values(:, 2); cbar_title = [measure_string '_W/' measure_string '_N'];
-        plot_values = values(:, 1); cbar_title = [measure_string '_W']; % Awake
+        %plot_values = values(:, 1)./values(:, 2); cbar_title = [measure_string '_W/' measure_string '_N'];
+        %plot_values = values(:, 1); cbar_title = [measure_string '_W']; % Awake
         %plot_values = values(:, 2); cbar_title = [measure_string '_N']; % Anest
         
         value_sizes = (rescale(plot_values, 0.01, 200));
@@ -465,6 +478,7 @@ for nChannels_counter = 1 : length(phis)
     nChannels = phis{nChannels_counter}.nChannels;
     
     channel_sets = phis{nChannels_counter}.channel_sets;
+    %channel_sets = nchoosek((1:15), nChannels_counter+1);
     
     % Get values
     if strcmp(measure_type, 'value')
@@ -771,7 +785,8 @@ for nChannels_counter = 2 : length(phis)
     subplot(1, 2, nChannels_counter - 1);
     
     nChannels = phis{nChannels_counter}.nChannels;
-    channel_sets = phis{nChannels_counter}.channel_sets;
+    %channel_sets = phis{nChannels_counter}.channel_sets;
+    channel_sets = nchoosek((1:15), nChannels_counter+1);
     
     for condition = 1 : 2
         if strcmp(measure_type, 'value')

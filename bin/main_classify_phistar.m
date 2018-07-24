@@ -36,7 +36,7 @@ if strcmp(global_covariance, 'nonGlobal')
     across_flies = 0;
 else % strcmp(global_covariance, 'global')
     data_directory = 'results/';
-    data_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels2t4_medianSplit0_phistar_phiToolbox_global';
+    data_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels2t4_medianSplit0_phistar_global';
     data_filename = [data_filename '.mat'];
     trials = 1; % Global calculation means only 1 effective trial (identical covariance across 8 trials)
     across_flies = 1;

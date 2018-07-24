@@ -11,7 +11,7 @@ Within flies classification
 
 %% SETUP
 
-class_type = 'across'; % 'across' or 'within'
+class_type = 'within'; % 'across' or 'within'
 
 nFeatures = 1;
 
@@ -27,34 +27,36 @@ results_file = ['phi3_svm_' class_type '_singleFeature.mat'];
 
 %% Load phi values
 
-% if strcmp(class_type, 'across')
-%     global_tpm = 1;
-% else % strcmp(class_type, 'within')
-%     global_tpm = 0;
-% end
-% 
-% [phi_threes, measure_strings{1}] = phi_load('phi_three', global_tpm, bin_location);
-% 
-% values_all = phi_threes{3}.phis(:, :, :, :, tau);
-% channel_sets = phi_threes{3}.channel_sets;
-% nSets = size(channel_sets, 1);
+if strcmp(class_type, 'across')
+    global_tpm = 1;
+else % strcmp(class_type, 'within')
+    global_tpm = 0;
+end
+
+[phi_threes, measure_strings{1}] = phi_load('phi_three', global_tpm, bin_location);
+
+values_all = phi_threes{3}.phis(:, :, :, :, tau);
+channel_sets = phi_threes{3}.channel_sets;
+nSets = size(channel_sets, 1);
 
 %% Classify using SVM
 
 if strcmp(class_type, 'across')
     
+    classifications = cell(size(values_all, 1), 1);
     accuracy = zeros(nSets, 1);
     
-    for set = 1 : nSets
-        disp(['set ' num2str(set)]);
+    for set_counter = 1 : nSets
+        disp(['set ' num2str(set_counter)]);
         
-        values = permute(mean(values_all(set, :, :, :), 2), [3 1 4 2]); % flies x set x conditions
+        values = permute(mean(values_all(set_counter, :, :, :), 2), [3 1 4 2]); % flies x set x conditions
         
         % Classify
-        classifications = svm_lol_libsvm(values);
+        classifications{set_counter} = svm_lol_libsvm(values);
         
         % Summarise across validations and store
-        accuracy(set) = sum(classifications.correct_total) / numel(classifications.leave_outs);
+        classifications{set_counter}.accuracy_per_class = classifications{set_counter}.correct_total / size(classifications{set_counter}.leave_outs, 1);
+        classifications{set_counter}.accuracy = sum(classifications{set_counter}.correct_total) / numel(classifications{set_counter}.leave_outs);
     end
     
 elseif strcmp(class_type, 'within')
@@ -101,25 +103,15 @@ end
 
 %% Save
 
-%save([results_location results_file], 'classifications');
+save([results_location results_file], 'classifications');
 
 %%
-% 
-% figure;
-% 
-% foo = cat(1, values(:, :, 1), values(:, :, 2));
-% [coeff, score, latent, ~, explained] = pca(foo);
-% 
-% scatter(score((1:13), 1), score((1:13), 2), 'r'); hold on;
-% scatter(score((1:13)+13, 1), score((1:13)+13, 2), 'b');
-% 
-% %%
-% 
-% figure;
-% 
-% for fly = 1 : size(values_all, 3)
-%     subplot(size(values_all, 3), 1, fly);
-%     
-%     bar(squeeze(values_all(:, :, fly, 1) - values_all(:, :, fly, 2)));
-% end
+
+figure;
+
+for fly = 1 : size(values_all, 3)
+    subplot(size(values_all, 3), 1, fly);
+    
+    bar(squeeze(values_all(:, :, fly, 1) - values_all(:, :, fly, 2)));
+end
 

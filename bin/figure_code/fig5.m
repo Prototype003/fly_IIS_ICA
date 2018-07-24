@@ -9,7 +9,7 @@ Figure 5 - correlation between mean 2ch mean values with 3/4ch values
 
 %% Setup
 
-measure = 'phi_three';
+measure = 'phi_SI'; % 'phi_three' or 'phi_star'
 tau = 1; % 1 = 4ms; 2 = 8ms; 3 = 16ms
 if tau == 1
     tau_string = '4';
@@ -201,13 +201,19 @@ for measure_counter = 1 : length(measures)
                     if strcmp(tpm_type, 'global')
                         values = permute(mean(mean(phis_a{nChannels_counter}.phis(:, :, :, condition, tau), 2), 3), [1 4 2 3]);
                         channel_means = permute(mean(mean(phis_a{1}.channel_means(:, :, :, condition), 2), 3), [1 4 2 3]);
+                        
+%                         % Can also plot for just one fly here
+%                         flies = (1:13);
+%                         values = permute(mean(phis_a{nChannels_counter}.phis(:, :, flies, condition, tau), 2), [1 4 2 3]);
+%                         channel_means = permute(mean(phis{1}.channel_means(:, :, flies, condition), 2), [1 4 2 3]);
                     else % strcmp(tpm_type, 'nonGlobal')
                         values = permute(mean(mean(phis{nChannels_counter}.phis(:, :, :, condition, tau), 2), 3), [1 4 2 3]);
                         channel_means = permute(mean(mean(phis{1}.channel_means(:, :, :, condition), 2), 3), [1 4 2 3]);
                         
-                        % Can also plot for just one fly here
-                        %values = permute(mean(phis{nChannels_counter}.phis(:, :, 7, condition, tau), 2), [1 4 2 3]);
-                        %channel_means = permute(mean(phis{1}.channel_means(:, :, 7, condition), 2), [1 4 2 3]);
+%                         % Can also plot for just one fly here
+%                         flies = (1:13);
+%                         values = permute(mean(phis{nChannels_counter}.phis(:, :, flies, condition, tau), 2), [1 4 2 3]);
+%                         channel_means = permute(mean(phis{1}.channel_means(:, :, flies, condition), 2), [1 4 2 3]);
                     end
                     
                     % Build values from average of single channel average values
@@ -220,6 +226,9 @@ for measure_counter = 1 : length(measures)
                     % Plot
                     scatter(values_rebuilt, values, [], colours(condition), shapes(condition)); hold on;
                     
+                    % Correlation
+                    [r, p] = corr(values_rebuilt, values);
+                    disp([measure_type tpm_type num2str(nChannels_counter) 'c' num2str(condition) ' r:' num2str(r) ' p:' num2str(p)]);
                 end
                 
                 title([num2str(nChannels_counter+1) 'ch']);
@@ -251,6 +260,10 @@ for measure_counter = 1 : length(measures)
                 
                 % Plot
                 scatter(values_rebuilt, values, [], 'k.'); hold on;
+                
+                % Correlation
+                [r, p] = corr(values_rebuilt, values);
+                disp([measure_type tpm_type num2str(nChannels_counter) ' r:' num2str(r) ' p:' num2str(p)]);
                 
                 if nChannels_counter == 2
                     ylabel('class. acc. %');
@@ -293,8 +306,8 @@ end
 
 %% Print figure
 
-figure_name = 'fig5';
-
-print(figure_name, '-dsvg'); % SVG
-print(figure_name, '-dpdf', '-bestfit'); % PDF
-print(figure_name, '-dpng'); % PNG
+% figure_name = 'fig5';
+% 
+% print(figure_name, '-dsvg'); % SVG
+% print(figure_name, '-dpdf', '-bestfit'); % PDF
+% print(figure_name, '-dpng'); % PNG

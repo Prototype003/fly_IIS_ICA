@@ -143,9 +143,11 @@ plot_metrics = {'threes', 'stars'};
 metric_labels = {'^{3.0}', '*'};
 metric_lims = struct();
 metric_limits.threes = [0.03 0.03 0.015];
-metric_limits.stars = [0.005 0.005 0.002]; % 0.005 0.005 0.002
+metric_limits.stars = [0.005 0.005 0.002]; % 0.005 0.005 0.002 % For Gaussian assumption values
+metric_limits.stars = [0.05 0.05 0.002];
 metric_exponents.threes = -2;
-metric_exponents.stars = -3;
+metric_exponents.stars = -3; % For Gaussian assumption values
+metric_exponents.stars = -2;
 
 yticks = struct();
 yticks.threes = [0 metric_limits.threes/2 metric_limits.threes];
@@ -184,7 +186,7 @@ for metric_counter = 1 : length(plot_metrics)
             'CapSize', setSize_caps(setSize_counter),...
             'LineWidth', setSize_widths(setSize_counter),...
             'MarkerFaceColor', 'k',...
-            'MarkerSize', 6);
+            'MarkerSize', 4);
         hold on;
     end
     %legend('    2ch', '    3ch', '    4ch', 'Location', 'southeast');
@@ -217,7 +219,7 @@ for metric_counter = 1 : length(plot_metrics)
             'CapSize', setSize_caps(setSize_counter),...
             'LineWidth', setSize_widths(setSize_counter),...
             'MarkerFaceColor', 'k',...
-            'MarkerSize', 6);
+            'MarkerSize', 4);
         hold on;
     end
     set(gca, 'Position', [xStarts(metric_counter) yStarts(2)+ySpacing, widths(metric_counter), heights(2)-ySpacing]);
@@ -248,7 +250,7 @@ for metric_counter = 1 : length(plot_metrics)
             'CapSize', setSize_caps(setSize_counter),...
             'LineWidth', setSize_widths(setSize_counter),...
             'MarkerFaceColor', 'k',...
-            'MarkerSize', 6);
+            'MarkerSize', 4);
         hold on;
     end
     set(gca, 'Position', [xStarts(metric_counter) yStarts(3)+ySpacing, widths(metric_counter), heights(3)-ySpacing]);
@@ -274,8 +276,8 @@ end
 
 %% Print figure
 
-figure_name = 'fig2';
-
-print(figure_name, '-dsvg'); % SVG
-print(figure_name, '-dpdf', '-bestfit'); % PDF
-print(figure_name, '-dpng'); % PNG
+% figure_name = 'fig2';
+% 
+% print(figure_name, '-dsvg'); % SVG
+% print(figure_name, '-dpdf', '-bestfit'); % PDF
+% print(figure_name, '-dpng'); % PNG

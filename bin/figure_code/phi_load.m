@@ -4,7 +4,7 @@ function [phis, measure_string] = phi_load(measure, global_tpm, root_directory)
 %
 % Inputs:
 %   measure: string
-%       'phi_three' or 'phi_star'
+%       'phi_three' or 'phi_star' or 'phi_SI'
 %   global_tpm: integer
 %       0 - get phi values using 2.25s TPM/covariance observation (per trial)
 %       1 - get phi values computed 18s TPM/covariance observation (across trials)
@@ -72,7 +72,7 @@ if strcmp(measure, 'phi_three') % Load phi-three results
 %         tmp = load([data_directory data_filename]);
 %         phis{2} = tmp.phis{1};
 %         
-%         data_directory = [root_directory 'results_split/'];
+%         data_directory = [root_directory 'results/'];
 %         data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels4t4_phithree_nonGlobal_tau4.mat'];
 %         disp('loading 4ch');
 %         tmp = load([data_directory data_filename]);
@@ -93,39 +93,87 @@ if strcmp(measure, 'phi_three') % Load phi-three results
         disp('loaded');
     end
     
-else % strcmp(measure, 'phi_star') % Load phi-star results
+elseif strcmp(measure, 'phi_star') % Load phi-star results
     measure_string = '\Phi*';
+%     % Results from calculation using Gaussian assumption
+%     if global_tpm == 1 % Global covariance
+%         disp('loading');
+%         
+%         data_directory = [root_directory 'results/'];
+%         data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels2t4_medianSplit0_phistar_global.mat'];
+%         load([data_directory data_filename]);
+%         
+%         % Rename measure specific variable names to generic names
+%         for nChannels_counter = 1 : length(phis)
+%             phis{nChannels_counter}.phis = phis{nChannels_counter}.phi_stars;
+%             phis{nChannels_counter} = rmfield(phis{nChannels_counter}, 'phi_stars');
+%         end
+%         
+%         disp('loaded');
+%         
+%     else % global_tpm == 0 % Covariance per trial
+%         disp('loading');
+%         
+%         data_directory = [root_directory 'results/'];
+%         data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels2t4_phistar.mat'];
+%         load([data_directory data_filename]);
+%         
+%         % Rename measure specific variable names to generic names
+%         for nChannels_counter = 1 : length(phis)
+%             phis{nChannels_counter}.phis = phis{nChannels_counter}.phi_stars;
+%             phis{nChannels_counter} = rmfield(phis{nChannels_counter}, 'phi_stars');
+%         end
+%         
+%         disp('loaded');
+%     end
     
-    if global_tpm == 1 % Global covariance
-        disp('loading');
-        
-        data_directory = [root_directory 'results/'];
-        data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels2t4_medianSplit0_phistar_global.mat'];
-        load([data_directory data_filename]);
-        
-        % Rename measure specific variable names to generic names
-        for nChannels_counter = 1 : length(phis)
-            phis{nChannels_counter}.phis = phis{nChannels_counter}.phi_stars;
-            phis{nChannels_counter} = rmfield(phis{nChannels_counter}, 'phi_stars');
-        end
-        
-        disp('loaded');
-        
-    else % global_tpm == 0 % Covariance per trial
-        disp('loading');
-        
-        data_directory = [root_directory 'results/'];
-        data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels2t4_phistar.mat'];
-        load([data_directory data_filename]);
-        
-        % Rename measure specific variable names to generic names
-        for nChannels_counter = 1 : length(phis)
-            phis{nChannels_counter}.phis = phis{nChannels_counter}.phi_stars;
-            phis{nChannels_counter} = rmfield(phis{nChannels_counter}, 'phi_stars');
-        end
-        
-        disp('loaded');
+    disp('loading');
+    phis = cell(3, 1);
+    if global_tpm == 1 % 1 big trial
+        data_directory = [root_directory 'phi_star/results/'];
+        data_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels2t4_phistar_global.mat';
+        tmp = load([data_directory data_filename]);
+        phis = tmp.phis;
+    else % global_tpm == 0 % 8 trials
+        data_directory = [root_directory 'phi_star/results/'];
+        data_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels2t4_phistar_nonGlobal.mat';
+        tmp = load([data_directory data_filename]);
+        phis = tmp.phis;
+%         data_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels2_phistar_nonGlobal.mat';
+%         tmp = load([data_directory data_filename]);
+%         phis{1} = tmp.phis{1};
+%         phis{1}.channel_sets = nchoosek((1:15), 2);
+%         data_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels3_phistar_nonGlobal.mat';
+%         tmp = load([data_directory data_filename]);
+%         phis{2} = tmp.phis{1};
+%         phis{2}.channel_sets = nchoosek((1:15), 3);
+%         data_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels4_phistar_nonGlobal.mat';
+%         tmp = load([data_directory data_filename]);
+%         phis{3} = tmp.phis{1};
+%         phis{3}.channel_sets = nchoosek((1:15), 4);
     end
+    disp('loaded');
+    
+elseif strcmp(measure, 'phi_SI')
+    disp('loading');
+    
+    measure_string = '\Phi^{SI}';
+    
+    if global_tpm == 1
+        data_directory = [root_directory 'phi_star/results/'];
+        data_file = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels2t4_phiSI_global.mat';
+        
+        tmp = load([data_directory data_file]);
+        phis = tmp.phis;
+    else % global_tpm == 0 % 8 trials
+        data_directory = [root_directory 'phi_star/results/'];
+        data_file = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels2t4_phiSI_nonGlobal.mat';
+        
+        tmp = load([data_directory data_file]);
+        phis = tmp.phis;
+    end
+    
+    disp('loaded');
     
 end
 

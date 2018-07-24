@@ -866,7 +866,7 @@ else % global_tpm == 0
     disp('loading 3ch');
     tmp = load([data_directory data_filename]);
     phis{2} = tmp.phis{1};
-    data_directory = 'results_split/';
+    data_directory = 'results/';
     data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels4t4_phithree_nonGlobal_tau4.mat'];
     disp('loading 4ch');
     tmp = load([data_directory data_filename]);

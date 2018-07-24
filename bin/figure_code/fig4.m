@@ -13,6 +13,7 @@ OR
 %% Setup
 
 measure = 'phi_three';
+measure_string = '\Phi^{3.0}';
 tau = 1; % 1 = 4ms; 2 = 8ms; 3 = 16ms
 if tau == 1
     tau_string = '4';
@@ -22,7 +23,8 @@ elseif tau == 3
     tau_string = '16';
 end
 
-freq_range = (1:42); %(1:83); % corresponding to ~5Hz and ~10Hz, check the 'frequencies' vector
+freq_range_w = (1:42); %(1:83); % corresponding to ~5Hz and ~10Hz, check the 'frequencies' vector
+freq_range_a = (1:329); %(1:329)=0-5Hz; There are more frequency bins for the single large trial
 freq_range_string = '0-5Hz'; %'0-10Hz';
 
 fontsize = 11; % Used for drawing label letters
@@ -37,13 +39,13 @@ results_directory = [bin_location 'workspace_results/'];
 % Power
 results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_power_classification.mat';
 load([results_directory results_filename]);
-measure_accuracies_w = permute(mean(mean(accuracies(freq_range, :, :), 1), 2), [3 1 2]); % average across frequency range and channels
+measure_accuracies_w = permute(mean(mean(accuracies(freq_range_w, :, :), 1), 2), [3 1 2]); % average across frequency range and channels
 measure_groups_w = zeros(size(measure_accuracies_w)) + 1;
 
 % Coherence
 results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_coherence_classification.mat';
 load([results_directory results_filename]);
-measure_accuracies_w = [measure_accuracies_w; permute(mean(mean(accuracies(freq_range, :, :), 1), 2), [3 1 2])]; % average across frequency range and sets
+measure_accuracies_w = [measure_accuracies_w; permute(mean(mean(accuracies(freq_range_w, :, :), 1), 2), [3 1 2])]; % average across frequency range and sets
 measure_groups_w = [measure_groups_w; zeros(size(accuracies, 3), 1) + 2];
 
 % Phi-three
@@ -111,13 +113,13 @@ end
 % Power
 results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_power_classification_across1.mat';
 load([results_directory results_filename]);
-measure_accuracies_a = permute(mean(accuracies(freq_range, :), 1), [2 1]); % average across frequency range
+measure_accuracies_a = permute(mean(accuracies(freq_range_a, :), 1), [2 1]); % average across frequency range
 measure_groups_a = zeros(size(measure_accuracies_a)) + 1;
 
 % Coherence
 results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_coherence_classification_across1.mat';
 load([results_directory results_filename]);
-measure_accuracies_a = [measure_accuracies_a; permute(mean(accuracies(freq_range, :, :), 1), [2 1])]; % average across frequency range and sets
+measure_accuracies_a = [measure_accuracies_a; permute(mean(accuracies(freq_range_a, :, :), 1), [2 1])]; % average across frequency range and sets
 measure_groups_a = [measure_groups_a; zeros(size(accuracies, 2), 1) + 2];
 
 % Phi-three
@@ -222,7 +224,7 @@ box_colors = 'kkbbbkkk';
 whisker_length = 1000; % Default 1.5, this determines what points are treated as outliers
 
 % Plot
-subplot(length(phis)+1, 2, [1 2]);
+subplot(length(accuracies)+1, 2, [1 2]);
 boxplot(measure_accuracies_w, measure_groups_w, 'Positions', measure_groups_w + condition_offsets(1), 'Widths', box_widths, 'MedianStyle', 'target', 'Colors', box_colors, 'Whisker', whisker_length); hold on;
 boxplot(measure_accuracies_a, measure_groups_a, 'Positions', measure_groups_a + condition_offsets(2), 'Widths', box_widths, 'MedianStyle', 'target', 'Colors', box_colors, 'Whisker', whisker_length);
 % % Means
@@ -266,9 +268,9 @@ text(0, 0.2, text_labels(subplot_counter), 'HorizontalAlignment', 'center', 'Ver
 subplot_counter = 3;
 xCounter = 1;
 yCounter = 2; % Because the first one was used by the boxplot
-for nChannels_counter = 1 : length(phis)
-    nChannels = phis{nChannels_counter}.nChannels;
-    channel_sets = phis{nChannels_counter}.channel_sets;
+for nChannels_counter = 1 : length(accuracies)
+    nChannels = accuracies{nChannels_counter}.nChannels;
+    channel_sets = double(accuracies{nChannels_counter}.channel_sets);
     
     % Get values to plot
     values = mean(accuracies{nChannels_counter}.accuracies, 2);
@@ -351,7 +353,7 @@ for nChannels_counter = 1 : length(phis)
     % Plot
     xCounter = 1;
     for value_type = 1 : size(plot_values, 2)
-        subplot(length(phis)+1, size(plot_values, 2), subplot_counter);
+        subplot(length(accuracies)+1, size(plot_values, 2), subplot_counter);
         set(gca, 'Position', [xStarts(xCounter) yStarts(nChannels_counter+1)+ySpacing  - (1-yPortion)/3, widths(xCounter), heights(nChannels_counter+1)-ySpacing]);
         
         plot = pcolor(values_map_plots(:, :, value_type));
@@ -436,8 +438,8 @@ end
 
 %% Print figure
 
-figure_name = 'fig4';
-
-print(figure_name, '-dsvg'); % SVG
-print(figure_name, '-dpdf', '-bestfit'); % PDF
-print(figure_name, '-dpng'); % PNG
+% figure_name = 'fig4';
+% 
+% print(figure_name, '-dsvg'); % SVG
+% print(figure_name, '-dpdf', '-bestfit'); % PDF
+% print(figure_name, '-dpng'); % PNG

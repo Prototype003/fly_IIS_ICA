@@ -43,27 +43,64 @@ disp('loaded');
 
 disp('Calculating power');
 
-% Results matrix: frequencies x trials x channels x condition x fly
-powers = zeros(410, size(fly_data, 3), nChannels, nConditions, nFlies);
-
-for condition = 1 : nConditions
-    for fly_counter = 1 : nFlies
-        fly = flies(fly_counter);
-        
-        for channel_counter = 1 : nChannels
-            channel = channels(channel_counter);
+if across_flies == 0
+    
+    % Results matrix: frequencies x trials x channels x condition x fly
+    powers = zeros(410, size(fly_data, 3), nChannels, nConditions, nFlies);
+    
+    for condition = 1 : nConditions
+        for fly_counter = 1 : nFlies
+            fly = flies(fly_counter);
             
-            % Get trials for the channel (input dimensions to chronux function should be time x trials
-            trials = permute(fly_data(:, channel, :, fly, condition), [1 3 2 4 5]);
+            for channel_counter = 1 : nChannels
+                channel = channels(channel_counter);
+                
+                % Get trials for the channel (input dimensions to chronux function should be time x trials
+                trials = permute(fly_data(:, channel, :, fly, condition), [1 3 2 4 5]);
+                
+                % Compute power spectrums
+                [spectrums, frequencies] = mtspectrumc(trials, chronux_params);
+                
+                % Store
+                powers(:, :, channel_counter, condition, fly_counter) = spectrums;
+            end
             
-            % Compute power spectrums
-            [spectrums, frequencies] = mtspectrumc(trials, chronux_params);
-            
-            % Store
-            powers(:, :, channel_counter, condition, fly_counter) = spectrums;
         end
-        
     end
+    
+else % across == 1
+    
+    % Results matrix: frequencies x trials x channels x condition x fly
+    powers = zeros(3277, 1, nChannels, nConditions, nFlies);
+    
+    for condition = 1 : nConditions
+        for fly_counter = 1 : nFlies
+            fly = flies(fly_counter);
+            
+            for channel_counter = 1 : nChannels
+                channel = channels(channel_counter);
+                
+                % Get trials for the channel (input dimensions to chronux function should be time x trials
+                trials = permute(fly_data(:, channel, :, fly, condition), [1 3 2 4 5]);
+                
+                % Concatenate trials into one big trial
+                trial = zeros(size(trials, 1) * size(trials, 2), size(trials, 3));
+                row_counter = (1:size(trials, 1));
+                for trial_counter = 1 : size(trials, 2)
+                    trial(row_counter, :) = trials(:, trial_counter, :);
+                    row_counter = row_counter + size(trials, 1);
+                end
+                
+                % Compute power spectrums
+                [spectrums, frequencies] = mtspectrumc(trial, chronux_params);
+                
+                % Store
+                powers(:, :, channel_counter, condition, fly_counter) = spectrums;
+            end
+            
+        end
+    end
+    
 end
 
 powers = log(powers);

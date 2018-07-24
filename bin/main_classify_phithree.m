@@ -54,7 +54,7 @@ for nChannels_counter = 1 : length(data_nChannels)
             load([data_directory data_filename]);
             phis = phis{1};
         else % '4t4'
-            data_directory = 'results_split/';
+            data_directory = 'results/';
             data_filename = [data_filename '_phithree_nonGlobal_tau4.mat'];
             phis = load([data_directory data_filename]);
             phis.channel_sets = nchoosek((1:15), 4);
