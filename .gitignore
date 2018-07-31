@@ -26,3 +26,6 @@
 
 # Data
 **/*.tar.gz
+
+# Pyphi environment
+bin/flyphi_environment/**
