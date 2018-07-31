@@ -1,0 +1,48 @@
+#!/bin/bash
+# Usage: sbatch slurm-serial-job-script
+# Prepared By: Kai Xi,  Oct 2014
+#              help@massive.org.au
+
+# NOTE: To activate a SLURM option, remove the whitespace between the '#' and 'SBATCH'
+
+#SBATCH --job-name=phijoin
+
+
+# To set a project account for credit charging, 
+#SBATCH --account=NCIfb7
+
+
+# Request CPU resource for a serial job
+#SBATCH --ntasks=1
+#SBATCH --ntasks-per-node=1
+# SBATCH --exclusive
+#SBATCH --cpus-per-task=1
+
+# Memory usage (MB)
+#SBATCH --mem-per-cpu=8000
+
+# Set your minimum acceptable walltime, format: day-hours:minutes:seconds
+#SBATCH --time=1-00:00:00
+
+
+# To receive an email when job completes or fails
+#SBATCH --mail-user=aleu6@student.monash.edu
+#SBATCH --mail-type=END
+#SBATCH --mail-type=FAIL
+
+
+# Set the file for output (stdout)
+#SBATCH --output=logs/flyjoin-%j.out
+
+# Set the file for error log (stderr)
+#SBATCH --error=logs/flyjoin-%j.err
+
+
+# Use reserved node to run job when a node reservation is made for you already
+# SBATCH --reservation=reservation_name
+
+
+# Command to run a serial job
+module load matlab/r2017a
+
+matlab -nodisplay -nosplash -nodesktop -r "cd results_split; main_parallel_phi_join2; exit"

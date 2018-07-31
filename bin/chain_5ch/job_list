@@ -1,0 +1,15 @@
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+           9883664 m2-com-c6 f13tau4t    aleu6 PD       0:00      1 (Priority)
+           9883667 m2-com-c6 f13tau4t    aleu6 PD       0:00      1 (Priority)
+           9883648 m2-com-c6 f12tau4t    aleu6  R      50:31      1 m2118
+           9883649 m2-com-c6 f12tau4t    aleu6  R      50:31      1 m2124
+           9883647 m2-com-c6 f12tau4t    aleu6  R      51:36      1 m2117
+           9883663 m2-com-c6 f13tau4t    aleu6  R       0:33      1 m2116
+           9883662 m2-com-c6 f13tau4t    aleu6  R      11:26      1 m2055
+           9883661 m2-com-c6 f13tau4t    aleu6  R      11:58      1 m2045
+           9883656 m2-com-c6 f13tau4t    aleu6  R      42:57      1 m2051
+           9883655 m2-com-c6 f13tau4t    aleu6  R      44:01      1 m2123
+           9883650 m2-com-c6 f12tau4t    aleu6  R      45:39      1 m2052
+           9883651 m2-com-c6 f12tau4t    aleu6  R      45:39      1 m2053
+           9883652 m2-com-c6 f12tau4t    aleu6  R      45:39      1 m2054
+           9883131 m2-com-c6 phi_star    aleu6  R    6:28:49      1 m2045
