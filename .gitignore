@@ -28,4 +28,4 @@
 **/*.tar.gz
 
 # Pyphi environment
-bin/flyphi_environment/
+bin/pyphi_environment/
