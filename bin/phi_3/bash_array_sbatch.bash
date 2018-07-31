@@ -11,7 +11,7 @@
 
 
 # To set a project account for credit charging, 
-#SBATCH --account=NCIfb7
+#SBATCH --account=qb48
 
 
 # Request CPU resource for a serial job
@@ -21,7 +21,7 @@
 #SBATCH --cpus-per-task=1
 
 # Memory usage (MB)
-#SBATCH --mem-per-cpu=4000
+#SBATCH --mem-per-cpu=8000
 
 # Set your minimum acceptable walltime, format: day-hours:minutes:seconds
 #SBATCH --time=0-00:20:00
@@ -46,7 +46,9 @@
 
 # Job script
 
-module load python/3.6.0
+module load python/3.6.2
+
+source ../pyphi_environment/bin/activate
 
 # Read job command from file (file is array_commands)
 # $1 gives the parameter line for the first job - 0 indexed
@@ -55,3 +57,5 @@ command=$(sed -n "$((${SLURM_ARRAY_TASK_ID} + ${1} - 1))p" "array_commands")
 if [[ -n "$command" ]]; then
 	eval $command
 fi
+
+deactivate

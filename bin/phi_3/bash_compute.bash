@@ -23,7 +23,7 @@ for (( fly=1; fly<=$flies; fly++ )); do
 							jobs=$(wc -l < job_list)
 							echo $jobs
 						done
-						sbatch --job-name="f${fly}tau${tau}t${trial}nCh${nChannels}g${global_tpm}" --output="logs/f${fly}tauBin${tau_bin}tau${tau}offset${start_sample}t${trial}nCh${nChannels}g${global_tpm}.out" --error="logs/f${fly}tauBin${tau_bin}tau${tau}offset${start_sample}t${trial}nCh${nChannels}g${global_tpm}.err" bash_compute_sbatch.bash $nChannels $fly $condition $set $tau $trial $global_tpm $tau_bin $start_sample
+						sbatch --job-name="f${fly}tau${tau}t${trial}nCh${nChannels}g${global_tpm}" --output="logs/f${fly}tau${tau}t${trial}nCh${nChannels}g${global_tpm}.out" --error="logs/f${fly}tau${tau}t${trial}nCh${nChannels}g${global_tpm}.err" bash_compute_sbatch.bash $nChannels $fly $condition $set $tau $trial $global_tpm $tau_bin $start_sample
 					done
 				done
 			done

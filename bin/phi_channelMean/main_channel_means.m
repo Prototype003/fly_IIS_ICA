@@ -83,14 +83,14 @@ end
 fly = 1;
 condition = 1;
 tau = 1;
-nChannels_counter = 1;
+nChannels_counter = 3;
 
 values = phis_a{nChannels_counter}.phis(:, :, fly, condition, tau);
 channel_means = mean(phis_a{1}.channel_means(:, :, fly, condition), 2); % values are identical across trials (because they're a duplicate of the same one trial)
 channel_sets = phis_a{nChannels_counter}.channel_sets;
 
 % Build values from average of single channel average values
-values_rebuilt = zeros(size(values));
+values_rebuilt = zeros([size(values, 1) 1]);
 for channel_set = 1 : size(channel_sets, 1)
     channels = channel_sets(channel_set, :);
     values_rebuilt(channel_set) = mean(channel_means(channels));
@@ -101,7 +101,7 @@ end
 channel_set = channel_sets(index, :)
 
 figure;
-scatter(values_rebuilt, values, '.');
+scatter(values_rebuilt, mean(values, 2), '.');
 
 %% Calculate phi-star
 

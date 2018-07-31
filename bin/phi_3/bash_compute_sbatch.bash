@@ -17,7 +17,7 @@
 
 
 # To set a project account for credit charging, 
-#SBATCH --account=NCIfb7
+#SBATCH --account=qb48
 
 
 # Request CPU resource for a serial job
@@ -51,7 +51,10 @@
 
 
 # Command to run a serial job
-module load python/3.6.0
+module load python/3.6.2
+
+source ../pyphi_environment/bin/activate
 
 python3 phi_compute.py $1 $2 $3 $4 $5 $6 $7 $8 $9
 
+deactivate

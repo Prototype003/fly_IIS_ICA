@@ -66,7 +66,7 @@ phi_mean = mean(phi_values, 2);
 phi_std = std(phi_values, [], 2);
 
 figure;
-plot(taus, (phi_std ./ phi_mean) ./ tau_bins');
+plot(taus, (phi_std ./ phi_mean) ./ taus');
 hold on;
 plot(taus, phi_std ./ tau_bins');
 

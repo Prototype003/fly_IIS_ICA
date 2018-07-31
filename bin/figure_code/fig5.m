@@ -9,7 +9,7 @@ Figure 5 - correlation between mean 2ch mean values with 3/4ch values
 
 %% Setup
 
-measure = 'phi_SI'; % 'phi_three' or 'phi_star'
+measure = 'phi_three'; % 'phi_three' or 'phi_star'
 tau = 1; % 1 = 4ms; 2 = 8ms; 3 = 16ms
 if tau == 1
     tau_string = '4';

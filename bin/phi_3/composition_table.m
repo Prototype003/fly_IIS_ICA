@@ -1,15 +1,25 @@
-%% Description
+function [phi, diff_table, unparted_table, parted_table] = composition_table(nChannels, source_file)
+% Builds table of phi values from a given phi-3 file
+%
+% Inputs:
+%   nChannels: integer, number of channels over which phi was computed
+%   source_file: string; filename of the result file holding the phi-3 result
+%       Files are assumed to be in directory 'results_split/'
+%
+% Outputs:
+%   phi: struct; holds phi results which were loaded from the file
+%   diff_table: matrix; (nstates + 1) x nmechanisms; the last row corresponds
+%       to the weighted mean of each mechanism across states (weighted by
+%       number of occurrences of each state.
+%       Holds difference between unpartitioned and partitioned small-phis
+%   unparted_table: matrix (same dimensions as 'diff_table'); holds small-phi
+%       values for the unpartitioned constellation
+%   parted_table: matrix(same dimensions as 'diff_table'); holds small-phi
+%       values for the partitioned constellation
 
-%{
 
-Builds composition table (table of phis for each concept)
-Currently only proof of concept, only does for one channel set
 
-%}
-
-%% Setup
-
-nChannels = 4;
+%nChannels = 4;
 nConcepts = 0;
 for nChannels_counter = 1 : nChannels
     nConcepts = nConcepts + nchoosek(nChannels, nChannels_counter);
@@ -26,9 +36,7 @@ end
 
 source_dir = 'results_split/';
 
-%% Table for wake condition
-
-source_file = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM1_f01c1tauBin24s1036t1.mat';
+%source_file = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM0_f01c1tauBin24s1036t1.mat';
 
 load([source_dir source_file]);
 
@@ -105,36 +113,10 @@ diff_table = unparted_table - parted_table;
 weighted_phis = diff_table((1:nStates), :) .* state_counters;
 diff_table(state, :) = sum(weighted_phis, 1) ./ sum(state_counters, 1);
 
-%% Figure
+% Remove portion of existence row
+unparted_table = unparted_table(1:end-1, :);
+parted_table = parted_table(1:end-1, :);
+diff_table = diff_table(1:end-1, :);
 
-concept_list_strings = concept_list;
-for concept = 1 : length(concept_list)
-    concept_list_strings{concept} = mat2str(concept_list{concept});
 end
 
-figure;
-
-subplot(3, 1, 1);
-imagesc(unparted_table((1:end-1), :));
-title('unpartitioned');
-set(gca, 'XTick', (1:15), 'XTickLabel', concept_list_strings)
-set(gca, 'YTick', nStates+1, 'YTickLabel', 'mean');
-ylabel('state');
-c = colorbar; ylabel(c, '\phi');
-
-subplot(3, 1, 2);
-imagesc(parted_table((1:end-1), :));
-title('partitioned');
-set(gca, 'XTick', (1:15), 'XTickLabel', concept_list_strings)
-set(gca, 'YTick', nStates+1, 'YTickLabel', 'mean');
-ylabel('state');
-c = colorbar; ylabel(c, '\phi');
-
-subplot(3, 1, 3);
-imagesc(diff_table((1:end-1), :));
-title('partitioned - unpartitioned');
-set(gca, 'XTick', (1:15), 'XTickLabel', concept_list_strings)
-set(gca, 'YTick', nStates+1, 'YTickLabel', 'mean');
-ylabel('state');
-c = colorbar; ylabel(c, '\Delta \phi');
-xlabel('concept');
