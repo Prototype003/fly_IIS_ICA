@@ -4,6 +4,9 @@ function [classification] = svm_lol_libsvm(values, leave_out_counter)
 %
 % Inputs:
 %   values: 3D matrix (observations x features x classes)
+%   leave_out_counter: optional int; counter for which data-combo to leave out
+% Outputs:
+%   classification: struct holding classification results
 
 nObservations = size(values, 1);
 nFeatures = size(values, 2);
