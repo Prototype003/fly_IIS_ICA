@@ -10,7 +10,7 @@ Joins 4-channel results (across all parameters)
 
 nChannels = 4;
 global_tpm = 0;
-flies = (1:2);
+flies = (1);
 conditions = (1:2);
 taus = [4];
 tau_type = 'step'; % 'step' or 'bin'
@@ -54,9 +54,11 @@ phis{1}.state_counters = zeros(dims_state_dep);
 phis{1}.state_phis = zeros(dims_state_dep);
 phis{1}.tpms = zeros([nStates dims_state_dep]); % Additional dimensions because TPM is state-by-state
 for fly = flies
+    disp(['fly' num2str(fly)]);
     for condition = conditions
         for tau = taus
             for set_counter = 1 : size(channel_sets, 1)
+                disp(['set' num2str(set_counter)]);
                 for trial = trials
                     
                     % File name
@@ -76,7 +78,7 @@ for fly = flies
                     % Place into large data structure
                     phis{1}.phis(set_counter, trial, fly, condition, tau) = single(tmp.phi.phi);
                     phis{1}.state_counters(:, set_counter, trial, fly, condition, tau) = int16(tmp.phi.state_counters);
-                    phis{1}.big_mips(:, set_counter, trial, fly, condition, tau) = tmp.phi.big_mips;
+                    phis{1}.big_mips(:, set_counter, trial, fly, condition, tau) = constellation_parse(tmp.phi.big_mips);
                     phis{1}.state_phis(:, set_counter, trial, fly, condition, tau) = single(tmp.phi.state_phis);
                     phis{1}.tpms(:, :, set_counter, trial, fly, condition, tau) = single(tmp.phi.tpm);
                     
@@ -89,3 +91,49 @@ end
 %% Save
 
 save (output_file, 'phis');
+
+%% Parse constellation
+
+function stripped = constellation_parse(big_mips)
+% Goes through big_mip and gets only the vital stuff
+%
+% Inputs:
+%   big_mips: cell vector holding big_mip structs (output from pyphi.compute.big_mip)
+%
+% Outputs:
+%   stripped: cell vector holding big_mip structs with minimal info and details
+
+stripped = cell(size(big_mips));
+
+for mip_counter = 1 : length(big_mips)
+    stripped{mip_counter} = struct();
+    stripped{mip_counter}.phi = single(big_mips{mip_counter}.phi);
+    
+    % unpartitioned_constellation
+    unpart = cell(size(big_mips{mip_counter}.unpartitioned_constellation));
+    for concept =  1 : length(big_mips{mip_counter}.unpartitioned_constellation)
+        unpart{concept} = struct();
+        unpart{concept}.phi = single(big_mips{mip_counter}.unpartitioned_constellation{concept}.phi);
+        unpart{concept}.mechanism = int8(big_mips{mip_counter}.unpartitioned_constellation{concept}.mechanism);
+    end
+    
+    % partitioned_constellation
+    part = cell(size(big_mips{mip_counter}.partitioned_constellation));
+    for concept = 1 : length(big_mips{mip_counter}.partitioned_constellation)
+        part{concept} = struct();
+        part{concept}.phi = single(big_mips{mip_counter}.partitioned_constellation{concept}.phi);
+        part{concept}.mechanism = int8(big_mips{mip_counter}.partitioned_constellation{concept}.mechanism);
+    end
+    stripped{mip_counter}.unpartitioned_constellation = unpart;
+    stripped{mip_counter}.partitioned_constellation = part;
+    
+    % cut_subsystem
+    mip = big_mips{mip_counter}.cut_subsystem;
+    mip.node_indices = int8(mip.node_indices);
+    for group = 1 : length(mip.cut)
+        mip.cut{group} = int8(mip.cut{group});
+    end
+    stripped{mip_counter}.cut_subsystem = mip;
+end
+
+end
