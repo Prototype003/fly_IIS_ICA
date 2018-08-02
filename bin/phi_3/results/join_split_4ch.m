@@ -36,13 +36,18 @@ nStates = 2^nChannels;
 dims_state_ind = [size(channel_sets, 1) length(trials), length(flies), length(conditions), length(taus)];
 dims_state_dep = [nStates dims_state_ind];
 
+output_file = [source_prefix(1:60) '_phithree' source_prefix(61:end) '.mat'];
+
+%% Join split results
+
 % NOTE: currently the actual parameters are used for indexing, so they need
 %   from 1 and increment by 1
 phis = cell(1);
 phis{1} = struct();
-phis{1}.nChannels = nChannels;
-phis{1}.channel_sets = channel_sets;
-phis{1}.taus = taus;
+phis{1}.nChannels = int8(nChannels);
+phis{1}.channel_sets = int8(channel_sets);
+phis{1}.taus = int8(taus);
+
 phis{1}.phis = zeros(dims_state_ind);
 phis{1}.big_mips = cell(dims_state_dep);
 phis{1}.state_counters = zeros(dims_state_dep);
@@ -69,11 +74,11 @@ for fly = flies
                     tmp = load([source_dir source_file]);
                     
                     % Place into large data structure
-                    phis{1}.phis(set_counter, trial, fly, condition, tau) = tmp.phi.phi;
-                    phis{1}.state_counters(:, set_counter, trial, fly, condition, tau) = tmp.phi.state_counters;
+                    phis{1}.phis(set_counter, trial, fly, condition, tau) = single(tmp.phi.phi);
+                    phis{1}.state_counters(:, set_counter, trial, fly, condition, tau) = int16(tmp.phi.state_counters);
                     phis{1}.big_mips(:, set_counter, trial, fly, condition, tau) = tmp.phi.big_mips;
-                    phis{1}.state_phis(:, set_counter, trial, fly, condition, tau) = tmp.phi.state_phis;
-                    phis{1}.tpms(:, :, set_counter, trial, fly, condition, tau) = tmp.phi.tpm;
+                    phis{1}.state_phis(:, set_counter, trial, fly, condition, tau) = single(tmp.phi.state_phis);
+                    phis{1}.tpms(:, :, set_counter, trial, fly, condition, tau) = single(tmp.phi.tpm);
                     
                 end
             end
@@ -81,3 +86,6 @@ for fly = flies
     end
 end
 
+%% Save
+
+save (output_file, 'phis');
