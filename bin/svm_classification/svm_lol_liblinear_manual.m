@@ -1,4 +1,4 @@
-function [classification] = svm_lol_libsvm(values, leave_out_counter)
+function [classification] = svm_lol_liblinear_manual(values, cost, leave_out_counter)
 % Classifies using SVM, validating using leave-one-out
 % Assumes equal number of observations in each class
 %
@@ -57,7 +57,12 @@ predictions = zeros(size(leave_outs));
 confidences = zeros([size(leave_outs) nClasses]);
 correctness = zeros(size(leave_outs));
 
-if nargin > 1
+% Default cost
+if nargin == 1
+    cost = 1;
+end
+
+if nargin > 2
     % Perform the specified leave out training/testing
     
     leave_out = leave_outs(leave_out_counter, :);
@@ -111,10 +116,10 @@ if nargin > 1
     %data_test = zscore(data_test, [], 1);
     
     % Train SVM
-    trained = svmtrain(data_train_labels, data_train, '-t 0'); % '-t 0' = linear; '-t 2' = rbf ('-t 2' is default)
+    trained = train(data_train_labels, data_train, '-s 2 -C'); % '-C' specifies searching for optimal cost, only works with '-s 0' or '-s 2'
     
     % Classify test data using SVM
-    [prediction, accuracy, confidence] = svmpredict(data_test_labels, data_test, trained);
+    [prediction, accuracy, confidence] = predict(data_test_labels, data_test, trained);
     
     % Store
     svms{leave_out_counter} = trained;
@@ -154,11 +159,15 @@ else
         stds_mat = repmat(stds, [size(data_test, 1), 1]);
         data_test = (data_test - means_mat) ./ stds_mat;
         
+        % Search for cost parameter
+        %c_param = train(data_train_labels, sparse(data_train), '-C -s 2');
+        
         % Train SVM
-        trained = svmtrain(data_train_labels, data_train, '-t 0'); % '-t 0' = linear; '-t 2' = rbf ('-t 2' is default)
+        trained = train(data_train_labels, sparse(data_train), ['-c ' num2str(cost)]); % Switching from -s 2 to -s 1 is fine
+        %trained = train(data_train_labels, sparse(data_train));
         
         % Classify test data using SVM
-        [prediction, accuracy, confidence] = svmpredict(data_test_labels, data_test, trained);
+        [prediction, accuracy, confidence] = predict(data_test_labels, sparse(data_test), trained);
         
         % Store
         svms{leave_out_counter} = trained;
