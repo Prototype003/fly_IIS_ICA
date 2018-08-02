@@ -130,8 +130,14 @@ for mip_counter = 1 : length(big_mips)
     % cut_subsystem
     mip = big_mips{mip_counter}.cut_subsystem;
     mip.node_indices = int8(mip.node_indices);
-    for group = 1 : length(mip.cut)
-        mip.cut{group} = int8(mip.cut{group});
+    if min(size(mip.cut)) == 1
+        % It's a cell array
+        for group = 1 : length(mip.cut)
+            mip.cut{group} = int8(mip.cut{group});
+        end
+    else
+        % It's a matrix
+        mip.cut = int8(mip.cut);
     end
     stripped{mip_counter}.cut_subsystem = mip;
 end
