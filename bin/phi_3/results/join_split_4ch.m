@@ -72,8 +72,14 @@ for fly = flies
                         '.mat'...
                         ];
                     
-                    % Load file
-                    tmp = load([source_dir source_file]);
+                    try
+                        % Load file
+                        tmp = load([source_dir source_file]);
+                    catch ME
+                        disp(ME.message);
+                        disp(['Failed file: ' source_file]);
+                        continue; % Skip to the next file, leave the data entry structure for this entry empty
+                    end
                     
                     % Place into large data structure
                     phis{1}.phis(set_counter, trial, fly, condition, tau) = single(tmp.phi.phi);
