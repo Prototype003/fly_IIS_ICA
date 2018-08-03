@@ -311,3 +311,32 @@ end
 % print(figure_name, '-dsvg'); % SVG
 % print(figure_name, '-dpdf', '-bestfit'); % PDF
 % print(figure_name, '-dpng'); % PNG
+
+%% Magnitude - Accuracy correlation
+
+nChannels_colours = 'kgb';
+
+flies = (1:13);
+condition = 1; % Let's look at correlation between wake value and accuracy
+
+figure;
+for nChannels_counter = 1 : length(phis)
+    nChannels = nChannels_counter + 1;
+    
+    % 2.25s trial phi (averaged) vs across-trial classification
+    values = mean(mean(phis{nChannels_counter}.phis(:, :, flies, condition, tau), 2), 3);
+    accuracy_values = mean(accuracies_w{nChannels_counter}.accuracies(:, flies), 2);
+    subplot(1, 2, 1);
+    scatter(values, accuracy_values, [nChannels_colours(nChannels_counter) '.']); hold on;
+    [r, p] = corr(values, accuracy_values);
+    disp(['2.25s/within-trial, ' num2str(nChannels) ' channels: r=' num2str(r) ' p=' num2str(p)]);
+    
+    % 18s trial phi vs across-fly classification
+    values = mean(mean(phis_a{nChannels_counter}.phis(:, :, flies, condition, tau), 2), 3); % Averaging across trials does nothing (dimension size = 1)
+    accuracy_values = mean(accuracies_a{nChannels_counter}.accuracies, 2); % Averaging across flies does nothing (dimension size = 1)
+    subplot(1, 2, 2);
+    scatter(values, accuracy_values, [nChannels_colours(nChannels_counter) '.']); hold on;
+    [r, p] = corr(values, accuracy_values);
+    disp(['18s/across-trial, ' num2str(nChannels) ' channels: r=' num2str(r) ' p=' num2str(p)]);
+    
+end
