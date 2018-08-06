@@ -146,7 +146,7 @@ for mip_counter = 1 : length(big_mips)
         % unpartitioned_constellation
         unpart_concept = big_mips{mip_counter}.unpartitioned_constellation{concept}.mechanism;
         if unpart_concept == concept_list{concept}
-            stripped(mip_counter, 1, concept) = single(big_mips{mip_counter}.unpartitioned_constellation{concept}.phi);
+            stripped(mip_counter, 1, concept) = single(big_mips{mip_counter}.unpartitioned_constellation{unpart_counter}.phi);
             unpart_counter = unpart_counter + 1;
         else
             stripped(mip_counter, 1, concept) = 0;
@@ -155,7 +155,7 @@ for mip_counter = 1 : length(big_mips)
         % unpartitioned_constellation
         part_concept = big_mips{mip_counter}.partitioned_constellation{concept}.mechanism;
         if part_concept == concept_list{concept}
-            stripped(mip_counter, 2, concept) = single(big_mips{mip_counter}.partitioned_constellation{concept}.phi);
+            stripped(mip_counter, 2, concept) = single(big_mips{mip_counter}.partitioned_constellation{part_counter}.phi);
             part_counter = part_counter + 1;
         else
             stripped(mip_counter, 2, concept) = 0;
