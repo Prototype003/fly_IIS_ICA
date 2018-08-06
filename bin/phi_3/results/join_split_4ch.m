@@ -36,8 +36,14 @@ nStates = 2^nChannels;
 dims_state_ind = [size(channel_sets, 1) length(trials), length(flies), length(conditions), length(taus)];
 dims_state_dep = [nStates dims_state_ind];
 nConcepts = 0; % power-set of nChannels
+concept_list_full = cell(0); concept_list_counter = 1;
 for concept_order = 1 : nChannels
-    nConcepts = nConcepts + nchoosek(nChannels, concept_order);
+    subsets = nchoosek((1:nChannels), concept_order);
+    nConcepts = nConcepts + size(subsets, 1);
+    for concept = 1 : size(subsets, 1)
+        concept_list_full{concept_list_counter} = subsets(concept, :) - 1;
+        concept_list_counter = concept_list_counter + 1;
+    end
 end
 
 output_file = [source_prefix(1:60) '_phithree' source_prefix(61:end) '.mat'];
@@ -89,7 +95,7 @@ for fly = flies
                     % Place into large data structure
                     phis{1}.phis(set_counter, trial, fly, condition, tau) = single(tmp.phi.phi);
                     phis{1}.state_counters(:, set_counter, trial, fly, condition, tau) = int16(tmp.phi.state_counters);
-                    phis{1}.big_mips(:, :, :, set_counter, trial, fly, condition, tau) = constellation_parse(tmp.phi.big_mips);
+                    phis{1}.big_mips(:, :, :, set_counter, trial, fly, condition, tau) = constellation_parse(tmp.phi.big_mips, concept_list_full);
                     phis{1}.state_phis(:, set_counter, trial, fly, condition, tau) = single(tmp.phi.state_phis);
                     phis{1}.tpms(:, :, set_counter, trial, fly, condition, tau) = single(tmp.phi.tpm);
                     
@@ -103,18 +109,26 @@ end
 
 save (output_file, 'phis', '-v7.3');
 
+if [1] == [0 1]
+    disp('y');
+else
+    disp('n');
+end
+
 %% Parse constellation
 
-function stripped = constellation_parse(big_mips)
+function stripped = constellation_parse(big_mips, concept_list)
 % Goes through big_mip and gets only the vital stuff
-% Assumes that concepts are sorted!!!! This is important as details of the
-% mechanism are discarded - only phi values for each concept are kept and returned
+% Assumes that concepts are sorted, with the same order of 'concept_list'!
+% This is important as details of the mechanism are discarded - only phi
+% values for each concept are kept and returned
 %
 % Inputs:
 %   big_mips: cell vector holding big_mip structs (output from pyphi.compute.big_mip)
+%   concept_list: cell vector, each cell holds a concept-mechanism
+%       concepts in 'big_mips' should be sorted to have the same order as this
 %
 % Outputs:
-%   stripped: cell vector holding big_mip structs with minimal info and details
 %   stripped: matrix (nMips x 2 x concepts)
 %       nMips: length of 'big_mips' (for 4ch, 16)
 %       2: unpartitioned (1), and partitioned (2) constellations
@@ -122,13 +136,31 @@ function stripped = constellation_parse(big_mips)
 
 stripped = single(zeros(length(big_mips), 2, length(big_mips{1}.partitioned_constellation)));
 
+
 for mip_counter = 1 : length(big_mips)
     
-    for concept =  1 : length(big_mips{mip_counter}.unpartitioned_constellation)
+    unpart_counter = 1;
+    part_counter = 1;
+    for concept =  1 : length(concept_list)
+        
         % unpartitioned_constellation
-        stripped(mip_counter, 1, concept) = single(big_mips{mip_counter}.unpartitioned_constellation{concept}.phi);
+        unpart_concept = big_mips{mip_counter}.unpartitioned_constellation{concept}.mechanism;
+        if unpart_concept == concept_list{concept}
+            stripped(mip_counter, 1, concept) = single(big_mips{mip_counter}.unpartitioned_constellation{concept}.phi);
+            unpart_counter = unpart_counter + 1;
+        else
+            stripped(mip_counter, 1, concept) = 0;
+        end
+        
         % unpartitioned_constellation
-        stripped(mip_counter, 2, concept) = single(big_mips{mip_counter}.partitioned_constellation{concept}.phi);
+        part_concept = big_mips{mip_counter}.partitioned_constellation{concept}.mechanism;
+        if part_concept == concept_list{concept}
+            stripped(mip_counter, 2, concept) = single(big_mips{mip_counter}.partitioned_constellation{concept}.phi);
+            part_counter = part_counter + 1;
+        else
+            stripped(mip_counter, 2, concept) = 0;
+        end
+        
     end
     
 end
