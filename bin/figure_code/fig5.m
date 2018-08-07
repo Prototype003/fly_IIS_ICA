@@ -9,7 +9,7 @@ Figure 5 - correlation between mean 2ch mean values with 3/4ch values
 
 %% Setup
 
-measure = 'phi_three'; % 'phi_three' or 'phi_star'
+measure = 'phi_three'; % 'phi_three' or 'phi_star' or 'phi_star_gaussian' or 'phi_SI'
 tau = 1; % 1 = 4ms; 2 = 8ms; 3 = 16ms
 if tau == 1
     tau_string = '4';
@@ -226,6 +226,10 @@ for measure_counter = 1 : length(measures)
                     % Plot
                     scatter(values_rebuilt, values, [], colours(condition), shapes(condition)); hold on;
                     
+                    % Slope
+                    [bs] = [ones(size(values_rebuilt)) values_rebuilt] \ values;
+                    disp([measure_type tpm_type num2str(nChannels_counter) 'c' num2str(condition) ' slope:' num2str(bs(2)) ' intercept:' num2str(bs(1))]);
+                    
                     % Correlation
                     [r, p] = corr(values_rebuilt, values);
                     disp([measure_type tpm_type num2str(nChannels_counter) 'c' num2str(condition) ' r:' num2str(r) ' p:' num2str(p)]);
@@ -277,6 +281,7 @@ for measure_counter = 1 : length(measures)
                         
             set(gca, 'Box', 'on');
             
+            %axis equal;
             xlim(xlims(subplot_counter, :));
             axis tight;
             
@@ -389,4 +394,3 @@ for nChannels_counter = 1 : length(phis)
     disp(['2.25s/18s, ' num2str(nChannels) ' channels: r=' num2str(r) ' p=' num2str(p)]);
     
 end
-
