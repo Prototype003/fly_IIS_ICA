@@ -134,7 +134,7 @@ function stripped = constellation_parse(big_mips, concept_list)
 %       2: unpartitioned (1), and partitioned (2) constellations
 %       concepts: number of possible concepts (for 4ch, 15)
 
-stripped = single(zeros(length(big_mips), 2, length(big_mips{1}.partitioned_constellation)));
+stripped = single(zeros(length(big_mips), 2, length(concept_list)));
 
 
 for mip_counter = 1 : length(big_mips)
