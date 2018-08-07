@@ -107,13 +107,7 @@ end
 
 %% Save
 
-save (output_file, 'phis', '-v7.3');
-
-if [1] == [0 1]
-    disp('y');
-else
-    disp('n');
-end
+save(output_file, 'phis', '-v7.3');
 
 %% Parse constellation
 
