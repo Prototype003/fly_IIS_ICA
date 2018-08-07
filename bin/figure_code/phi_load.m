@@ -95,38 +95,6 @@ if strcmp(measure, 'phi_three') % Load phi-three results
     
 elseif strcmp(measure, 'phi_star') % Load phi-star results
     measure_string = '\Phi*';
-%     % Results from calculation using Gaussian assumption
-%     if global_tpm == 1 % Global covariance
-%         disp('loading');
-%         
-%         data_directory = [root_directory 'results/'];
-%         data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels2t4_medianSplit0_phistar_global.mat'];
-%         load([data_directory data_filename]);
-%         
-%         % Rename measure specific variable names to generic names
-%         for nChannels_counter = 1 : length(phis)
-%             phis{nChannels_counter}.phis = phis{nChannels_counter}.phi_stars;
-%             phis{nChannels_counter} = rmfield(phis{nChannels_counter}, 'phi_stars');
-%         end
-%         
-%         disp('loaded');
-%         
-%     else % global_tpm == 0 % Covariance per trial
-%         disp('loading');
-%         
-%         data_directory = [root_directory 'results/'];
-%         data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels2t4_phistar.mat'];
-%         load([data_directory data_filename]);
-%         
-%         % Rename measure specific variable names to generic names
-%         for nChannels_counter = 1 : length(phis)
-%             phis{nChannels_counter}.phis = phis{nChannels_counter}.phi_stars;
-%             phis{nChannels_counter} = rmfield(phis{nChannels_counter}, 'phi_stars');
-%         end
-%         
-%         disp('loaded');
-%     end
-    
     disp('loading');
     phis = cell(3, 1);
     if global_tpm == 1 % 1 big trial
@@ -153,6 +121,40 @@ elseif strcmp(measure, 'phi_star') % Load phi-star results
 %         phis{3}.channel_sets = nchoosek((1:15), 4);
     end
     disp('loaded');
+elseif strcmp(measure, 'phi_star_gaussian')
+    
+    measure_string = '\Phi*';
+    % Results from calculation using Gaussian assumption
+    if global_tpm == 1 % Global covariance
+        disp('loading');
+        
+        data_directory = [root_directory 'results/'];
+        data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels2t4_medianSplit0_phistar_global.mat'];
+        load([data_directory data_filename]);
+        
+        % Rename measure specific variable names to generic names
+        for nChannels_counter = 1 : length(phis)
+            phis{nChannels_counter}.phis = phis{nChannels_counter}.phi_stars;
+            phis{nChannels_counter} = rmfield(phis{nChannels_counter}, 'phi_stars');
+        end
+        
+        disp('loaded');
+        
+    else % global_tpm == 0 % Covariance per trial
+        disp('loading');
+        
+        data_directory = [root_directory 'results/'];
+        data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels2t4_phistar.mat'];
+        load([data_directory data_filename]);
+        
+        % Rename measure specific variable names to generic names
+        for nChannels_counter = 1 : length(phis)
+            phis{nChannels_counter}.phis = phis{nChannels_counter}.phi_stars;
+            phis{nChannels_counter} = rmfield(phis{nChannels_counter}, 'phi_stars');
+        end
+        
+        disp('loaded');
+    end
     
 elseif strcmp(measure, 'phi_SI')
     disp('loading');
