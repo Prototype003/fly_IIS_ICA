@@ -24,7 +24,7 @@
 #SBATCH --mem-per-cpu=8000
 
 # Set your minimum acceptable walltime, format: day-hours:minutes:seconds
-#SBATCH --time=0-00:20:00
+#SBATCH --time=0-00:30:00
 
 
 # To receive an email when job completes or fails

@@ -21,10 +21,10 @@
 #SBATCH --cpus-per-task=1
 
 # Memory usage (MB)
-#SBATCH --mem-per-cpu=16000
+#SBATCH --mem-per-cpu=32000
 
 # Set your minimum acceptable walltime, format: day-hours:minutes:seconds
-#SBATCH --time=0-05:00:00
+#SBATCH --time=0-24:00:00
 
 
 # To receive an email when job completes or fails
