@@ -19,7 +19,7 @@ trials = (1:8);
 
 % _nChannels4_globalTPM1_f01c2tauBin4500tauOffset21s1036t1
 
-source_dir = '../results_split/';
+source_dir = '../tmp/';
 source_prefix = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels'...
     num2str(nChannels)...
     '_globalTPM' num2str(global_tpm)...
@@ -146,7 +146,7 @@ for mip_counter = 1 : length(big_mips)
         % unpartitioned_constellation
         if unpart_counter <= length(big_mips{mip_counter}.unpartitioned_constellation) % Ensure that there are still concepts to index into
             unpart_concept = big_mips{mip_counter}.unpartitioned_constellation{unpart_counter}.mechanism;
-            if unpart_concept == concept_list{concept}
+            if isequal(unpart_concept, concept_list{concept})
                 stripped(mip_counter, 1, concept) = single(big_mips{mip_counter}.unpartitioned_constellation{unpart_counter}.phi);
                 unpart_counter = unpart_counter + 1;
             else
@@ -159,7 +159,7 @@ for mip_counter = 1 : length(big_mips)
         % partitioned_constellation
         if part_counter <= length(big_mips{mip_counter}.partitioned_constellation) % Ensure that there are still concepts to index into
             part_concept = big_mips{mip_counter}.partitioned_constellation{part_counter}.mechanism;
-            if part_concept == concept_list{concept}
+            if isequal(part_concept, concept_list{concept})
                 stripped(mip_counter, 2, concept) = single(big_mips{mip_counter}.partitioned_constellation{part_counter}.phi);
                 part_counter = part_counter + 1;
             else
