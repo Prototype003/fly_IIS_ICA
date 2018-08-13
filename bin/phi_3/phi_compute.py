@@ -31,6 +31,7 @@ data_file = data_file_prefix + ".mat"
 
 # Output location
 results_directory = "results_split/"
+results_directory = "tmp2/"
 if not os.path.exists(results_directory):
 	os.makedirs(results_directory)
 
@@ -108,12 +109,14 @@ state_counters = np.zeros((n_states))
 state_phis = np.zeros((n_states))
 
 # Build TPM
-tpm = build_tpm(fly_data[:, :, None], tau_step, n_values)
+#tpm = build_tpm(fly_data[:, :, None], tau_step, n_values)
+tpm, tmp = build_tpm_sbn_normalise(fly_data[:, :, None], tau_step, n_values, 9000)
 print("TPM built")
 
 # Build the network and subsystem
 # We are assuming full connection
-tpm_formatted = pyphi.convert.state_by_state2state_by_node(tpm)
+#tpm_formatted = pyphi.convert.state_by_state2state_by_node(tpm)
+tpm_formatted = tpm
 network = pyphi.Network(tpm_formatted)
 print("Network built")
 
