@@ -73,10 +73,9 @@ print("Specific data obtained")
 
 # Preprocess ############################################################################
 
-
 if sample_offsets == 1:
 	n_values = 2
-	tpm, state_counters = build_tpm_bin_offsets(fly_data, n_values, tau)
+	tpm, transition_counters = build_tpm_bin_offsets(fly_data, n_values, tau)
 	tpm_formatted = tpm
 else:
 	if tau_bin == 1:
@@ -157,15 +156,18 @@ for state_index in range(0, n_states):
 
 # We average across the phi values previously computed for the channel set
 # When averaging across samples, we weight by the number of times each state occurred
-for sample_counter in range(0, fly_data.shape[0]):
-	sample = fly_data[sample_counter, :]
-	
-	# Determine the state
-	state = pyphi.convert.state2loli_index(tuple(sample))
-	
-	# Add to state_counter
-	state_counters[state] += 1
-	
+if sample_offsets == 0:
+	for sample_counter in range(0, fly_data.shape[0]):
+		sample = fly_data[sample_counter, :]
+		
+		# Determine the state
+		state = pyphi.convert.state2loli_index(tuple(sample))
+		
+		# Add to state_counter
+		state_counters[state] += 1
+else:
+	state_counters = transition_counters
+
 phi_total = 0
 for state_index in range(0, n_states):
 	if state_counters[state_index] > 0:
