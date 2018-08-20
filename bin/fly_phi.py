@@ -186,7 +186,7 @@ def build_tpm(fly_data, tau, n_values):
 	for state, counter in enumerate(transition_counter):
 		if counter == 0:
 			transition_counter[state] = 1
-			tpm[state, :] = 1 / tpm.shape[1]
+			tpm[state, :] = 1 / tpm.shape[1] # maximum entropy if no observations
 		counter_position = counter_position + 1
 	tpm /= transition_counter # Check vector operation
 	
@@ -256,12 +256,96 @@ def build_tpm_sbn(fly_data, tau, n_values):
 	
 	# Divide elements in TPM by transition counter
 	# If counter is 0, then transition never occurred - to avoid dividing 0 by 0, we set the counter to 1
-	for counter in transition_counter:
+	for state, counter in enumerate(transition_counter):
 		if counter == 0:
-			counter = 1
+			transition_counter[state] = 1
+			tpm[state, :] = 1 / n_values # maximum entropy if no observations
 	tpm /= transition_counter # This division works because of how we declared the vector ((n_states x 1) matrix)
 	
 	return tpm
+
+def build_tpm_bin_offsets(fly_data, n_values, tau):
+	"""
+	Builds a state-by-node TPM, holding the probabilities of each node being "on" given some past
+	network states. Averages across tau samples (into bins) before finding transition probabilities.
+	Computes transition probabilities from each possible binning (i.e. using all offsets before binning;
+	e.g. starting from sample 1, then from sample, up to tau-1)
+	
+	Inputs:
+		fly_data = matrix (of non-discretised data) with dimensions (samples x channels x epoch-trials)
+			Holds data for one fly, one condition
+		tau = integer - level at which to coarse grain
+			e.g. 1 means no averaging/binning across samples
+			e.g. 2 means averaging each group of 2 samples
+		n_values = number of states each *node* can be in (e.g. 2 for ON and OFF)
+	Outputs:
+		tpm = matrix with dimensions (n_values^channels x channels)
+	"""
+	
+	import pyphi as pyphi
+	import numpy as np
+	
+	tau_step = 1
+	
+	# Determine number of system states
+	n_states = n_values ** fly_data.shape[1]
+	
+	# Declare TPM (all zeros)
+	tpm = np.zeros((n_states, fly_data.shape[1]))
+	
+	"""
+	TPM Indexing (LOLI):
+	e.g. for 4x4 TPM:
+	
+	0 = 00
+	1 = 10
+	2 = 01
+	3 = 11
+	
+	Use pyphi.convert.state2loli_index(tuple) to get the index (v0.8.1)
+	Use pyphi.convert.state2le_index(tuple) in v1
+	"""
+	
+	# Declare transition counter (we will divide the sum of occurrences by this to get empirical probability)
+	transition_counter = np.zeros((n_states, 1))
+	
+	# For each possible sample offset before binning, bin and contribute transition probabilities
+	for offset in range(0, tau):
+		fly_data_offset = fly_data[offset-1, :]
+		
+		# Downsample by averaging in bins of length tau
+		fly_data_offset = tau_resample(fly_data[:, :, None, None, None], tau)
+		fly_data_offset = fly_data_offset[:, :, 0, 0, 0] # Get rid of those appended singleton dimensions
+		
+		# Binarise by median split
+		fly_data_offset, n_values, medians = binarise_trial_median(fly_data_offset[:, :, None, None, None])
+		fly_data_offset = fly_data_offset[:, :, 0, 0, 0] # Get rid of those appended singleton dimensions
+		
+		for sample in range(0, fly_data_offset.shape[0]-tau_step): # The last sample to transition is the second last one
+			sample_current = fly_data_offset[sample, :]
+			sample_future = fly_data_offset[sample+tau_step, :]
+			
+			# Identify current state
+			state_current = pyphi.convert.state2loli_index(tuple(sample_current))
+			
+			# Future boolean state
+			sample_future_bool = sample_future.astype(bool)
+			
+			# Increment 'on' channels by 1
+			tpm[state_current, sample_future_bool] += 1
+			
+			# Increment transition counter
+			transition_counter[state_current] += 1
+			
+	# Divide elements in TPM by transition counter
+	# If counter is 0, then transition never occurred - to avoid dividing 0 by 0, we set the counter to 1
+	for state, counter in enumerate(transition_counter):
+		if counter == 0:
+			transition_counter[state] = 1
+			tpm[state, :] = 1 / n_values # maximum entropy if no observations
+	tpm /= transition_counter # This division works because of how we declared the vector ((n_states x 1) matrix)
+	
+	return tpm, transition_counter
 
 def build_tpm_sbn_normalise(fly_data, tau, n_values, n_normalise):
 	"""
@@ -338,9 +422,10 @@ def build_tpm_sbn_normalise(fly_data, tau, n_values, n_normalise):
 	
 	# Divide elements in TPM by transition counter
 	# If counter is 0, then transition never occurred - to avoid dividing 0 by 0, we set the counter to 1
-	for counter in transition_counter:
+	for state, counter in enumerate(transition_counter):
 		if counter == 0:
-			counter = 1
+			transition_counter[state] = 1
+			tpm[state, :] = 1 / n_values # Maximum entropy if no observations
 	tpm /= transition_counter # This division works because of how we declared the vector ((n_states x 1) matrix)
 	
 	return tpm, transition_counter

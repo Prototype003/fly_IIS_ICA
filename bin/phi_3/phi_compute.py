@@ -22,7 +22,7 @@ tau = int(sys.argv[5]) # Actual tau in terms of how many samples to lag across (
 trial = int(sys.argv[6]) # 1-indexed
 global_tpm = int(sys.argv[7]) # 0=8 trials (2250 samples); 1=1 trial (18000 samples)
 tau_bin = int(sys.argv[8]) # 0=don't average across tau samples, use stepsize tau; 1=average across tau samples, afterwards use stepsize 1
-start_sample = int(sys.argv[9]) # which sample to treat as the first sample (relevant if tau_bin==1) 1-indexed
+sample_offsets = int(sys.argv[9]) # Compute TPM across sample offsets before binning (for when tau_bin == 1)
 
 # Fly data location
 data_directory = "../workspace_results/"
@@ -39,7 +39,7 @@ if tau_bin == 1:
 	tau_type = "tauBin"
 else:
 	tau_type = "tau"
-tau_string = tau_type + str(tau) + "tauOffset" + str(start_sample-1)
+tau_string = tau_type + str(tau) + "binOffsets" + str(sample_offsets)
 
 # Results file
 results_file_suffix = "_nChannels" + str(nChannels) + "_globalTPM" + str(global_tpm) + "_f" + "{0:0>2}".format(fly) + "c" + str(condition) + tau_string + "s" + "{0:0>4}".format(set) + "t" + str(trial)
@@ -57,7 +57,6 @@ channel_set = np.asarray(channel_combinations[set-1])
 
 fly_data = fly_data[:, :, :, fly-1, condition-1] # From here, only holds data for specified fly, condition
 fly_data = fly_data[:, channel_set, :] # Data for channel set (can't do with fly,condition because dimension order changes for some reason)
-fly_data = fly_data[start_sample-1:, :, :]
 
 # Get trial
 if global_tpm == 1:
@@ -74,17 +73,35 @@ print("Specific data obtained")
 
 # Preprocess ############################################################################
 
-if tau_bin == 1:
-	# Downsample by averaging in bins of length tau
-	fly_data = tau_resample(fly_data[:, :, None, None, None], tau)
-	fly_data = fly_data[:, :, 0, 0, 0] # Get rid of those appended singleton dimensions
-	tau_step = 1
-else:
-	tau_step = tau
 
-# Binarise by median split
-fly_data, n_values, medians = binarise_trial_median(fly_data[:, :, None, None, None])
-fly_data = fly_data[:, :, 0, 0, 0] # Get rid of those appended singleton dimensions
+if sample_offsets == 1:
+	n_values = 2
+	tpm, state_counters = build_tpm_bin_offsets(fly_data, n_values, tau)
+	tpm_formatted = tpm
+else:
+	if tau_bin == 1:
+		# Downsample by averaging in bins of length tau
+		fly_data = tau_resample(fly_data[:, :, None, None, None], tau)
+		fly_data = fly_data[:, :, 0, 0, 0] # Get rid of those appended singleton dimensions
+		tau_step = 1
+	else:
+		tau_step = tau
+	
+	# Binarise by median split
+	fly_data, n_values, medians = binarise_trial_median(fly_data[:, :, None, None, None])
+	fly_data = fly_data[:, :, 0, 0, 0] # Get rid of those appended singleton dimensions
+
+	# Build TPM
+	tpm = build_tpm(fly_data[:, :, None], tau_step, n_values)
+	tpm_formatted = pyphi.convert.state_by_state2state_by_node(tpm)
+	#tpm = build_tpm(np.flip(fly_data[:, :, None], 0), tau_step, n_values)
+	#tpm, tmp = build_tpm_sbn_normalise(fly_data[:, :, None], tau_step, n_values, 9000)
+print("TPM built")
+
+# Build the network and subsystem
+# We are assuming full connection
+network = pyphi.Network(tpm_formatted)
+print("Network built")
 
 #########################################################################################
 # Remember that the data is in the form a matrix
@@ -102,22 +119,9 @@ phi['tau'] = tau
 # Initialise results storage structures
 phi_value = 0; # Doesn't need initialisation
 mips = np.empty((n_states), dtype=tuple)
-tpm = np.zeros((n_states, n_states)) # Doesn't need initialisation
 big_mips = np.empty((n_states), dtype=object)
 state_counters = np.zeros((n_states))
 state_phis = np.zeros((n_states))
-
-# Build TPM
-tpm = build_tpm(fly_data[:, :, None], tau_step, n_values)
-#tpm, tmp = build_tpm_sbn_normalise(fly_data[:, :, None], tau_step, n_values, 9000)
-print("TPM built")
-
-# Build the network and subsystem
-# We are assuming full connection
-#tpm_formatted = pyphi.convert.state_by_state2state_by_node(tpm)
-tpm_formatted = tpm
-network = pyphi.Network(tpm_formatted)
-print("Network built")
 
 # sys.exit()
 
