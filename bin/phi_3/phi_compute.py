@@ -30,7 +30,7 @@ data_file_prefix = "split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim
 data_file = data_file_prefix + ".mat"
 
 # Output location
-results_directory = "results_split/"
+results_directory = "tmp3/"
 if not os.path.exists(results_directory):
 	os.makedirs(results_directory)
 
