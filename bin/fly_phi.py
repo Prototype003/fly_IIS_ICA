@@ -264,14 +264,12 @@ def build_tpm_sbn(fly_data, tau, n_values):
 	
 	return tpm
 
-def build_tpm_bin_offsets(fly_data, tau):
+def build_tpm_bin_offsets(fly_data, n_values, tau):
 	"""
 	Builds a state-by-node TPM, holding the probabilities of each node being "on" given some past
 	network states. Averages across tau samples (into bins) before finding transition probabilities.
 	Computes transition probabilities from each possible binning (i.e. using all offsets before binning;
 	e.g. starting from sample 1, then from sample, up to tau-1)
-	
-	ASSUMES that the state of a node is binary (i.e. only either ON or OFF)
 	
 	Inputs:
 		fly_data = matrix (of non-discretised data) with dimensions (samples x channels x epoch-trials)
@@ -279,6 +277,7 @@ def build_tpm_bin_offsets(fly_data, tau):
 		tau = integer - level at which to coarse grain
 			e.g. 1 means no averaging/binning across samples
 			e.g. 2 means averaging each group of 2 samples
+		n_values = number of states each *node* can be in (e.g. 2 for ON and OFF)
 	Outputs:
 		tpm = matrix with dimensions (n_values^channels x channels)
 	"""
@@ -289,7 +288,7 @@ def build_tpm_bin_offsets(fly_data, tau):
 	tau_step = 1
 	
 	# Determine number of system states
-	n_states = 2 ** fly_data.shape[1]
+	n_states = n_values ** fly_data.shape[1]
 	
 	# Declare TPM (all zeros)
 	tpm = np.zeros((n_states, fly_data.shape[1]))
@@ -312,7 +311,7 @@ def build_tpm_bin_offsets(fly_data, tau):
 	
 	# For each possible sample offset before binning, bin and contribute transition probabilities
 	for offset in range(0, tau):
-		fly_data_offset = fly_data[offset-1:, :, :]
+		fly_data_offset = fly_data[offset-1, :]
 		
 		# Downsample by averaging in bins of length tau
 		fly_data_offset = tau_resample(fly_data[:, :, None, None, None], tau)
@@ -322,23 +321,22 @@ def build_tpm_bin_offsets(fly_data, tau):
 		fly_data_offset, n_values, medians = binarise_trial_median(fly_data_offset[:, :, None, None, None])
 		fly_data_offset = fly_data_offset[:, :, 0, 0, 0] # Get rid of those appended singleton dimensions
 		
-		for trial in range(0, fly_data_offset.shape[2]):
-			for sample in range(0, fly_data_offset.shape[0]-tau_step): # The last sample to transition is the second last one
-				sample_current = fly_data_offset[sample, :, trial]
-				sample_future = fly_data_offset[sample+tau_step, :, trial]
-				
-				# Identify current state
-				state_current = pyphi.convert.state2loli_index(tuple(sample_current))
-				
-				# Future boolean state
-				sample_future_bool = sample_future.astype(bool)
-				
-				# Increment 'on' channels by 1
-				tpm[state_current, sample_future_bool] += 1
-				
-				# Increment transition counter
-				transition_counter[state_current] += 1
-				
+		for sample in range(0, fly_data_offset.shape[0]-tau_step): # The last sample to transition is the second last one
+			sample_current = fly_data_offset[sample, :]
+			sample_future = fly_data_offset[sample+tau_step, :]
+			
+			# Identify current state
+			state_current = pyphi.convert.state2loli_index(tuple(sample_current))
+			
+			# Future boolean state
+			sample_future_bool = sample_future.astype(bool)
+			
+			# Increment 'on' channels by 1
+			tpm[state_current, sample_future_bool] += 1
+			
+			# Increment transition counter
+			transition_counter[state_current] += 1
+			
 	# Divide elements in TPM by transition counter
 	# If counter is 0, then transition never occurred - to avoid dividing 0 by 0, we set the counter to 1
 	for state, counter in enumerate(transition_counter):
