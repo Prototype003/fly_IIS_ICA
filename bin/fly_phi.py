@@ -311,7 +311,7 @@ def build_tpm_bin_offsets(fly_data, n_values, tau):
 	
 	# For each possible sample offset before binning, bin and contribute transition probabilities
 	for offset in range(0, tau):
-		fly_data_offset = fly_data[offset-1, :]
+		fly_data_offset = fly_data[offset:, :]
 		
 		# Downsample by averaging in bins of length tau
 		fly_data_offset = tau_resample(fly_data_offset[:, :, None, None, None], tau)
