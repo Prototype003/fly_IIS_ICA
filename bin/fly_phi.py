@@ -314,7 +314,7 @@ def build_tpm_bin_offsets(fly_data, n_values, tau):
 		fly_data_offset = fly_data[offset-1, :]
 		
 		# Downsample by averaging in bins of length tau
-		fly_data_offset = tau_resample(fly_data[:, :, None, None, None], tau)
+		fly_data_offset = tau_resample(fly_data_offset[:, :, None, None, None], tau)
 		fly_data_offset = fly_data_offset[:, :, 0, 0, 0] # Get rid of those appended singleton dimensions
 		
 		# Binarise by median split
