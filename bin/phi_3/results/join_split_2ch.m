@@ -67,7 +67,8 @@ phis{1}.tpms = single(zeros([nStates dims_state_dep])); % Additional dimensions 
 for fly = flies
     disp(['fly' num2str(fly)]);
     for condition = conditions
-        for tau = taus
+        for tau_counter = 1 : length(taus)
+            tau = taus(tau_counter);
             for set_counter = 1 : size(channel_sets, 1)
                 disp(['set' num2str(set_counter)]);
                 for trial = trials
@@ -93,11 +94,11 @@ for fly = flies
                     end
                     
                     % Place into large data structure
-                    phis{1}.phis(set_counter, trial, fly, condition, tau) = single(tmp.phi.phi);
-                    phis{1}.state_counters(:, set_counter, trial, fly, condition, tau) = int16(tmp.phi.state_counters);
-                    phis{1}.big_mips(:, :, :, set_counter, trial, fly, condition, tau) = constellation_parse(tmp.phi.big_mips, concept_list_full);
-                    phis{1}.state_phis(:, set_counter, trial, fly, condition, tau) = single(tmp.phi.state_phis);
-                    phis{1}.tpms(:, :, set_counter, trial, fly, condition, tau) = single(tmp.phi.tpm);
+                    phis{1}.phis(set_counter, trial, fly, condition, tau_counter) = single(tmp.phi.phi);
+                    phis{1}.state_counters(:, set_counter, trial, fly, condition, tau_counter) = int16(tmp.phi.state_counters);
+                    phis{1}.big_mips(:, :, :, set_counter, trial, fly, condition, tau_counter) = constellation_parse(tmp.phi.big_mips, concept_list_full);
+                    phis{1}.state_phis(:, set_counter, trial, fly, condition, tau_counter) = single(tmp.phi.state_phis);
+                    phis{1}.tpms(:, :, set_counter, trial, fly, condition, tau_counter) = single(tmp.phi.tpm);
                     
                 end
             end
