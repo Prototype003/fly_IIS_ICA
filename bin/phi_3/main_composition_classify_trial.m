@@ -2,6 +2,8 @@
 
 %{
 
+Classification across trials for a single channel set, single fly
+
 Need to classify:
     Using 2nd order concepts only
     Using 3rd order concepts only
@@ -53,7 +55,10 @@ end
 %% Load compositions for each trial
 
 tables = zeros(nStates + 1, 15, length(conditions), length(trials));
-phi_table = zeros(length(conditions), length(trials));
+
+phi_states = zeros(nStates, length(conditions), length(trials));
+phi_unweighted = zeros(length(conditions), length(trials));
+phi_weighted = zeros(length(conditions), length(trials));
 
 for condition = conditions
     for trial = trials
@@ -73,7 +78,9 @@ for condition = conditions
         
         tables(:, :, condition, trial) = diff_table; % Small phi values
         
-        phi_table(condition, trial) = phi.phi; % Big phi values
+        phi_weighted(condition, trial) = phi.phi; % Big phi values
+        phi_unweighted(condition, trial) = mean(phi.state_phis);
+        phi_states(:, condition, trial) = phi.state_phis;
         
     end
 end
@@ -116,7 +123,12 @@ for state_features = 1 : size(classification_features, 1)
 end
 
 % Classification using just big-phi values (1 feature)
-phi_classification = svm_lol_liblinear_manual(permute(phi_table, [2 3 1]));
+phi_classifications = cell(3, length(costs));
+for cost_counter = 1 : length(costs)
+    phi_classifications{1, cost_counter} = svm_lol_liblinear_manual(permute(phi_states, [3 1 2]), costs(cost_counter));
+    phi_classifications{2, cost_counter} = svm_lol_liblinear_manual(permute(phi_unweighted, [2 3 1]), costs(cost_counter));
+    phi_classifications{3, cost_counter} = svm_lol_liblinear_manual(permute(phi_weighted, [2 3 1]), costs(cost_counter));
+end
 
 %% Extract classification accuracy for each feature-type
 
@@ -130,6 +142,48 @@ for state_features = 1 : size(classification_features, 1)
     end
 end
 
+phi_accuracies = zeros(3, length(costs));
+for state_features = 1 : size(phi_classifications, 1)
+    for cost = 1 : length(costs)
+        phi_accuracies(state_features, cost) = phi_classifications{state_features, cost}.accuracy;
+    end
+end
+
+% Join into one matrix
+big_phi_mat = zeros(3, 1, length(costs));
+big_phi_mat(:, :, :) = NaN;
+big_phi_mat(:, 1, :) = phi_accuracies; % This 3rd row corresponds to weighted average across states
+accuracies = cat(2, accuracies, big_phi_mat);
+
+%% Plot accuracies
+
+% Plot format:
+%   1 row per feature type
+%   1 colour/line pattern per state dependence type
+
+figure;
+
+dependence_colours = 'rgb';
+
+feature_titles = {'1st', '2nd', '3rd', '4th', '2/3/4th', '\Phi'};
+
+for feature_type = 1 : size(classification_features, 2)
+    subplot(size(classification_features, 2), 1, feature_type);
+    for state_dependence = 1 : size(classification_features, 1)
+        line = permute(accuracies(state_dependence, feature_type, :), [3 1 2]);
+        plot(cost_powers, line, dependence_colours(state_dependence)); hold on;
+        title(feature_titles{feature_type});
+        ylim([0.5 1]);
+    end
+    
+    if feature_type == 1
+        legend('x16 states' ,'unweighted mean', 'weighted mean');
+    end
+end
+
+xlabel('cost (2^n)');
+ylabel('accuracy');
+
 %% Video frames for cost search
 figure;
 clim = [min(accuracies(:)) max(accuracies(:))];
@@ -138,8 +192,8 @@ frames = cell(size(costs));
 for cost = 1 : length(costs)
     imagesc(accuracies(:, :, cost), clim); c=colorbar; ylabel(c, '% accuracy');
     title(['Cost = 2^{' num2str(cost_powers(cost)) '}']);
-    set(gca, 'XTick', (1:size(classification_features, 2)), 'XTickLabel', {'1st', '2nd', '3rd', '4th', '2nd-3rd-4th'}); xlabel('concept order');
-    set(gca, 'YTick', (1:size(classification_features, 2)), 'YTickLabel', {'x16 states', 'unweighted avg', 'weighted avg'}); ylabel('state dependence');
+    set(gca, 'XTick', (1:size(accuracies, 2)), 'XTickLabel', {'1st', '2nd', '3rd', '4th', '2/3/4th', '\Phi'}); xlabel('concept order');
+    set(gca, 'YTick', (1:size(accuracies, 1)), 'YTickLabel', {'x16 states', 'unweighted avg', 'weighted avg'}); ylabel('state dependence');
     drawnow;
     frame = getframe(gcf);
     frames{cost} = frame2im(frame);
