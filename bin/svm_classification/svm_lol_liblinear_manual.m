@@ -116,7 +116,7 @@ if nargin > 2
     %data_test = zscore(data_test, [], 1);
     
     % Train SVM
-    trained = train(data_train_labels, data_train, '-s 2 -C'); % '-C' specifies searching for optimal cost, only works with '-s 0' or '-s 2'
+    trained = train(data_train_labels, data_train, '-s 2 -C -q'); % '-C' specifies searching for optimal cost, only works with '-s 0' or '-s 2'
     
     % Classify test data using SVM
     [prediction, accuracy, confidence] = predict(data_test_labels, data_test, trained);
@@ -163,11 +163,11 @@ else
         %c_param = train(data_train_labels, sparse(data_train), '-C -s 2');
         
         % Train SVM
-        trained = train(data_train_labels, sparse(data_train), ['-c ' num2str(cost)]); % Switching from -s 2 to -s 1 is fine
+        trained = train(data_train_labels, sparse(data_train), ['-c ' num2str(cost) ' -q']); % Switching from -s 2 to -s 1 is fine
         %trained = train(data_train_labels, sparse(data_train));
         
         % Classify test data using SVM
-        [prediction, accuracy, confidence] = predict(data_test_labels, sparse(data_test), trained);
+        [prediction, accuracy, confidence] = predict(data_test_labels, sparse(data_test), trained, '-q');
         
         % Store
         svms{leave_out_counter} = trained;
