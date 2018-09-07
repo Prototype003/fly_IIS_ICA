@@ -12,7 +12,7 @@ OR
 
 %% Setup
 
-measure = 'phi_three';
+measure = 'phi_three'; % 'phi_three' or 'phi_star' or 'phi_star_gaussian' or 'phi_SI'
 measure_string = '\Phi^{3.0}';
 tau = 1; % 1 = 4ms; 2 = 8ms; 3 = 16ms
 if tau == 1
@@ -298,12 +298,12 @@ for nChannels_counter = 1 : length(accuracies)
     distances_axis = (min(distances) : distances_delta : max(distances)+distances_delta); % range is from min to max
     [centers_map, distances_map] = meshgrid(centers_axis, distances_axis);
     
-    % Create mapped space
-    values_map = zeros(size(centers_map)); % Will sum all values with the same coordinates
-    values_map_counter = zeros(size(centers_map)); % Keeps count in each coordinate as to how many values have that coordinate
-    
     % Map channel sets to 2D matrix (and average overlaps)
     for value_type = 1 : size(plot_values, 2)
+        
+        % Create mapped space
+        values_map = zeros(size(centers_map)); % Will sum all values with the same coordinates
+        values_map_counter = zeros(size(centers_map)); % Keeps count in each coordinate as to how many values have that coordinate
         
         % Populate mapped space
         for value_counter = 1 : size(plot_values, 1)
@@ -438,7 +438,7 @@ end
 
 %% Print figure
 
-% figure_name = 'fig4';
+% figure_name = 'fig4'; % 'fig4' for phi-3; 'figS4' for phi-star-gaussian
 % 
 % print(figure_name, '-dsvg'); % SVG
 % print(figure_name, '-dpdf', '-bestfit'); % PDF

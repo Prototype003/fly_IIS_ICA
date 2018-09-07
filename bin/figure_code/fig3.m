@@ -13,7 +13,7 @@ across fly analyses (for trying to extend within fly findings across flies)
 
 %% Setup
 
-measure = 'phi_SI'; % 'phi_three' or 'phi_star' or 'phi_SI'
+measure = 'phi_three'; % 'phi_three' or 'phi_star' or 'phi_star_gaussian' or 'phi_SI'
 tau = 1; % 1 = 4ms; 2 = 8ms; 3 = 16ms
 if tau == 1
     tau_string = '4';
@@ -77,7 +77,7 @@ xStarts(3) = xStarts(3) + cbar_width + xSpacing + cbar_spacing;
 
 for nChannels_counter = 1 : length(phis)
     nChannels = phis{nChannels_counter}.nChannels;
-    channel_sets = phis{nChannels_counter}.channel_sets;
+    channel_sets = double(phis{nChannels_counter}.channel_sets);
     
     % Get values to plot
     values = permute(mean(mean(phis{nChannels_counter}.phis(:, :, :, :, tau), 2), 3), [1 4 2 3]);
@@ -106,12 +106,12 @@ for nChannels_counter = 1 : length(phis)
     distances_axis = (min(distances) : distances_delta : max(distances)+distances_delta); % range is from min to max
     [centers_map, distances_map] = meshgrid(centers_axis, distances_axis);
     
-    % Create mapped space
-    values_map = zeros(size(centers_map)); % Will sum all values with the same coordinates
-    values_map_counter = zeros(size(centers_map)); % Keeps count in each coordinate as to how many values have that coordinate
-    
     % Map channel sets to 2D matrix (and average overlaps)
     for value_type = 1 : size(plot_values, 2)
+        
+        % Create mapped space
+        values_map = zeros(size(centers_map)); % Will sum all values with the same coordinates
+        values_map_counter = zeros(size(centers_map)); % Keeps count in each coordinate as to how many values have that coordinate
         
         % Populate mapped space
         for value_counter = 1 : size(plot_values, 1)
@@ -242,7 +242,7 @@ end
 
 %% Print figure
 
-% figure_name = 'fig3';
+% figure_name = 'fig3'; % 'fig3' for phi-3; 'figS1' for phi-star-gaussian
 % 
 % print(figure_name, '-dsvg'); % SVG
 % print(figure_name, '-dpdf', '-bestfit'); % PDF

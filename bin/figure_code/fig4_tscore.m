@@ -359,12 +359,12 @@ for nChannels_counter = 1 : length(accuracies_a)
     distances_axis = (min(distances) : distances_delta : max(distances)+distances_delta); % range is from min to max
     [centers_map, distances_map] = meshgrid(centers_axis, distances_axis);
     
-    % Create mapped space
-    values_map = zeros(size(centers_map)); % Will sum all values with the same coordinates
-    values_map_counter = zeros(size(centers_map)); % Keeps count in each coordinate as to how many values have that coordinate
-    
     % Map channel sets to 2D matrix (and average overlaps)
     for value_type = 1 : size(plot_values, 2)
+        
+        % Create mapped space
+        values_map = zeros(size(centers_map)); % Will sum all values with the same coordinates
+        values_map_counter = zeros(size(centers_map)); % Keeps count in each coordinate as to how many values have that coordinate
         
         % Populate mapped space
         for value_counter = 1 : size(plot_values, 1)
