@@ -10,7 +10,7 @@ See figures/videos from http://www.eneuro.org/content/4/5/ENEURO.0085-17.2017
 
 %% Setup
 
-output_file = 'composition.gif';
+output_file = 'composition_both';
 
 marker_size = 500;
 
@@ -48,10 +48,13 @@ nChannels = 4;
 [phis{1}, wake] = composition_table(nChannels, 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM1_f01c1tauBin24tauOffset0s1036t1.mat');
 [phis{2}, anest] = composition_table(nChannels, 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM1_f01c2tauBin24tauOffset0s1036t1.mat');
 
-[phis{1}, wake] = composition_table(nChannels, 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM1_f01c1tauBin24tauOffset0s0002t1.mat');
-[phis{2}, anest] = composition_table(nChannels, 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM1_f01c2tauBin24tauOffset0s0002t1.mat');
+[phis{1}, ~, wake, wake2] = composition_table(nChannels, 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM1_f01c1tauBin24tauOffset0s0002t1.mat');
+[phis{2}, ~, anest, anest2] = composition_table(nChannels, 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM1_f01c2tauBin24tauOffset0s0002t1.mat');
 
-compositions = [wake(end, :); anest(end, :)];
+%[phis{1}, wake] = composition_table(nChannels, 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM0_f01c1tau4tauOffset0s0002t1.mat');
+%[phis{2}, anest] = composition_table(nChannels, 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM0_f01c2tau4tauOffset0s0002t1.mat');
+
+compositions = [wake(end, :); anest(end, :); wake2(end, :); anest2(end, :)];
 compositions = fliplr(compositions);
 
 % Hardcoded lines for Hasse Diagram
@@ -83,9 +86,10 @@ lines{10} = [13 15];
 lines{11} = [14 15];
 
 figure;
-subplots = zeros(1, 2);
-for condition = 1 : 2
-    subplots(condition) = subplot(1, 2, condition);
+subplots = zeros(1, 4);
+subplot_counter = 1;
+for condition = 1 : 4
+    subplots(condition) = subplot(2, 2, subplot_counter);
     scatter3(x, y, compositions(condition, :), marker_size, colours, '.');
     
     % Draw lines
@@ -99,7 +103,10 @@ for condition = 1 : 2
     xlabel('x');
     ylabel('y');
     axis([min(x)-1 max(x)+1 min(y)-1 max(y)+1 0 max(compositions(:))]);
-    title([condition_titles{condition} ': \Phi=' num2str(phis{condition}.phi)]);
+    
+    if condition <=2
+        title([condition_titles{condition} ': \Phi=' num2str(phis{condition}.phi)]);
+    end
     
     set(gca, 'YTick', [min(y) max(y)], 'XTick', [min(x) max(x)], 'ZTick', linspace(0, max(compositions(:)), 3));
     set(gca, 'YTickLabel', [], 'XTickLabel', []);
@@ -108,6 +115,7 @@ for condition = 1 : 2
     grid off
     axis square
     axis vis3d
+    subplot_counter = subplot_counter + 1;
 end
 
 linkprop(subplots, {'CameraPosition','CameraUpVector'});
@@ -146,16 +154,16 @@ frame_duration = video_duration / length(azimuth);
 for frame = 1 : length(frames)
     [mapped_frame, map] = rgb2ind(frames{frame}, 256);
     if frame == 1
-        imwrite(mapped_frame, map, output_file, 'gif', 'LoopCount', Inf, 'DelayTime', frame_duration);
+        imwrite(mapped_frame, map, [output_file '.gif'], 'gif', 'LoopCount', Inf, 'DelayTime', frame_duration);
     else
-        imwrite(mapped_frame, map, output_file, 'gif', 'WriteMode', 'append', 'DelayTime', frame_duration);
+        imwrite(mapped_frame, map, [output_file '.gif'], 'gif', 'WriteMode', 'append', 'DelayTime', frame_duration);
     end
 end
 
 %% Write frames into video
 
  % create the video writer with 1 fps
- writerObj = VideoWriter('composition.avi');
+ writerObj = VideoWriter([output_file '.avi']);
  writerObj.FrameRate = 1 / (video_duration / length(frames));
 
  % open the video writer
