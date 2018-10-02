@@ -12,7 +12,7 @@ Test is conducted using LME with model comparisons (to the null)
 %% SETUP
 
 bin_location = './';
-phi_type = 'phi_three'; % 'phi_three' or 'phi_star_gaussian'
+phi_type = 'phi_star_gaussian'; % 'phi_three' or 'phi_star_gaussian'
 global_tpm = 0;
 
 results_directory = 'analysis_results/';
@@ -173,11 +173,12 @@ disp('Saved');
 
 % Average across channel sets to get single value per fly
 sigs = zeros(length(phis), length(phis{1}.taus));
+zs = zeros(length(phis), length(phis{1}.taus));
 reduced = zeros(length(phis), size(phis{1}.phis, 3), size(phis{1}.phis, 5));
 for nChannels = 1 : length(phis)
     phis{nChannels}.phis_channelAveraged = permute(mean(phis{nChannels}.phis, 1), [3 4 5 1 2]);
     reduced(nChannels, :, :) = permute(...
-        phis{3}.phis_channelAveraged(:, 1, :) > phis{3}.phis_channelAveraged(:, 2, :),...
+        phis{nChannels}.phis_channelAveraged(:, 1, :) > phis{nChannels}.phis_channelAveraged(:, 2, :),...
         [1 3 2]...
         );
     
@@ -185,7 +186,8 @@ for nChannels = 1 : length(phis)
     for tau = 1 : size(phis{nChannels}.phis_channelAveraged, 3)
         air = phis{nChannels}.phis_channelAveraged(:, 1, tau);
         iso = phis{nChannels}.phis_channelAveraged(:, 2, tau);
-        [sigs(nChannels, tau), decision] = signrank(air, iso, 'Tail', 'right');
+        [sigs(nChannels, tau), decision, stats] = signrank(air, iso, 'Tail', 'right', 'Method', 'approx');
+        zs(nChannels, tau) = stats.zval;
     end
 end
 
