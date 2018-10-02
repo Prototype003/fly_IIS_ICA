@@ -11,39 +11,23 @@ Test is conducted using LME with model comparisons (to the null)
 
 %% SETUP
 
-phi_type = 'three';
-file_suffix = '';
-
-data_nChannels = '2t4';
-data_detrended = 0;
-data_zscored = 0;
-
-data_directory = 'results/';
-data_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim'...
-    '_detrend' num2str(data_detrended)...
-    '_zscore' num2str(data_zscored)...
-    '_nChannels' data_nChannels...
-    '_phi' phi_type...
-    ];
+bin_location = './';
+phi_type = 'phi_star_gaussian'; % 'phi_three' or 'phi_star_gaussian'
+global_tpm = 0;
 
 results_directory = 'analysis_results/';
-results_filename = [data_filename '_lmeStats'];
+results_filename = [phi_type '_globalTPM' num2str(global_tpm) '_lmeStats'];
 
 %% LOAD
 
-disp('loading');
-
-load([data_directory data_filename file_suffix '.mat']);
-
-disp('loaded');
+addpath('figure_code/');
+[phis, measure_strings{1}] = phi_load(phi_type, global_tpm, bin_location);
 
 %% Preprocess
 
 for nChannels_counter = 1 : length(phis)
-    % So I don't need to keep on typing ...}.phi_threes
-    phis{nChannels_counter}.phis = phis{nChannels_counter}.(['phi_' phi_type 's']);
-    
     % Average across trials
+    phis{nChannels_counter}.phis_orig = phis{nChannels_counter}.phis; % Backup phi values
     phis{nChannels_counter}.phis = mean(phis{nChannels_counter}.phis, 2);
 end
 
@@ -120,7 +104,6 @@ disp('table built');
 
 model_spec = 'phi ~ nChannels + condition + tau + (1|fly) + (1|fly:set)';
 
-
 disp(['fitting model: ' model_spec]);
 
 model_full = fitlme(phi_table, model_spec);
@@ -176,9 +159,10 @@ save([results_directory results_filename '.mat'],...
     'model_spec',...
     'model_full',...
     'model_null_specs',...
-    'model_nulls',...
-    'model_comparisons',...
-    'model_comparisons_sim'...
+    'model_nulls'...
     );
+    %'model_comparisons',...
+    %'model_comparisons_sim'...
+    %);
 
 disp('Saved');
