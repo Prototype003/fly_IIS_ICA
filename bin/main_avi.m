@@ -12,7 +12,7 @@ Test is conducted using LME with model comparisons (to the null)
 %% SETUP
 
 bin_location = './';
-phi_type = 'phi_star_gaussian'; % 'phi_three' or 'phi_star_gaussian'
+phi_type = 'phi_three'; % 'phi_three' or 'phi_star_gaussian'
 global_tpm = 0;
 
 results_directory = 'analysis_results/';
@@ -127,6 +127,8 @@ for null = 1 : length(model_null_specs)
     disp('null model built');
 end
 
+%phis{nChannels_counter}.phis = phis{nChannels_counter}.phis_orig; % restore backed up (non-averaged) values
+
 %% Likelihood ratio test
 % % Likelihood ratio test is anticonservative when testing for fixed effects, so use simulated test
 % 
@@ -166,3 +168,101 @@ save([results_directory results_filename '.mat'],...
     %);
 
 disp('Saved');
+
+%% Post-hoc tests : condition
+
+% Average across channel sets to get single value per fly
+sigs = zeros(length(phis), length(phis{1}.taus));
+reduced = zeros(length(phis), size(phis{1}.phis, 3), size(phis{1}.phis, 5));
+for nChannels = 1 : length(phis)
+    phis{nChannels}.phis_channelAveraged = permute(mean(phis{nChannels}.phis, 1), [3 4 5 1 2]);
+    reduced(nChannels, :, :) = permute(...
+        phis{3}.phis_channelAveraged(:, 1, :) > phis{3}.phis_channelAveraged(:, 2, :),...
+        [1 3 2]...
+        );
+    
+    % Test if reduction in phi is significant
+    for tau = 1 : size(phis{nChannels}.phis_channelAveraged, 3)
+        air = phis{nChannels}.phis_channelAveraged(:, 1, tau);
+        iso = phis{nChannels}.phis_channelAveraged(:, 2, tau);
+        [sigs(nChannels, tau), decision] = signrank(air, iso, 'Tail', 'right');
+    end
+end
+
+% Find which channel sets have a significant decrease in phi across flies (using trial-averaged values)
+q = 0.05;
+sig_portions = zeros(length(phis), length(phis{1}.taus));
+sig_counts = zeros(length(phis), length(phis{1}.taus));
+for nChannels = 1 : length(phis)
+    phis{nChannels}.channel_sigs = zeros(size(phis{nChannels}.phis, 1), size(phis{nChannels}.phis, 5));
+    phis{nChannels}.channel_sigs_fdr = zeros(size(phis{nChannels}.phis, 1), size(phis{nChannels}.phis, 5));
+    for tau = 1 : size(phis{nChannels}.phis, 5)
+        
+        for channel_set = 1 : size(phis{nChannels}.phis, 1)
+            
+            air = squeeze(phis{nChannels}.phis(channel_set, 1, :, 1, tau));
+            iso = squeeze(phis{nChannels}.phis(channel_set, 1, :, 2, tau));
+            
+            % Conduct test across flies
+            [phis{nChannels}.channel_sigs(channel_set, tau), decision] =...
+                signrank(air(:), iso(:), 'Tail', 'right'); % paired non-parametric test
+            
+        end
+        
+        % FDR correction
+        phis{nChannels}.channel_sigs_fdr(:, tau) = fdr_correct(phis{nChannels}.channel_sigs(:, tau), q);
+        
+    end
+    
+    sig_portions(nChannels, :) = mean(phis{nChannels}.channel_sigs_fdr, 1);
+    sig_counts(nChannels, :) = sum(phis{nChannels}.channel_sigs_fdr, 1);
+end
+
+% 
+
+%% Post-hoc tests : nChannels
+
+% Average across sets, conditions, and taus
+values = zeros(length(phis), size(phis{1}.phis, 3));
+for nChannels = 1 : length(phis)
+    values(nChannels, :) = permute(mean(mean(mean(phis{nChannels}.phis, 1), 4), 5), [3 1 2 4 5]);
+end
+
+% Conduct tests
+clear sigs
+test_counter = 1;
+for nChannels_1 = 1 : length(phis)
+    for nChannels_2 = 2 : length(phis)
+        if nChannels_1 ~= nChannels_2 && nChannels_2 > nChannels_1
+            [p, decision, stats] = signrank(values(nChannels_1, :), values(nChannels_2, :), 'Tail', 'left', 'Method', 'approx');
+            disp([num2str(nChannels_1) ' ' num2str(nChannels_2) ': Z = ' num2str(stats.zval) ' p = ' num2str(p)]);
+            sigs(test_counter) = p;
+            test_counter = test_counter + 1;
+        end
+    end
+end
+
+%% Post-hoc tests : tau
+
+% Average across all sets (from all set sizes), and conditions
+values = zeros(length(phis{1}.taus), size(phis{1}.phis, 3));
+set_counter = 0;
+for nChannels = 1 : length(phis)
+    set_counter = set_counter + size(phis{nChannels}.phis, 1)*size(phis{nChannels}.phis, 4);
+    values(:, :) = values(:, :) + permute(sum(sum(phis{nChannels}.phis, 1), 4), [5 3 1 2 4]);
+end
+values = values ./ set_counter;
+
+% Conduct tests
+clear sigs
+test_counter = 1;
+for nChannels_1 = 1 : length(phis)
+    for nChannels_2 = 2 : length(phis)
+        if nChannels_1 ~= nChannels_2 && nChannels_2 > nChannels_1
+            [p, decision, stats] = signrank(values(nChannels_1, :), values(nChannels_2, :), 'Method', 'approx');
+            disp([num2str(nChannels_1) ' ' num2str(nChannels_2) ': Z = ' num2str(stats.zval) ' p = ' num2str(p)]);
+            sigs(test_counter) = p;
+            test_counter = test_counter + 1;
+        end
+    end
+end
