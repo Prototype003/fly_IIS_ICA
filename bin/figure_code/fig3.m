@@ -256,3 +256,43 @@ end
 % print(figure_name, '-dsvg'); % SVG
 % print(figure_name, '-dpdf', '-bestfit'); % PDF
 % print(figure_name, '-dpng'); % PNG
+
+%% Stats
+
+sigs = zeros(3, 3, 2); % 2,3,4 channels x w,a,w/a x parameter
+rs = zeros(3, 3, 2);
+for nChannels = 1 : length(values_mapped)
+    for value_type = 1 : size(values_mapped{1}.values, 2)
+        [r, p] = corr([values_mapped{nChannels}.values(:, value_type) values_mapped{nChannels}.centers]);
+        sigs(nChannels, value_type, 1) = p(1, 2);
+        rs(nChannels, value_type, 1) = r(1, 2);
+        
+        [r, p] = corr([values_mapped{nChannels}.values(:, value_type) values_mapped{nChannels}.distances]);
+        sigs(nChannels, value_type, 2) = p(1, 2);
+        rs(nChannels, value_type, 2) = r(1, 2);
+    end
+end
+
+%%
+value_type = 1;
+
+% Correlations (with set center axis) after splitting based on center value
+sigs = [];
+counter = 1;
+for nChannels = 1 : length(values_mapped)
+    
+    middle = median(values_mapped{nChannels}.centers);
+    
+    below = values_mapped{nChannels}.centers < middle;
+    above = ~below; % The middle value is included in the top half
+    
+    [r, p] = corr([values_mapped{nChannels}.values(below, value_type) values_mapped{nChannels}.centers(below)]);
+    sigs(counter) = p(1, 2);
+    disp(['nChannels' num2str(nChannels) ' ' num2str(value_type) ' below r=' num2str(r(1, 2)) ' p=' num2str(p(1, 2))]);
+    
+    [r, p] = corr([values_mapped{nChannels}.values(above, value_type) values_mapped{nChannels}.centers(above)]);
+    sigs(counter+1) = p(1, 2);
+    disp(['nChannels' num2str(nChannels) ' ' num2str(value_type) ' above r=' num2str(r(1, 2)) ' p=' num2str(p(1, 2))]);
+    
+    counter = counter + 2;
+end
