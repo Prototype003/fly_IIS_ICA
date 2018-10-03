@@ -45,7 +45,7 @@ set(gcf, 'InvertHardCopy', 'off'); % For keeping the black background when print
 % set(gcf, 'RendererMode', 'manual');
 % set(gcf, 'Renderer', 'painters');
 
-colormap('jet');
+colormap(inferno());
 subplot_counter = 1;
 cbar_titles = {...
     [measure_string '_{W}'],...
@@ -75,11 +75,15 @@ xStarts = (1-xPortion)/3 + (0 : widths(1) : 1);
 xStarts(2) = xStarts(2) + xSpacing;
 xStarts(3) = xStarts(3) + cbar_width + xSpacing + cbar_spacing;
 
+% Store values for stats
+values_mapped = cell(size(phis));
+
 for nChannels_counter = 1 : length(phis)
     nChannels = phis{nChannels_counter}.nChannels;
     channel_sets = double(phis{nChannels_counter}.channel_sets);
     
     % Get values to plot
+    % Mean across trials and flies
     values = permute(mean(mean(phis{nChannels_counter}.phis(:, :, :, :, tau), 2), 3), [1 4 2 3]);
     plot_values = zeros(size(values, 1), 3);
     plot_values(:, 1) = values(:, 1);
@@ -89,6 +93,11 @@ for nChannels_counter = 1 : length(phis)
     % Set center / set path distance mapping
     centers = mean(channel_sets, 2); % Mean across channels in each set
     distances = channel_set_distances(channel_sets);
+    
+    % Store mapping
+    values_mapped{nChannels_counter}.centers = centers;
+    values_mapped{nChannels_counter}.distances = distances;
+    values_mapped{nChannels_counter}.values = plot_values;
     
     % Find minimum delta among map values
     centers_deltas = pdist2(unique(centers), unique(centers));
@@ -168,7 +177,7 @@ for nChannels_counter = 1 : length(phis)
         axis_defaults(gca);
         
         set(gca, 'TickDir', 'out');
-        set(gca, 'Box', 'on');
+        set(gca, 'Box', 'off');
         
         if value_type < 3
             
@@ -227,7 +236,7 @@ for nChannels_counter = 1 : length(phis)
             ylabel('set path distance');
         end
         
-        set(gca, 'color', [0 0 0]); % black background
+        set(gca, 'color', [1 1 1]); % black background
         set(plot, 'EdgeColor', 'none'); % remove grid outline
         
         % Add letter label to plot
