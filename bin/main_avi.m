@@ -12,7 +12,7 @@ Test is conducted using LME with model comparisons (to the null)
 %% SETUP
 
 bin_location = './';
-phi_type = 'phi_star_gaussian'; % 'phi_three' or 'phi_star_gaussian'
+phi_type = 'phi_three'; % 'phi_three' or 'phi_star_gaussian'
 global_tpm = 0;
 
 results_directory = 'analysis_results/';
@@ -50,6 +50,8 @@ table_raw.trial = zeros(table_length, 1);
 table_raw.fly = zeros(table_length, 1);
 table_raw.condition = zeros(table_length, 1);
 table_raw.tau = zeros(table_length, 1);
+table_raw.center = zeros(table_length, 1);
+table_raw.distance = zeros(table_length, 1);
 table_raw.phi = zeros(table_length, 1);
 row_counter = 1;
 set_label_starts = [1 106 456];
@@ -60,6 +62,9 @@ for fly = 1 : size(phis{1}.phis, 3)
     for condition = 1 : size(phis{1}.phis, 4)
         for tau = 1 : size(phis{1}.phis, 5)
             for nChannels = 1 : length(phis)
+                channel_sets = double(phis{nChannels}.channel_sets);
+                centers = mean(channel_sets, 2); % Mean across channels in each set
+                distances = channel_set_distances(channel_sets);
                 set_label = set_label_starts(nChannels_counter);
                 for set_counter = 1 : size(phis{nChannels}.phis, 1)
                     for trial = 1 : size(phis{nChannels}.phis, 2)
@@ -76,6 +81,8 @@ for fly = 1 : size(phis{1}.phis, 3)
 %                         else
 %                             table_raw.phi(row_counter) = log(phis{nChannels}.phis(set_counter, trial, fly, condition, tau));
 %                         end
+                        table_raw.center(row_counter) = centers(set_counter);
+                        table_raw.distance(row_counter) = distances(set_counter);
                         table_raw.phi(row_counter) = phis{nChannels}.phis(set_counter, trial, fly, condition, tau);
                         row_counter = row_counter + 1;
                     end
@@ -87,8 +94,8 @@ for fly = 1 : size(phis{1}.phis, 3)
 end
 
 % Natural ordering: fly, condition, tau, nChannels, set, trial
-table_headings = {'fly', 'condition', 'tau', 'nChannels', 'set', 'trial', 'phi'};
-phi_table = table(table_raw.fly, table_raw.condition, table_raw.tau, table_raw.nChannels, table_raw.set, table_raw.trial, table_raw.phi, 'VariableNames', table_headings);
+table_headings = {'fly', 'condition', 'tau', 'nChannels', 'set', 'center', 'distance', 'trial', 'phi'};
+phi_table = table(table_raw.fly, table_raw.condition, table_raw.tau, (table_raw.nChannels), table_raw.set, table_raw.center, table_raw.distance, table_raw.trial, log(table_raw.phi), 'VariableNames', table_headings);
 
 disp('table built');
 
@@ -103,10 +110,12 @@ disp('table built');
 % Consequences of not include trial in the model? Less fit, so test is more conservative?
 
 model_spec = 'phi ~ nChannels + condition + tau + (1|fly) + (1|fly:set)';
+%model_spec = 'phi ~ nChannels + tau + center*distance + (1|fly) + (1|fly:set)';
 
 disp(['fitting model: ' model_spec]);
 
 model_full = fitlme(phi_table, model_spec);
+%model_full = fitlme(phi_table(phi_table.condition==1, :), model_spec);
 
 disp('full model built');
 
@@ -118,6 +127,13 @@ model_null_specs = {...
     'phi ~ nChannels + condition + (1|fly) + (1|fly:set)'... % tau null model
     'phi ~ nChannels + condition + tau + (1|fly) + (1|fly:set)'... % full main effect null model
     };
+
+% model_null_specs = {...
+%     'phi ~ nChannels + tau + center*distance + (1|fly) + (1|fly:set)',... % condition null model
+%     'phi ~ tau + center*distance + (1|fly) + (1|fly:set)',... % nChannels null model
+%     'phi ~ nChannels + center*distance + (1|fly) + (1|fly:set)'... % tau null model
+%     'phi ~ nChannels + tau + center + distance + (1|fly) + (1|fly:set)'... % center:distance interaction null model
+%     };
 
 % Build null models
 model_nulls = cell(length(model_null_specs), 1);
