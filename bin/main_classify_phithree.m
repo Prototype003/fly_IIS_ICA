@@ -22,7 +22,7 @@ data_detrended = 0;
 data_zscored = 0;
 
 across_flies = 1;
-global_tpm = 'global'; %  global/nonGlobal
+global_tpm = 'nonGlobal'; %  global/nonGlobal
 
 results_directory = 'workspace_results/';
 results_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_phithree_' global_tpm '_classification_across' num2str(across_flies) '.mat'];

@@ -21,7 +21,8 @@ data_nChannels = '2t4';
 data_detrended = 0;
 data_zscored = 0;
 
-global_covariance = 'global'; % 'nonGlobal' Eight trials, each with own covariance matrices, or 'global' 1 covariance matrix built across all 8 trials
+across_flies = 1;
+global_covariance = 'nonGlobal'; % 'nonGlobal' Eight trials, each with own covariance matrices, or 'global' 1 covariance matrix built across all 8 trials
 
 if strcmp(global_covariance, 'nonGlobal')
     data_directory = 'results/';
@@ -33,7 +34,6 @@ if strcmp(global_covariance, 'nonGlobal')
         ];
     data_filename = [data_filename '_phistar.mat'];
     trials = (1:8); % 8 trials
-    across_flies = 0;
 else % strcmp(global_covariance, 'global')
     data_directory = 'results/';
     data_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_detrend0_zscore0_nChannels2t4_medianSplit0_phistar_global';
@@ -69,8 +69,8 @@ for nChannels_counter = 1 : length(nChannels)
             
             % Classes are awake and anest, each column is a class
             class_data = [...
-                permute(phis{nChannels_counter}.phi_stars(set, trials, :, 1, tau), [3 1 2 4 5])...
-                permute(phis{nChannels_counter}.phi_stars(set, trials, :, 2, tau), [3 1 2 4 5])...
+                permute(mean(phis{nChannels_counter}.phi_stars(set, trials, :, 1, tau), 2), [3 1 2 4 5])...
+                permute(mean(phis{nChannels_counter}.phi_stars(set, trials, :, 2, tau), 2), [3 1 2 4 5])...
                 ];
             
             % Classify

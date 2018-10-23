@@ -43,7 +43,7 @@ disp('Computing coherencies');
 networks = nchoosek((1:nChannels), network_size);
 nNetworks = size(networks, 1);
 
-if across_flies == 0
+if across_flies >= 0
     
     % Results matrix: frequencies x trials x channel sets x condition x fly
     coherencies = zeros(410, size(fly_data, 3), nNetworks, nConditions, nFlies);
@@ -123,8 +123,8 @@ if across_flies == 1
             
             % Classes are awake and anest, each column is a class
             class_data = [...
-                permute(coherencies(frequency, 1, network, 1, :), [5 1 2 3 4])...
-                permute(coherencies(frequency, 1, network, 2, :), [5 1 2 3 4])...
+                permute(mean(coherencies(frequency, 2, network, 1, :), 2), [5 1 2 3 4])...
+                permute(mean(coherencies(frequency, 1, network, 2, :), 2), [5 1 2 3 4])...
                 ];
             
             [accuracies(frequency, network), classifications{network}.leave_out, classifications{network}.classifications, classifications{network}.correctness] = classify_lol(class_data);

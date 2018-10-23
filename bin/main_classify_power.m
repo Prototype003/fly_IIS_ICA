@@ -43,7 +43,7 @@ disp('loaded');
 
 disp('Calculating power');
 
-if across_flies == 0
+if across_flies >= 0
     
     % Results matrix: frequencies x trials x channels x condition x fly
     powers = zeros(410, size(fly_data, 3), nChannels, nConditions, nFlies);
@@ -124,8 +124,8 @@ if across_flies == 1 % across flies
             
             % Classes are awake and anest, each column is a class
             class_data = [...
-                permute(powers(frequency, 1, channel, 1, :), [5 1 2 3 4])...
-                permute(powers(frequency, 1, channel, 2, :), [5 1 2 3 4])...
+                permute(mean(powers(frequency, :, channel, 1, :), 2), [5 1 2 3 4])...
+                permute(mean(powers(frequency, :, channel, 2, :), 2), [5 1 2 3 4])...
                 ];
             [accuracies(frequency, channel), classifications{channel}.leave_out, classifications{channel}.classifications, classifications{channel}.correctness] = classify_lol(class_data);
         end
