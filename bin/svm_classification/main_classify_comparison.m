@@ -22,9 +22,11 @@ nChannels = (2:4);
 class_type = 'across'; % 'across' or 'within'
 
 freq_range = (1:42); % (1:42) = 0-5Hz; Vector of which frequency bins to use, we want to use the lowest frequency bin
-freq_range = (2:42); % (2:42) = 0.1-5Hz;
-freq_range = (1:83); % (1:83) = 0-10Hz;
-freq_range = (1:410); % Everything
+%freq_range = (2:42); % (2:42) = 0.1-5Hz;
+%freq_range = (1:83); % (1:83) = 0-10Hz;
+%freq_range = (1:410); % Everything
+
+freq_range = (83:165);
 
 % bin directory location
 bin_dir = '../';
@@ -40,6 +42,9 @@ powers = load_power(bin_dir);
 powers = mean(powers(freq_range, :, :, :, :), 1);
 powers = permute(powers, [2 3 4 5 1]); % trials x channels x conditions x flies
 
+%% Load without average across frequency range
+powers = load_power(bin_dir);
+
 %% Setup features + results storage structure
 
 power_accuracies = cell(length(nChannels), 1);
@@ -51,28 +56,36 @@ end
 
 %% Classify (within flies)
 
+% Uses SVM
+
 cost = 1;
 
 for nChannels_counter = 1 : length(nChannels)
     
     % Results storage
     accuracies = zeros(...
+        length(freq_range),...
         size(powers, 4),...
         size(power_accuracies{nChannels_counter}.channel_sets, 1)...
         );
     
-    for fly = 1 : size(powers, 4)
-        disp([num2str(nChannels_counter) ' ' num2str(fly)]); tic;
-        for network = 1 : size(power_accuracies{nChannels_counter}.channel_sets,1)
+    for freq = 1 : length(freq_range)
+        disp([num2str(nChannels_counter) ' ' num2str(freq)]); tic;
+        for fly = 1 : size(powers, 5)
             
-            channel_set = power_accuracies{nChannels_counter}.channel_sets(network, :);
-            
-            % Get features
-            features = powers(:, channel_set, :, fly);
-            
-            % Classify
-            results = svm_lol_liblinear_manual(features, cost);
-            accuracies(fly, network) = results.accuracy;
+            for network = 1 : size(power_accuracies{nChannels_counter}.channel_sets,1)
+                
+                channel_set = power_accuracies{nChannels_counter}.channel_sets(network, :);
+                
+                % Get features
+                features = permute(powers(freq, :, channel_set, :, fly), [2 3 4 1 5]); % All features
+                %features = permute(mean(powers(freq, :, channel_set, :, fly), 3), [2 4 3 1]); % Mean across channels
+                
+                % Classify
+                results = svm_lol_liblinear_manual(features, cost);
+                accuracies(freq, fly, network) = results.accuracy;
+                
+            end
             
         end
         toc
@@ -81,6 +94,54 @@ for nChannels_counter = 1 : length(nChannels)
     power_accuracies{nChannels_counter}.accuracies = accuracies;
     
 end
+
+%% Plot;
+
+
+figure;
+
+%% Classify (within flies)
+
+% Uses nearest-mean classification, on averaged power across channels
+
+addpath(bin_dir);
+
+for nChannels_counter = 1 : length(nChannels)
+    
+    % Results storage
+    accuracies = zeros(...
+        length(freq_range),...
+        size(powers, 4),...
+        size(power_accuracies{nChannels_counter}.channel_sets, 1)...
+        );
+    
+    for freq_counter = 1 : length(freq_range)
+        freq = freq_range(freq_counter);
+        disp([num2str(nChannels_counter) ' ' num2str(freq)]); tic;
+        for fly = 1 : size(powers, 5)
+            
+            for network = 1 : size(power_accuracies{nChannels_counter}.channel_sets,1)
+                
+                channel_set = power_accuracies{nChannels_counter}.channel_sets(network, :);
+                
+                % Get features
+                features = permute(mean(powers(freq, :, channel_set, :, fly), 3), [2 4 3 1]);
+                
+                % Classify
+                results = classify_lol(features);
+                accuracies(freq_counter, fly, network) = results;
+                
+            end
+            
+        end
+        toc
+    end
+    
+    power_accuracies{nChannels_counter}.accuracies = accuracies;
+    
+end
+
+%save('power_nChannelsMeaned_classify_across0.mat', 'power_accuracies', 'nChannels');
 
 %% Classify (across flies)
 
@@ -99,6 +160,7 @@ for nChannels_counter = 1 : length(nChannels)
         
         % Get features
         features = permute(mean(powers(:, channel_set, :, :), 1), [4 2 3 1]);
+        features = permute(mean(mean(powers(:, channel_set, :, :), 1), 2), [4 2 3 1]);
         
         % Classify
         results = svm_lol_liblinear_manual(features, cost);
@@ -110,8 +172,45 @@ for nChannels_counter = 1 : length(nChannels)
     
 end
 
+%% Classify (across flies)
+
+% Uses nearest-mean classification, on averaged power across channels
+
+for nChannels_counter = 1 : length(nChannels)
+    
+    % Results storage
+    accuracies = zeros(length(freq_range), size(power_accuracies{nChannels_counter}.channel_sets, 1));
+    
+    for freq_counter = 1 : length(freq_range)
+        freq = freq_range(freq_counter);
+        disp([num2str(nChannels_counter) ' ' num2str(freq)]); tic;
+        
+        for network = 1 : size(power_accuracies{nChannels_counter}.channel_sets,1)
+            
+            channel_set = power_accuracies{nChannels_counter}.channel_sets(network, :);
+            
+            % Get features
+            features = permute(mean(mean(powers(freq, :, channel_set, :, :), 3), 2), [5 4 3 2 1]);
+            
+            % Classify using nearest-mean
+            %results = classify_lol(features);
+            %accuracies(freq_counter, network) = results;
+            
+            % Classify using svm
+            results = svm_lol_liblinear_manual(permute(features, [1 3 2]), cost);
+            accuracies(freq_counter, network) = results.accuracy;
+            
+        end
+        toc
+    end
+    power_accuracies{nChannels_counter}.accuracies = accuracies;
+    
+end
+
+save('power_nChannelsMeaned_classify_across1.mat', 'power_accuracies', 'nChannels', 'freq_range');
+
 %% Save accuracies
 
 results_dir = 'results/';
-results_file = ['composition_' constellation_type '_classify.mat'];
-save([results_dir results_file], 'accuracies', 'tau', 'nChannels');
+results_file = ['power_classify_across' num2str(across) '.mat'];
+save([results_dir results_file], 'power_accuracies', 'nChannels');

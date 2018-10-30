@@ -28,7 +28,7 @@ source_dir = 'results_split/';
 
 %% Table for wake condition
 
-source_file = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM1_f01c1tauBin24s1036t1.mat';
+source_file = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM0_f01c2tau4tauOffset0s0002t1.mat';
 
 load([source_dir source_file]);
 

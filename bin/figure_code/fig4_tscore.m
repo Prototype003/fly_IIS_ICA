@@ -28,7 +28,7 @@ elseif tau == 3
     tau_string = '16';
 end
 
-freq_range_w = (1:42); %(1:83); % corresponding to ~5Hz and ~10Hz, check the 'frequencies' vector
+freq_range_w = (1:410); %(1:83); % corresponding to ~5Hz and ~10Hz, check the 'frequencies' vector
 freq_range_a = (1:329); %(1:329)=0-5Hz; There are more frequency bins for the single large trial
 freq_range_string = '0-5Hz'; %'0-10Hz';
 

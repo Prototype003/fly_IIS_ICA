@@ -4,6 +4,7 @@ function [classification] = svm_lol_liblinear_manual(values, cost, leave_out_cou
 %
 % Inputs:
 %   values: 3D matrix (observations x features x classes)
+%   cost: number: actual cost, e.g. 2^-10 (not a power to apply, in this case -10)
 %   leave_out_counter: optional int; counter for which data-combo to leave out
 % Outputs:
 %   classification: struct holding classification results
@@ -57,7 +58,7 @@ predictions = zeros(size(leave_outs));
 confidences = zeros([size(leave_outs) nClasses]);
 correctness = zeros(size(leave_outs));
 
-% Default cost
+% Default cost = 2^0
 if nargin == 1
     cost = 1;
 end

@@ -13,7 +13,7 @@ across fly analyses (for trying to extend within fly findings across flies)
 
 %% Setup
 
-measure = 'phi_three'; % 'phi_three' or 'phi_star' or 'phi_star_gaussian' or 'phi_SI'
+measure = 'phi_star_gaussian'; % 'phi_three' or 'phi_star' or 'phi_star_gaussian' or 'phi_SI'
 tau = 1; % 1 = 4ms; 2 = 8ms; 3 = 16ms
 if tau == 1
     tau_string = '4';
@@ -22,6 +22,8 @@ elseif tau == 2
 elseif tau == 3
     tau_string = '16';
 end
+
+flies = (1:13);
 
 % 0 for tpms/covariances constructed per trial, and for within fly analyses
 % 1 for tpms/covariances constructed across trials, and for across fly analyses
@@ -84,7 +86,7 @@ for nChannels_counter = 1 : length(phis)
     
     % Get values to plot
     % Mean across trials and flies
-    values = permute(mean(mean(phis{nChannels_counter}.phis(:, :, :, :, tau), 2), 3), [1 4 2 3]);
+    values = permute(mean(mean(phis{nChannels_counter}.phis(:, :, flies, :, tau), 2), 3), [1 4 2 3]);
     plot_values = zeros(size(values, 1), 3);
     plot_values(:, 1) = values(:, 1);
     plot_values(:, 2) = values(:, 2);
@@ -258,6 +260,7 @@ end
 % print(figure_name, '-dpng'); % PNG
 
 %% Stats
+% Correlations with set center / set distance (no splitting)
 
 sigs = zeros(3, 3, 2); % 2,3,4 channels x w,a,w/a x parameter
 rs = zeros(3, 3, 2);
@@ -274,9 +277,10 @@ for nChannels = 1 : length(values_mapped)
 end
 
 %%
-value_type = 1;
 
-% Correlations (with set center axis) after splitting based on center value
+% Correlation with set center after splitting based on center value
+value_type = 1; % 1 = wake; 2 = anest; 3 = wake/anest (or wake-anest, depending on what the figure is plotting)
+
 sigs = [];
 counter = 1;
 for nChannels = 1 : length(values_mapped)
@@ -296,3 +300,25 @@ for nChannels = 1 : length(values_mapped)
     
     counter = counter + 2;
 end
+
+%%
+
+% Correlation(distance from middle set center, phi values)
+value_type = 2; % 1 = wake; 2 = anest; 3 = wake/anest (or wake-anest, depending on what the figure is plotting)
+
+sigs = [];
+counter = 1;
+for nChannels = 1 : length(values_mapped)
+    subplot(1, 3, nChannels);
+    
+    middle = median(values_mapped{nChannels}.centers);
+    
+    dist_from_mid = abs(middle - values_mapped{nChannels}.centers);
+    
+    [r, p] = corr([values_mapped{nChannels}.values(:, value_type) dist_from_mid]);
+    sigs(counter) = p(1, 2);
+    disp(['nChannels' num2str(nChannels) ': r=' num2str(r(1, 2)) ' p=' num2str(p(1, 2))]);
+    
+    counter = counter + 1;
+end
+

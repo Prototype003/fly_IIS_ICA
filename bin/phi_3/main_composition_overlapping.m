@@ -24,8 +24,10 @@ addpath('../');
 
 %% Load
 
+tic;
 load('results/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_phithree_nChannels4_globalTPM0.mat');
 channel_sets = double(phis{1}.channel_sets);
+toc
 
 %% Get state-weighted compositions for all parameters
 
@@ -48,9 +50,9 @@ composition_phis = permute(sum(composition_phis, 1), [2 3 4 5 6 7 1]);
 composition_phis = composition_phis ./ sum(phis{1}.state_counters(:, 1, 1, 1, 1));
 
 % Unpartitioned - partitioned
-composition_phis = permute(composition_phis(1, :, :, :, :, :) - composition_phis(2, :, :, :, :, :), [2 3 4 5 6 7 1]);
+%composition_phis = permute(composition_phis(1, :, :, :, :, :) - composition_phis(2, :, :, :, :, :), [2 3 4 5 6 7 1]);
 % Unpartitioned
-%composition_phis = permute(composition_phis(1, :, :, :, :, :), [2 3 4 5 6 7 1]);
+composition_phis = permute(composition_phis(1, :, :, :, :, :), [2 3 4 5 6 7 1]);
 % Partitioned
 %composition_phis = permute(composition_phis(2, :, :, :, :, :), [2 3 4 5 6 7 1]);
 %% Setup Hasse graph
@@ -132,7 +134,7 @@ concept_displacement = 0; % For skipping lower order concepts
 for concept_order = 1 : size(channel_sets, 2) % 4th-order concepts aren't shared
     concepts = nchoosek((min(channel_sets(:)):max(channel_sets(:))), concept_order);
     for concept = 1 : size(concepts, 1)
-        value_sum = zeros(size(compositions, 1), 1)+1; % values for each condition
+        value_sum = zeros(size(compositions, 1), 1); % values for each condition
         share_counter = 0;
         for network = 1 : size(channel_sets, 1)
             if all(ismember(concepts(concept, :), channel_sets(network, :))) % If concept is a subset of the channel set

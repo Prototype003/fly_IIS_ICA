@@ -76,7 +76,7 @@ for condition = conditions
         
         [phi, diff_table, unparted, parted] = composition_table(nChannels, [file_prefix file_infix]);
         
-        tables(:, :, condition, trial) = diff_table; % Small phi values
+        tables(:, :, condition, trial) = unparted; % Small phi values
         
         phi_weighted(condition, trial) = phi.phi; % Big phi values
         phi_unweighted(condition, trial) = mean(phi.state_phis);

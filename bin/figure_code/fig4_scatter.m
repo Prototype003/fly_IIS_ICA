@@ -21,9 +21,12 @@ elseif tau == 3
     tau_string = '16';
 end
 
-freq_range_w = (1:42); %(1:83); % corresponding to ~5Hz and ~10Hz, check the 'frequencies' vector
-freq_range_a = (1:329); %(1:329)=0-5Hz; There are more frequency bins for the single large trial
-freq_range_string = '0-5Hz'; %'0-10Hz';
+freq_range_w = (1:410); %(1:42); %(1:83); % corresponding to ~5Hz and ~10Hz, check the 'frequencies' vector
+freq_range_a = (1:410); %(1:329); %(1:329)=0-5Hz; There are more frequency bins for the single large trial
+freq_range_string = '10-20Hz'; %'0-10Hz';
+
+freq_range_w = (83:165); % 10-20 Hz range
+freq_range_a = (83:165);
 
 fontsize = 11; % Used for drawing label letters
 
@@ -49,7 +52,7 @@ values = permute(mean(mean(accuracies(freq_range_w, :, :), 1), 3), [2 1 3]); % a
 % grand_mean = repmat(mean(fly_mean, 1), [size(values, 1) 1]);
 % values = values - grand_mean + fly_mean;
 measure_accuracies_w = mean(values);
-measure_accuracies_w_std = std(values) / sqrt(length(values));
+measure_accuracies_w_std = std(values);% / sqrt(length(values));
 measure_groups_w = zeros(size(measure_accuracies_w)) + 1;
 
 % Coherence
@@ -59,7 +62,7 @@ load([results_directory results_filename]);
 %fly_means(:, 2) = values;
 values = permute(mean(mean(accuracies(freq_range_w, :, :), 1), 3), [2 1 3]); % average across frequency range and flies
 measure_accuracies_w = [measure_accuracies_w; mean(values)];
-measure_accuracies_w_std = [measure_accuracies_w_std; std(values) / sqrt(length(values))];
+measure_accuracies_w_std = [measure_accuracies_w_std; std(values)];% / sqrt(length(values))];
 measure_groups_w = [measure_groups_w; 2];
 
 % Phi-three
@@ -72,7 +75,7 @@ for nChannels = 1 : length(accuracies)
     %fly_means(:, group_counter) = values;
     values = mean(values, 2); % Average across flies
     measure_accuracies_w = [measure_accuracies_w; mean(values)];
-    measure_accuracies_w_std = [measure_accuracies_w_std; std(values) / sqrt(length(values))];
+    measure_accuracies_w_std = [measure_accuracies_w_std; std(values)];% / sqrt(length(values))];
     measure_groups_w = [measure_groups_w; group_counter];
     group_counter = group_counter + 1;
 end
@@ -88,7 +91,7 @@ for nChannels = 1 : length(accuracies)
     %fly_means(:, group_counter) = values;
     values = mean(values, 2); % Average across flies
     measure_accuracies_w = [measure_accuracies_w; mean(values)];
-    measure_accuracies_w_std = [measure_accuracies_w_std; std(values) / sqrt(length(values))];
+    measure_accuracies_w_std = [measure_accuracies_w_std; std(values)];% / sqrt(length(values))];
     measure_groups_w = [measure_groups_w; group_counter];
     group_counter = group_counter + 1;
 end
@@ -100,7 +103,7 @@ results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_power_classific
 load([results_directory results_filename]);
 values = permute(mean(accuracies(freq_range_a, :), 1), [2 1]); % average across frequency range
 measure_accuracies_a = mean(values);
-measure_accuracies_a_std = std(values) / sqrt(length(values));
+measure_accuracies_a_std = std(values);% / sqrt(length(values));
 measure_groups_a = zeros(size(measure_accuracies_a)) + 1;
 
 % Coherence
@@ -108,30 +111,30 @@ results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_coherence_class
 load([results_directory results_filename]);
 values = permute(mean(accuracies(freq_range_a, :, :), 1), [2 1]); % average across frequency range and sets
 measure_accuracies_a = [measure_accuracies_a; mean(values)];
-measure_accuracies_a_std = [measure_accuracies_a_std; std(values) / sqrt(length(values))];
+measure_accuracies_a_std = [measure_accuracies_a_std; std(values)];% / sqrt(length(values))];
 measure_groups_a = [measure_groups_a; 2];
 
 % Phi-three
-results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phithree_global_classification_across1.mat';
+results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phithree_nonGlobal_classification_across1.mat';
 load([results_directory results_filename]);
 group_counter = 3;
 for nChannels = 1 : length(accuracies)
     values = accuracies{nChannels}.accuracies;
     measure_accuracies_a = [measure_accuracies_a; mean(values)];
-    measure_accuracies_a_std = [measure_accuracies_a_std; std(values) / sqrt(length(values))];
+    measure_accuracies_a_std = [measure_accuracies_a_std; std(values)];% / sqrt(length(values))];
     measure_groups_a = [measure_groups_a; group_counter];
     group_counter = group_counter + 1;
 end
 
 % Phi-star
-%results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_global_classification_across1.mat';
-results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_discrete_global_classification_across1.mat';
+results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_nonGlobal_classification_across1.mat';
+%results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_discrete_global_classification_across1.mat';
 %results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phiSI_discrete_global_classification_across1.mat';
 load([results_directory results_filename]);
 for nChannels = 1 : length(accuracies)
     values = accuracies{nChannels}.accuracies;
     measure_accuracies_a = [measure_accuracies_a; mean(values)];
-    measure_accuracies_a_std = [measure_accuracies_a_std; std(values) / sqrt(length(values))];
+    measure_accuracies_a_std = [measure_accuracies_a_std; std(values)];% / sqrt(length(values))];
     measure_groups_a = [measure_groups_a; group_counter];
     group_counter = group_counter + 1;
 end
@@ -142,7 +145,7 @@ results_directory = '../workspace_results/';
 
 if strcmp(measure, 'phi_three')
     % Load ACROSS
-    results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phithree_global_classification_across1.mat';
+    results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phithree_nonGlobal_classification_across1.mat';
     load([results_directory results_filename]);
     % Fix python indexing
     for nChannels_counter = 1 : length(accuracies)
@@ -160,14 +163,14 @@ if strcmp(measure, 'phi_three')
     accuracies_w = accuracies;
 else % strcmp(measure, 'phi_star')
     % Load ACROSS
-    %results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_global_classification_across1.mat';
-    results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_discrete_global_classification_across1.mat';
+    results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_nonGlobal_classification_across1.mat';
+    %results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_discrete_global_classification_across1.mat';
     %results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phiSI_discrete_global_classification_across1.mat';
     load([results_directory results_filename]);
     accuracies_a = accuracies;
     % Load WITHIN
-    %results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_nonGlobal_classification.mat';
-    results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_discrete_nonGlobal_classification_across0.mat';
+    results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_nonGlobal_classification.mat';
+    %results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_discrete_nonGlobal_classification_across0.mat';
     %results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phiSI_discrete_nonGlobal_classification_across0.mat';
     load([results_directory results_filename]);
     accuracies_w = accuracies;
@@ -182,7 +185,7 @@ set(gcf, 'InvertHardCopy', 'off'); % For keeping the black background when print
 % set(gcf, 'RendererMode', 'manual');
 % set(gcf, 'Renderer', 'painters');
 
-colormap('jet');
+colormap(inferno());
 subplot_counter = 1;
 titles = {'within', 'across'};
 
@@ -196,6 +199,7 @@ xPortion = 0.7;
 
 textbox_width = 0.03;
 text_labels = 'aabcdefg';
+%text_labels = 'aaabcdefg'; % add extra 'a' to beginning for supplementary figure
 
 cbar_width = 0.01;
 cbar_spacing = 0.08;
@@ -224,6 +228,7 @@ measures = [3 4 5]; % phithree
 errorbar(measure_groups_w(measures) + condition_offsets(1), measure_accuracies_w(measures), measure_accuracies_w_std(measures), 'b.', 'Capsize', 0);
 errorbar(measure_groups_a(measures) + condition_offsets(2), measure_accuracies_a(measures), measure_accuracies_a_std(measures), 'bx', 'Capsize', 0, 'LineStyle', 'None');
 xlim([0 9]); ylim([45 70]);
+ylim([45 75]);
 
 % Chance
 line([0 9], [50 50], 'Color', 'k', 'LineStyle', ':');
@@ -339,7 +344,7 @@ for nChannels_counter = 1 : length(accuracies)
         subplot(length(accuracies)+1, size(plot_values, 2), subplot_counter);
         set(gca, 'Position', [xStarts(xCounter) yStarts(nChannels_counter+1)+ySpacing  - (1-yPortion)/3, widths(xCounter), heights(nChannels_counter+1)-ySpacing]);
         
-        plot = pcolor(values_map_plots(:, :, value_type));
+        plot_handle = pcolor(values_map_plots(:, :, value_type));
         
         axis_defaults(gca);
         
@@ -407,7 +412,7 @@ for nChannels_counter = 1 : length(accuracies)
         end
         
         set(gca, 'color', [0 0 0]); % black background
-        set(plot, 'EdgeColor', 'none'); % remove grid outline
+        set(plot_handle, 'EdgeColor', 'none'); % remove grid outline
         
         % Add letter label to plot
         ax_pos = get(gca, 'Position');

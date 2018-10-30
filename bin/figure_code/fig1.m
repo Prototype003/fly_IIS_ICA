@@ -55,6 +55,8 @@ xlabel(cbar, '\muV');
 ylabel('channel');
 colormap(data_plot, 'jet');
 
+fontsize = 11;
+textbox_width = 0.03;
 ax_pos = get(gca, 'Position');
 axes('Visible', 'off', 'Position', [ax_pos(1) ax_pos(2)+ax_pos(4) textbox_width textbox_width]); axis_defaults(gca);
 text(0, 0.2, text_labels(1), 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom', 'FontSize', fontsize, 'FontWeight', 'bold');
@@ -117,11 +119,40 @@ text(0, 0.2, text_labels(4), 'HorizontalAlignment', 'center', 'VerticalAlignment
 
 %% Print figure
 
-figure_name = 'fig1a';
+% figure_name = 'fig1a';
+% 
+% print(figure_name, '-dsvg'); % SVG
+% print(figure_name, '-dpdf', '-bestfit'); % PDF
+% print(figure_name, '-dpng'); % PNG
 
-print(figure_name, '-dsvg'); % SVG
-print(figure_name, '-dpdf', '-bestfit'); % PDF
-print(figure_name, '-dpng'); % PNG
+%% Show probability distributions for a given state
+
+state = 4;
+
+figure;
+set(gcf, 'color', 'w');
+
+subplot(1, 2, 1);
+bar(tpm(state, :), 'k');
+bar([1/4 1/4 1/4 1/4], 'k');
+bar([0 1 0 0], 'k');
+ylim([0 1]);
+xlim([0.5 4.5]);
+set(gca, 'XTick', (1:4), 'XTickLabel', {'00','01','10','11'});
+set(gca, 'YTick', [0 0.5 1]);
+xlabel('state_{t+1}');
+ylabel('P(state)', 'Rotation', 90);
+box off;
+
+subplot(1, 2, 2);
+bar(tpm_ind(state, :), 'k');
+ylim([0 1]);
+xlim([0.5 4.5]);
+set(gca, 'XTick', (1:4), 'XTickLabel', {'00','01','10','11'});
+set(gca, 'YTick', [0 0.5 1]);
+xlabel('state_{t+1}');
+ylabel('P(state)', 'Rotation', 90);
+box off;
 
 %% Function: build independent TPM from 2 channel data
 function [tpm, a, b] = build_tpm_independent(channel_data, tau, n_values)

@@ -59,12 +59,18 @@ storage_size = [matches tmp([5 6 7 8 2])];
 concept_phi = struct();
 concept_phi.twoCh = zeros(storage_size);
 concept_phi.fourCh = zeros(storage_size);
+concept_phi.concept_labels = zeros(8190, 1);
 
-match_counter = 1; 
+match_counter = 1;
+label_counter = 1;
 for channel_pair_counter = 1 : size(phis{2}.channel_sets, 1)
     channel_pair = phis{2}.channel_sets(channel_pair_counter, :);
     
     supersets = find_supersets(channel_pair, phis{4}.channel_sets);
+    
+    % Label sets
+    concept_phi.concept_labels(label_counter:label_counter+length(supersets)-1) = channel_pair_counter;
+    label_counter = label_counter + length(supersets);
     
     for superset_counter = 1 : length(supersets)
         superset = supersets(superset_counter);
@@ -305,3 +311,39 @@ for partitioned = 1 : 2
 end
 
 legend('wake-anest', 'x=y', 'Location', 'southeast');
+
+%% Regress 4ch concept phi onto 2ch concept phi
+
+phis_little = mean(concept_phi.twoCh, 2);
+phis_big = mean(concept_phi.fourCh, 2);
+fly_ids = zeros(size(phis_big));
+conditions = zeros(size(phis_big));
+set_ids = repmat(concept_phi.concept_labels, [1 1 13 2 1 2]);
+partition_status = cell(size(phis_big));
+partition_status = zeros(size(phis_big));
+partition_titles = {'unpartitioned', 'partitioned'};
+
+for fly = flies
+    fly_ids(:, :, fly, :, :, :) = fly;
+end
+for condition = 1 : 2
+    conditions(:, :, condition, :, :) = condition;
+end
+for partitioned = 1 : 2
+    %partition_status(:, :, :, :, :, partitioned) = {partition_titles{partitioned}};
+    partition_status(:, :, :, :, :, partitioned) = partitioned;
+end
+
+concept_table = table(phis_little(:), phis_big(:), fly_ids(:), conditions(:), set_ids(:), partition_status(:),...
+    'VariableNames', {'phi_c', 'phi_b', 'fly_id', 'condition', 'set_id', 'partitioned'});
+
+concept_table.fly_id = nominal(concept_table.fly_id);
+concept_table.set_id = nominal(concept_table.set_id);
+concept_table.partitioned = nominal(concept_table.partitioned);
+concept_table = concept_table(concept_table.partitioned == nominal(1), :);
+
+model_spec = 'phi_b ~ phi_c + (1|fly_id) + (1|fly_id:set_id)';
+model_full = fitlme(concept_table, model_spec);
+
+model_null = fitlme(concept_table, 'phi_b ~ 1 + (1|fly_id) + (1|fly_id:set_id)');
+compare(model_null, model_full)

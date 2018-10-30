@@ -19,7 +19,7 @@ nChannels = 4;
 
 %% Load
 
-load('results_split/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_phithree_nChannels4_globalTPM0.mat');
+load('results/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_phithree_nChannels4_globalTPM0.mat');
 
 %% Get state-weighted compositions for all parameters
 
@@ -41,9 +41,14 @@ composition_phis = permute(sum(composition_phis, 1), [2 3 4 5 6 7 1]);
 % Assumes equal number of samples for all parameters
 composition_phis = composition_phis ./ sum(phis{1}.state_counters(:, 1, 1, 1, 1));
 
+
+
 % Unpartitioned - partitioned
 composition_phis = permute(composition_phis(1, :, :, :, :, :) - composition_phis(2, :, :, :, :, :), [2 3 4 5 6 7 1]);
-
+% Unpartitioned
+%composition_phis = permute(composition_phis(1, :, :, :, :, :), [2 3 4 5 6 7 1]);
+% Partitioned
+%composition_phis = permute(composition_phis(2, :, :, :, :, :), [2 3 4 5 6 7 1]);
 %% Setup Hasse graph
 
 % Hard coded coordinates assumes order:
@@ -145,7 +150,8 @@ for condition = 1 : 2
     ylabel('y');
     axis([min(x)-1 max(x)+1 min(y)-1 max(y)+1 0 max(compositions(:))]);
     
-%     title([condition_titles{condition} ': \Phi=' num2str(phis{condition}.phi)]);
+    %title([condition_titles{condition} ': \Phi=' num2str(phis{condition}.phi)]);
+    title([condition_titles{condition}]);
     
     set(gca, 'YTick', [min(y) max(y)], 'XTick', [min(x) max(x)], 'ZTick', linspace(0, max(compositions(:)), 3));
     set(gca, 'YTickLabel', [], 'XTickLabel', []);

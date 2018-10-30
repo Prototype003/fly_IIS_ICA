@@ -10,11 +10,11 @@ Original script: main_phiplots.m
 
 %% SETUP
 
-global_tpm = 1;
+global_tpm = 0;
 
 %% SETUP
 
-flies = (1:13); %[1 2 3 4 5 6 7 9 10 11 12 13];
+flies = [1 2 3 4 5 6 7 8 9 10 12 13];%(1:13); %[1 2 3 4 5 6 7 9 10 11 12 13];
 
 fontsize = 11;
 
@@ -54,8 +54,8 @@ addpath(bin_location);
 % Stats
 for nChannels_counter = 1 : numel(phi_threes)
     % Raw
-    phi_threes{nChannels_counter}.phis_raw = phi_threes{nChannels_counter}.phis(:, :, flies, :, :);
-    phi_stars{nChannels_counter}.phis_raw = phi_stars{nChannels_counter}.phis(:, :, flies, :, :);
+    phi_threes{nChannels_counter}.phis_raw = phi_threes{nChannels_counter}.phis(:, :, :, :, :);
+    phi_stars{nChannels_counter}.phis_raw = phi_stars{nChannels_counter}.phis(:, :, :, :, :);
     
     % Average 
     phi_threes{nChannels_counter}.phis = squeeze(mean(mean(phi_threes{nChannels_counter}.phis(:, :, flies, :, :), 2), 3));
@@ -142,7 +142,7 @@ taus = [4 8 16];
 plot_metrics = {'threes', 'stars'};
 metric_labels = {'^{3.0}', '*'};
 metric_lims = struct();
-metric_limits.threes = [0.03 0.03 0.015];
+metric_limits.threes = [0.05 0.05 0.02];
 metric_limits.stars = [0.005 0.005 0.002]; % 0.005 0.005 0.002 % For Gaussian assumption values
 %metric_limits.stars = [0.05 0.05 0.002];
 metric_exponents.threes = -2;

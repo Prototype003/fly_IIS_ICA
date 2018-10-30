@@ -54,7 +54,7 @@ table_raw.center = zeros(table_length, 1);
 table_raw.distance = zeros(table_length, 1);
 table_raw.phi = zeros(table_length, 1);
 row_counter = 1;
-set_label_starts = [1 106 456];
+set_label_starts = [1 106 456]; % E.g. set 1 of 2 channels is given a different label to set 1 of 4 channels
 tau_labels = [4 8 16];
 % Loop is based on natural ordering: fly, condition, tau, nChannels, set, trial
 % Assumes same number of flies, conditions and taus for all nChannels
@@ -96,7 +96,10 @@ end
 % Natural ordering: fly, condition, tau, nChannels, set, trial
 table_headings = {'fly', 'condition', 'tau', 'nChannels', 'set', 'center', 'distance', 'trial', 'phi'};
 phi_table = table(table_raw.fly, table_raw.condition, table_raw.tau, (table_raw.nChannels), table_raw.set, table_raw.center, table_raw.distance, table_raw.trial, log(table_raw.phi), 'VariableNames', table_headings);
-
+%phi_table.fly = nominal(phi_table.fly);
+%phi_table.condition = nominal(phi_table.condition);
+%phi_table.set = nominal(phi_table.set);
+phi_dataset = table2dataset(phi_table);
 disp('table built');
 
 %% LME model
@@ -114,10 +117,17 @@ model_spec = 'phi ~ nChannels + condition + tau + (1|fly) + (1|fly:set)';
 
 disp(['fitting model: ' model_spec]);
 
+% Warning - GLME using Laplace method (needed for likelihood ratio test) takes a long time
+% Also, GLME using lognormal function still has heteroscedasticity
+
 model_full = fitlme(phi_table, model_spec);
 %model_full = fitlme(phi_table(phi_table.condition==1, :), model_spec);
+%model_full = fitglme(phi_table(phi_table.fly==1, :), model_spec, 'Distribution', 'Normal', 'Link', 'log', 'FitMethod', 'Laplace'); % Log-normal distribution has normal distribution and log link function
 
 disp('full model built');
+
+figure; scatter(phi_table.phi, fitted(model_full));
+%figure; scatter(phi_table.phi(phi_table.fly==1, :), fitted(model_full)); line([0 0.35], [0 0.35]);
 
 %% Build null models for comparison
 

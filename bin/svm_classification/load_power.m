@@ -1,4 +1,4 @@
-function [powers] = load_power(bin_location)
+function [powers, frequencies, chronux_params] = load_power(bin_location)
 % Loads power values
 % Note power values are averaged across trials if across flies is specified
 %

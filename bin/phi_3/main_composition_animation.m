@@ -12,7 +12,7 @@ See figures/videos from http://www.eneuro.org/content/4/5/ENEURO.0085-17.2017
 
 output_file = 'animations/composition';
 
-marker_size = 500;
+%marker_size = 500;
 
 %% Load
 
@@ -104,7 +104,166 @@ lines{9} = [12 15];
 lines{10} = [13 15];
 lines{11} = [14 15];
 
-conditions = 2;
+%% Plot for static
+
+concept_order = [4 3 3 3 3 2 2 2 2 2 2 1 1 1 1];
+
+% Concept order - 4,3,2,1
+marker_size = 60;
+colours = [...
+    0.3 0.3 0.3;
+    0 0 1;
+    0 0 1;
+    0 0 1;
+    0 0 1;
+    0 0.8 0;
+    0 0.8 0;
+    0 0.8 0;
+    0 0.8 0;
+    0 0.8 0;
+    0 0.8 0;
+    1 0 0;
+    1 0 0;
+    1 0 0;
+    1 0 0
+    ];
+concept_shapes = fliplr('s^oo');
+concept_lineWidths = [0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 2 2 2 2];
+concept_fill = flipud([...
+    0.3 0.3 0.3;
+    0 0 1;
+    0 0.8 0;
+    1 1 1
+    ]);
+
+label_displacements = [...
+    -0.5 0.5 0;
+    -0.5 0 0.002;
+    0 -0.5 0.002
+    ];
+label_displacements = [0.1 0.1 0.001];
+
+concept_labels = {...
+    'ABCD',...
+    'BCD',...
+    'ACD',...
+    'ABD',...
+    ' ABC',...
+    'CD',...
+    'BD',...
+    'BC',...
+    'AD',...
+    'AC',...
+    '     AB',...
+    'D',...
+    'C',...
+    'B',...
+    '    A'...
+    };
+concept_labels = {...
+    'ABCD',...
+    'BCD',...
+    'ACD',...
+    'ABD',...
+    'ABC',...
+    'CD',...
+    'BD',...
+    'BC',...
+    'AD',...
+    'AC',...
+    'AB',...
+    'D',...
+    'C',...
+    'B',...
+    'A'...
+    };
+
+condition = 1;
+views = [5 85; 5 5; 85 5]; views = views((1), :);
+%figure('pos', [0 0 750 600]);
+figure('pos', [0 0 300*size(views, 1) 300]);
+set(gcf, 'color', 'w');
+subplots = zeros(1, size(views, 1));
+for view_angle = 1 : size(views, 1)
+    subplots(view_angle) = subplot(1, size(views, 1), view_angle);
+    
+    for concept = 1 : size(compositions, 2)
+        scatter3(x(concept), y(concept), compositions(condition, concept),...
+            marker_size,...
+            colours(concept, :),...
+            concept_shapes(concept_order(concept)),...
+            'MarkerFaceColor', concept_fill(concept_order(concept), :),...
+            'LineWidth', 2);
+        hold on;
+    end
+    
+    % Text labels
+    wanted_labels = [1 5 11 15];
+    text(x(wanted_labels) + label_displacements(view_angle, 1),...
+        y(wanted_labels) + label_displacements(view_angle, 2),...
+        compositions(condition, (wanted_labels)) + label_displacements(view_angle, 3),...
+        concept_labels(wanted_labels));
+    
+    % Draw lines
+    for source = 1:length(lines)
+        for dest = lines{source}
+            tmp = line([x(source) x(dest)],...
+                [y(source) y(dest)],...
+                [compositions(condition, source) compositions(condition, dest)],...
+                'Color', 'k',...
+                'LineWidth', 1.5);
+            tmp.Color(4) = 0.5;
+        end
+    end
+    
+    box on; box off; grid off;
+    
+    view(views(view_angle, :));
+    
+    zlabel('\phi');
+    set(gca, 'XTick', (min(x)+max(x))/2, 'XTickLabel', 'x');
+    set(gca, 'YTick', (min(y)+max(y))/2, 'YTickLabel', 'y');
+    set(gca, 'ZTick', linspace(0, max(compositions(:)), 3));
+    axis([min(x)-0.5 max(x)+0.5 min(y)-0.5 max(y)+0.5 0 max(compositions(:))]);
+    set(gca, 'FontSize', 12);
+    
+    axis square;
+    axis vis3d;
+    %axis manual;
+    set(gca, 'Units', 'pixels');
+    position = get(gca, 'Position');
+    set(gcf, 'pos', [0 0 500 500]);
+    set(gca, 'Position', [position(1)+100 position(2)+100 position(3) position(4)]);
+    %set(gca, 'Position', [0 0 300 300]);
+end
+
+%set(gcf, 'pos', [0 0 500 500]);
+linkprop(subplots, {'CameraPosition','CameraUpVector'});
+
+%% Plot for animation
+
+marker_size = 500;
+colours = [1 2 2 2 2 3 3 3 3 3 3 4 4 4 4];
+
+concept_labels = {...
+    'ABCD',...
+    'BCD',...
+    'ACD',...
+    'ABD',...
+    'ABC',...
+    'CD',...
+    'BD',...
+    'BC',...
+    'AD',...
+    'AC',...
+    'AB',...
+    'D',...
+    'C',...
+    'B',...
+    'A'...
+    };
+
+conditions = 1;
 
 figure('pos', [0 0 750*conditions 600]);
 set(gcf, 'color', 'w');
@@ -140,6 +299,8 @@ for condition = 1 : conditions
 end
 
 linkprop(subplots, {'CameraPosition','CameraUpVector'});
+
+
 
 %% Rotate and turn into video frames
 
@@ -183,21 +344,21 @@ end
 
 %% Write frames into video
 
- % create the video writer with 1 fps
- writerObj = VideoWriter([output_file '.avi']);
- writerObj.FrameRate = 1 / (video_duration / length(frames));
+% create the video writer with 1 fps
+writerObj = VideoWriter([output_file '.mp4'], 'MPEG-4');
+writerObj.FrameRate = 1 / (video_duration / length(frames));
 
- % open the video writer
- open(writerObj);
+% open the video writer
+open(writerObj);
 
- % write the frames to the video
- for u=1:length(frames)
-     % convert the image to a frame
-     frame = im2frame(frames{u});
-     
-     % write to video
-     writeVideo(writerObj, frame);
- end
+% write the frames to the video
+for u=1:length(frames)
+    % convert the image to a frame
+    frame = im2frame(frames{u});
+    
+    % write to video
+    writeVideo(writerObj, frame);
+end
 
- % close the writer object
- close(writerObj);
+% close the writer object
+close(writerObj);
