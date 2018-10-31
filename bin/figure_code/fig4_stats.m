@@ -362,12 +362,17 @@ gscatter(foo, roo, table_within.measure);
 
 % Planned comparisons:
 %   Power vs 2, 3, 4ch phi-3 (3 comparisons)
+%   Power vs 2, 3, 4ch phi-star (3 comparisons)
 %   Coherence vs 2, 3, 4ch phi-3 (3 comparisons)
+%   Coherence vs 2, 3, 4ch phi-star (3 comparisons)
 %   Phi-* (all ch) vs phi-3 (all ch) (1 comparison)
+%   Phi-3 2v3v4ch (3 comparisons)
+%   Phi-star 2v3v4ch (3 comparisons)
+% Total 19 comparisons
 
 format shortg
 
-ps = zeros(10, 1);
+ps = zeros(19, 1);
 test_counter = 1;
 
 % 2ch phi-3 vs 3ch phi-3
@@ -400,6 +405,40 @@ disp('3ch vs 4ch phi-3:');
 tmp.Coefficients
 ps(test_counter) = tmp.Coefficients(2, 6); test_counter = test_counter + 1;
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% 2ch phi-star vs 3ch phi-star
+table_tmp = table_within(table_within.measure == nominal(2) | table_within.measure == nominal(3), :);
+table_tmp.measure = double(table_tmp.measure);
+table_tmp.measure(table_tmp.measure == 6) = 0;
+table_tmp.measure(table_tmp.measure == 7) = 1;
+tmp = fitlme(table_tmp, 'value ~ measure + (1|fly_id) + (1|fly_id:set_label)');
+disp('2ch vs 3ch phi-star:');
+tmp.Coefficients
+ps(test_counter) = tmp.Coefficients(2, 6); test_counter = test_counter + 1;
+
+% 2ch phi-star vs 4ch phi-star
+table_tmp = table_within(table_within.measure == nominal(2) | table_within.measure == nominal(4), :);
+table_tmp.measure = double(table_tmp.measure);
+table_tmp.measure(table_tmp.measure == 6) = 0;
+table_tmp.measure(table_tmp.measure == 8) = 1;
+tmp = fitlme(table_tmp, 'value ~ measure + (1|fly_id) + (1|fly_id:set_label)');
+disp('2ch vs 4ch phi-star:');
+tmp.Coefficients
+ps(test_counter) = tmp.Coefficients(2, 6); test_counter = test_counter + 1;
+
+% 3ch phi-star vs 4ch phi-star
+table_tmp = table_within(table_within.measure == nominal(3) | table_within.measure == nominal(4), :);
+table_tmp.measure = double(table_tmp.measure);
+table_tmp.measure(table_tmp.measure == 7) = 0;
+table_tmp.measure(table_tmp.measure == 8) = 1;
+tmp = fitlme(table_tmp, 'value ~ measure + (1|fly_id) + (1|fly_id:set_label)');
+disp('3ch vs 4ch phi-star:');
+tmp.Coefficients
+ps(test_counter) = tmp.Coefficients(2, 6); test_counter = test_counter + 1;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % phi-star vs phi-3 (all nChannels)
 table_tmp = table_within(table_within.measure == nominal(2) |...
     table_within.measure == nominal(3) |...
@@ -413,6 +452,19 @@ tmp = fitlme(table_tmp, 'value ~ measure + (1|fly_id) + (1|fly_id:set_label)');
 disp('2,3,4ch phi-star vs 2,3,4ch phi-3:');
 tmp.Coefficients
 ps(test_counter) = tmp.Coefficients(2, 6); test_counter = test_counter + 1;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% % Power vs phi-3 (all nChannels)
+% table_tmp = table_within(table_within.measure == nominal(5) |...
+%     table_within.measure == nominal(6) |....
+%     table_within.measure == nominal(7) |....
+%     table_within.measure == nominal(8), :);
+% table_tmp.measure = double(table_tmp.measure);
+% table_tmp.measure = table_tmp.measure > 5;
+% tmp = fitlme(table_tmp, 'value ~ measure + (1|fly_id) + (1|fly_id:set_label)');
+% disp('Power vs 2,3,4ch phi-3:');
+% tmp.Coefficients
 
 % Power vs 2ch phi-3
 table_tmp = table_within(table_within.measure == nominal(5) | table_within.measure == nominal(6), :);
@@ -444,16 +496,39 @@ disp('Power vs 4ch phi-3:');
 tmp.Coefficients
 ps(test_counter) = tmp.Coefficients(2, 6); test_counter = test_counter + 1;
 
-% % Power vs phi-3 (all nChannels)
-% table_tmp = table_within(table_within.measure == nominal(5) |...
-%     table_within.measure == nominal(6) |....
-%     table_within.measure == nominal(7) |....
-%     table_within.measure == nominal(8), :);
-% table_tmp.measure = double(table_tmp.measure);
-% table_tmp.measure = table_tmp.measure > 5;
-% tmp = fitlme(table_tmp, 'value ~ measure + (1|fly_id) + (1|fly_id:set_label)');
-% disp('Power vs 2,3,4ch phi-3:');
-% tmp.Coefficients
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Power vs 2ch phi-star
+table_tmp = table_within(table_within.measure == nominal(5) | table_within.measure == nominal(2), :);
+table_tmp.measure = double(table_tmp.measure);
+table_tmp.measure(table_tmp.measure == 5) = 0;
+table_tmp.measure(table_tmp.measure == 6) = 1;
+tmp = fitlme(table_tmp, 'value ~ measure + (1|fly_id) + (1|fly_id:set_label)');
+disp('Power vs 2ch phi-star:');
+tmp.Coefficients
+ps(test_counter) = tmp.Coefficients(2, 6); test_counter = test_counter + 1;
+
+% Power vs 3ch phi-star
+table_tmp = table_within(table_within.measure == nominal(5) | table_within.measure == nominal(3), :);
+table_tmp.measure = double(table_tmp.measure);
+table_tmp.measure(table_tmp.measure == 5) = 0;
+table_tmp.measure(table_tmp.measure == 7) = 1;
+tmp = fitlme(table_tmp, 'value ~ measure + (1|fly_id) + (1|fly_id:set_label)');
+disp('Power vs 3ch phi-star:');
+tmp.Coefficients
+ps(test_counter) = tmp.Coefficients(2, 6); test_counter = test_counter + 1;
+
+% Power vs 4ch phi-star
+table_tmp = table_within(table_within.measure == nominal(5) | table_within.measure == nominal(4), :);
+table_tmp.measure = double(table_tmp.measure);
+table_tmp.measure(table_tmp.measure == 5) = 0;
+table_tmp.measure(table_tmp.measure == 8) = 1;
+tmp = fitlme(table_tmp, 'value ~ measure + (1|fly_id) + (1|fly_id:set_label)');
+disp('Power vs 4ch phi-star:');
+tmp.Coefficients
+ps(test_counter) = tmp.Coefficients(2, 6); test_counter = test_counter + 1;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Coherence vs 2ch phi-3
 table_tmp = table_within(table_within.measure == nominal(1) | table_within.measure == nominal(6), :);
@@ -482,6 +557,38 @@ table_tmp.measure(table_tmp.measure == 1) = 0;
 table_tmp.measure(table_tmp.measure == 8) = 1;
 tmp = fitlme(table_tmp, 'value ~ measure + (1|fly_id) + (1|fly_id:set_label)');
 disp('Coherence vs 4ch phi-3:');
+tmp.Coefficients
+ps(test_counter) = tmp.Coefficients(2, 6); test_counter = test_counter + 1;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Coherence vs 2ch phi-star
+table_tmp = table_within(table_within.measure == nominal(1) | table_within.measure == nominal(2), :);
+table_tmp.measure = double(table_tmp.measure);
+table_tmp.measure(table_tmp.measure == 1) = 0;
+table_tmp.measure(table_tmp.measure == 6) = 1;
+tmp = fitlme(table_tmp, 'value ~ measure + (1|fly_id) + (1|fly_id:set_label)');
+disp('Coherence vs 2ch phi-star:');
+tmp.Coefficients
+ps(test_counter) = tmp.Coefficients(2, 6); test_counter = test_counter + 1;
+
+% Coherence vs 3ch phi-star
+table_tmp = table_within(table_within.measure == nominal(1) | table_within.measure == nominal(3), :);
+table_tmp.measure = double(table_tmp.measure);
+table_tmp.measure(table_tmp.measure == 1) = 0;
+table_tmp.measure(table_tmp.measure == 7) = 1;
+tmp = fitlme(table_tmp, 'value ~ measure + (1|fly_id) + (1|fly_id:set_label)');
+disp('Coherence vs 3ch phi-star:');
+tmp.Coefficients
+ps(test_counter) = tmp.Coefficients(2, 6); test_counter = test_counter + 1;
+
+% Coherence vs 4ch phi-star
+table_tmp = table_within(table_within.measure == nominal(1) | table_within.measure == nominal(4), :);
+table_tmp.measure = double(table_tmp.measure);
+table_tmp.measure(table_tmp.measure == 1) = 0;
+table_tmp.measure(table_tmp.measure == 8) = 1;
+tmp = fitlme(table_tmp, 'value ~ measure + (1|fly_id) + (1|fly_id:set_label)');
+disp('Coherence vs 4ch phi-star:');
 tmp.Coefficients
 ps(test_counter) = tmp.Coefficients(2, 6); test_counter = test_counter + 1;
 
@@ -727,12 +834,83 @@ gscatter(foo, roo, table_across.measure);
 % scatter(table_across.centre, table_across.value);
 
 %% Post-hoc tests (across)
-% We will use ranksum tests, treating the pool of channels/sets as independent
+% LME not required, as data is not nested here
+% Will use ranksum test (different sample sizes across measures)
+%   This will treat the pool of channels/sets as independent
 % Assumed measure order:
 %   1 - coherence
 %   2, 3, 4 - phi-star(2, 3, 4)
 %   5 - power
 %   6 7 8 - phi-three(2, 3, 4)
+
+% Planned comparisons:
+%   Power vs 2, 3, 4ch phi-3 (3 comparisons)
+%   Power vs 2, 3, 4ch phi-star (3 comparisons)
+%   Coherence vs 2, 3, 4ch phi-3 (3 comparisons)
+%   Coherence vs 2, 3, 4ch phi-star (3 comparisons)
+%   Phi-* (all ch) vs phi-3 (all ch) (1 comparison)
+%   Phi-3 2v3v4ch (3 comparisons)
+%   Phi-star 2v3v4ch (3 comparisons)
+% Total 19 comparisons
+
+format shortg
+
+ps = zeros(19, 1);
+test_counter = 1;
+
+% Phi-3 2v3v4
+disp('phi-3 (2ch, 3ch, 4ch)');
+a = table_across.value(table_across.measure == nominal(6)); % 2ch
+b = table_across.value(table_across.measure == nominal(7)); % 3ch
+[p, h, stats] = ranksum(a, b);
+disp(['p=' num2str(p) ' zval=' num2str(stats.zval) ' ranksum=' num2str(stats.ranksum)]);
+ps(test_counter) = p;
+test_counter = test_counter + 1;
+a = table_across.value(table_across.measure == nominal(6)); % 2ch
+b = table_across.value(table_across.measure == nominal(8)); % 4ch
+[p, h, stats] = ranksum(a, b);
+disp(['p=' num2str(p) ' zval=' num2str(stats.zval) ' ranksum=' num2str(stats.ranksum)]);
+ps(test_counter) = p;
+test_counter = test_counter + 1;
+a = table_across.value(table_across.measure == nominal(7)); % 3ch
+b = table_across.value(table_across.measure == nominal(8)); % 4ch
+[p, h, stats] = ranksum(a, b);
+disp(['p=' num2str(p) ' zval=' num2str(stats.zval) ' ranksum=' num2str(stats.ranksum)]);
+ps(test_counter) = p;
+test_counter = test_counter + 1;
+disp(' ');
+
+% Phi-star 2v3v4
+disp('phi-star (2ch, 3ch, 4ch)');
+a = table_across.value(table_across.measure == nominal(2)); % 2ch
+b = table_across.value(table_across.measure == nominal(3)); % 3ch
+[p, h, stats] = ranksum(a, b);
+disp(['p=' num2str(p) ' zval=' num2str(stats.zval) ' ranksum=' num2str(stats.ranksum)]);
+ps(test_counter) = p;
+test_counter = test_counter + 1;
+a = table_across.value(table_across.measure == nominal(2)); % 2ch
+b = table_across.value(table_across.measure == nominal(4)); % 4ch
+[p, h, stats] = ranksum(a, b);
+disp(['p=' num2str(p) ' zval=' num2str(stats.zval) ' ranksum=' num2str(stats.ranksum)]);
+ps(test_counter) = p;
+test_counter = test_counter + 1;
+a = table_across.value(table_across.measure == nominal(3)); % 3ch
+b = table_across.value(table_across.measure == nominal(4)); % 4ch
+[p, h, stats] = ranksum(a, b);
+disp(['p=' num2str(p) ' zval=' num2str(stats.zval) ' ranksum=' num2str(stats.ranksum)]);
+ps(test_counter) = p;
+test_counter = test_counter + 1;
+disp(' ');
+
+% Phi-3 vs Phi-star
+a = table_across.value(table_across.measure == nominal(2) | table_across.measure == nominal(3) | table_across.measure == nominal(4)); % 3ch
+b = table_across.value(table_across.measure == nominal(6) | table_across.measure == nominal(7) | table_across.measure == nominal(8)); % 4ch
+[p, h, stats] = ranksum(a, b);
+disp(['p=' num2str(p) ' zval=' num2str(stats.zval) ' ranksum=' num2str(stats.ranksum)]);
+ps(test_counter) = p;
+test_counter = test_counter + 1;
+disp(' ');
+
 
 % Power vs Phi-3
 disp('power vs phi-3 (2ch, 3ch, 4ch)');
@@ -740,12 +918,18 @@ a = table_across.value(table_across.measure == nominal(5));
 b = table_across.value(table_across.measure == nominal(6)); % 2ch
 [p, h, stats] = ranksum(a, b);
 disp(['p=' num2str(p) ' zval=' num2str(stats.zval) ' ranksum=' num2str(stats.ranksum)]);
+ps(test_counter) = p;
+test_counter = test_counter + 1;
 b = table_across.value(table_across.measure == nominal(7)); % 3ch
 [p, h, stats] = ranksum(a, b);
 disp(['p=' num2str(p) ' zval=' num2str(stats.zval) ' ranksum=' num2str(stats.ranksum)]);
+ps(test_counter) = p;
+test_counter = test_counter + 1;
 b = table_across.value(table_across.measure == nominal(8)); % 4ch
-[p, h, stats] = ranksum(a, b, 'tail', 'left');
+[p, h, stats] = ranksum(a, b);
 disp(['p=' num2str(p) ' zval=' num2str(stats.zval) ' ranksum=' num2str(stats.ranksum)]);
+ps(test_counter) = p;
+test_counter = test_counter + 1;
 disp(' ');
 
 % Power vs Phi-*
@@ -754,12 +938,18 @@ a = table_across.value(table_across.measure == nominal(5));
 b = table_across.value(table_across.measure == nominal(2)); % 2ch
 [p, h, stats] = ranksum(a, b);
 disp(['p=' num2str(p) ' zval=' num2str(stats.zval) ' ranksum=' num2str(stats.ranksum)]);
+ps(test_counter) = p;
+test_counter = test_counter + 1;
 b = table_across.value(table_across.measure == nominal(3)); % 3ch
 [p, h, stats] = ranksum(a, b);
 disp(['p=' num2str(p) ' zval=' num2str(stats.zval) ' ranksum=' num2str(stats.ranksum)]);
+ps(test_counter) = p;
+test_counter = test_counter + 1;
 b = table_across.value(table_across.measure == nominal(4)); % 4ch
 [p, h, stats] = ranksum(a, b);
 disp(['p=' num2str(p) ' zval=' num2str(stats.zval) ' ranksum=' num2str(stats.ranksum)]);
+ps(test_counter) = p;
+test_counter = test_counter + 1;
 disp(' ');
 
 % Coherence vs Phi-3
@@ -768,12 +958,18 @@ a = table_across.value(table_across.measure == nominal(1));
 b = table_across.value(table_across.measure == nominal(6)); % 2ch
 [p, h, stats] = ranksum(a, b);
 disp(['p=' num2str(p) ' zval=' num2str(stats.zval) ' ranksum=' num2str(stats.ranksum)]);
+ps(test_counter) = p;
+test_counter = test_counter + 1;
 b = table_across.value(table_across.measure == nominal(7)); % 3ch
 [p, h, stats] = ranksum(a, b);
 disp(['p=' num2str(p) ' zval=' num2str(stats.zval) ' ranksum=' num2str(stats.ranksum)]);
+ps(test_counter) = p;
+test_counter = test_counter + 1;
 b = table_across.value(table_across.measure == nominal(8)); % 4ch
 [p, h, stats] = ranksum(a, b);
 disp(['p=' num2str(p) ' zval=' num2str(stats.zval) ' ranksum=' num2str(stats.ranksum)]);
+ps(test_counter) = p;
+test_counter = test_counter + 1;
 disp(' ');
 
 % Coherence vs Phi-*
@@ -782,20 +978,67 @@ a = table_across.value(table_across.measure == nominal(1));
 b = table_across.value(table_across.measure == nominal(2)); % 2ch
 [p, h, stats] = ranksum(a, b);
 disp(['p=' num2str(p) ' zval=' num2str(stats.zval) ' ranksum=' num2str(stats.ranksum)]);
+ps(test_counter) = p;
+test_counter = test_counter + 1;
 b = table_across.value(table_across.measure == nominal(3)); % 3ch
 [p, h, stats] = ranksum(a, b);
 disp(['p=' num2str(p) ' zval=' num2str(stats.zval) ' ranksum=' num2str(stats.ranksum)]);
+ps(test_counter) = p;
+test_counter = test_counter + 1;
 b = table_across.value(table_across.measure == nominal(4)); % 4ch
 [p, h, stats] = ranksum(a, b);
 disp(['p=' num2str(p) ' zval=' num2str(stats.zval) ' ranksum=' num2str(stats.ranksum)]);
+ps(test_counter) = p;
+test_counter = test_counter + 1;
 disp(' ');
-
-% Phi-3 nChannels comparison
-% disp('phi-3 2v3v4ch');
-
-
-% Phi-* nChannels comparison
 
 %% Compare within-performance to across-performance
 
+% We will use signrank tests, averaging across channels/sets to obtain a single value per fly
+% Assumed measure order:
+%   1 - coherence
+%   2, 3, 4 - phi-star(2, 3, 4)
+%   5 - power
+%   6 7 8 - phi-three(2, 3, 4)
 
+% Compare fly-averaged results to across-fly results
+table_within_summary = grpstats(table_within(:, {'value', 'measure', 'set_label'}), {'measure', 'set_label'});
+
+ps = zeros(4, 1);
+test_counter = 1;
+
+% Power
+disp('power');
+within = table_within_summary.mean_value(table_within_summary.measure == nominal(5));
+across = table_across.value(table_across.measure == nominal(5));
+[p, h, stats] = ranksum(within, across);
+disp(['p=' num2str(p) ' zval=' num2str(stats.zval) ' ranksum=' num2str(stats.ranksum)]);
+ps(test_counter) = p;
+test_counter = test_counter + 1;
+
+% Coherence
+disp('coherence');
+within = table_within_summary.mean_value(table_within_summary.measure == nominal(1));
+across = table_across.value(table_across.measure == nominal(1));
+[p, h, stats] = ranksum(within, across);
+disp(['p=' num2str(p) ' zval=' num2str(stats.zval) ' ranksum=' num2str(stats.ranksum)]);
+ps(test_counter) = p;
+test_counter = test_counter + 1;
+
+% Phi-3
+disp('phi-3');
+within = table_within_summary.mean_value(table_within_summary.measure == nominal(6) | table_within_summary.measure == nominal(7) | table_within_summary.measure == nominal(8));
+across = table_across.value(table_across.measure == nominal(6) | table_across.measure == nominal(7) | table_across.measure == nominal(8));
+[p, h, stats] = ranksum(within, across);
+disp(['p=' num2str(p) ' zval=' num2str(stats.zval) ' ranksum=' num2str(stats.ranksum)]);
+ps(test_counter) = p;
+test_counter = test_counter + 1;
+
+% Phi-star
+disp('phi-star');
+within = table_within_summary.mean_value(table_within_summary.measure == nominal(2) | table_within_summary.measure == nominal(3) | table_within_summary.measure == nominal(4));
+across = table_across.value(table_across.measure == nominal(2) | table_across.measure == nominal(3) | table_across.measure == nominal(4));
+[p, h, stats] = ranksum(within, across);
+disp(['p=' num2str(p) ' zval=' num2str(stats.zval) ' ranksum=' num2str(stats.ranksum)]);
+ps(test_counter) = p;
+test_counter = test_counter + 1;
