@@ -1,7 +1,7 @@
 %% Load
 
 results_directory = 'workspace_results/';
-results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_power_classification.mat';
+results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_power_classification_across1.mat';
 
 load([results_directory results_filename]);
 

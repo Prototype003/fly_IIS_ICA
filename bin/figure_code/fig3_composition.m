@@ -65,9 +65,9 @@ composition_phis = permute(sum(composition_phis, 1), [2 3 4 5 6 7 1]);
 composition_phis = composition_phis ./ sum(phis{1}.state_counters(:, 1, 1, 1, 1));
 
 % Unpartitioned - partitioned
-%composition_phis = permute(composition_phis(1, :, :, :, :, :) - composition_phis(2, :, :, :, :, :), [2 3 4 5 6 7 1]);
+composition_phis = permute(composition_phis(1, :, :, :, :, :) - composition_phis(2, :, :, :, :, :), [2 3 4 5 6 7 1]);
 % Unpartitioned
-composition_phis = permute(composition_phis(1, :, :, :, :, :), [2 3 4 5 6 7 1]);
+%composition_phis = permute(composition_phis(1, :, :, :, :, :), [2 3 4 5 6 7 1]);
 % Partitioned
 %composition_phis = permute(composition_phis(2, :, :, :, :, :), [2 3 4 5 6 7 1]);
 
@@ -159,6 +159,7 @@ save('fig3_composition_phis.mat', 'phi_composition');
 %% Load to avoid recomputing
 
 load('fig3_composition_phis.mat');
+measure_string = '\phi';
 
 %% Correlation between concept-phi and big-phi
 
@@ -234,7 +235,7 @@ model_null = fitlme(model_table, model_spec_null);
 model_full.Rsquared
 compare(model_null, model_full)
 
-%% Make figure
+%% Make figure (Big PHI)
 
 figure;
 set(gcf, 'Position', [0 0 2100/2 750]);
@@ -243,7 +244,7 @@ set(gcf, 'InvertHardCopy', 'off'); % For keeping the black background when print
 % set(gcf, 'RendererMode', 'manual');
 % set(gcf, 'Renderer', 'painters');
 
-colormap(inferno());
+%colormap(inferno());
 subplot_counter = 1;
 cbar_titles = {...
     [measure_string '_{W}'],...
@@ -281,7 +282,7 @@ for nChannels_counter = 1 : length(phis)
     channel_sets = double(phis{nChannels_counter}.channel_sets);
     
     % Exclude sets with most peripheral channel
-    valid_sets = channel_sets(:, 1) ~= 1; % the first channel will only ever be in the first column
+    valid_sets = channel_sets(:, 1) ~= 0; %1; % the first channel will only ever be in the first column
     channel_sets = channel_sets(valid_sets, :);
     
     % Get values to plot
@@ -451,7 +452,7 @@ for nChannels_counter = 1 : length(phis)
     end
 end
 
-%%
+%% Figure for SMALL PHI
 
 figure;
 set(gcf, 'Position', [0 0 2100/2 750]);
@@ -460,7 +461,7 @@ set(gcf, 'InvertHardCopy', 'off'); % For keeping the black background when print
 % set(gcf, 'RendererMode', 'manual');
 % set(gcf, 'Renderer', 'painters');
 
-colormap(inferno());
+%colormap(inferno());
 subplot_counter = 1;
 cbar_titles = {...
     ['\phi_{W}'],...
@@ -666,11 +667,11 @@ end
 
 %% Print figure
 
-% figure_name = 'fig3'; % 'fig3' for phi-3; 'figS1' for phi-star-gaussian
-% 
-% print(figure_name, '-dsvg'); % SVG
-% print(figure_name, '-dpdf', '-bestfit'); % PDF
-% print(figure_name, '-dpng'); % PNG
+figure_name = 'fig3_comp'; % 'fig3' for phi-3; 'figS1' for phi-star-gaussian
+
+print(figure_name, '-dsvg'); % SVG
+print(figure_name, '-dpdf', '-bestfit'); % PDF
+print(figure_name, '-dpng'); % PNG
 
 %% Stats
 % Correlations with set center / set distance (no splitting)

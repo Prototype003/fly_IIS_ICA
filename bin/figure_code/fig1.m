@@ -7,6 +7,8 @@ samples = (101:120); %(101:110);
 condition = 1;
 tau = 1;
 
+addpath('../');
+
 %% Load
 data_directory = '../workspace_results/';
 data_file = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim';
@@ -43,17 +45,39 @@ figure;
 set(gcf, 'Position', [0 0 2100/2 500]);
 set(gcf, 'Color', [1 1 1]);
 set(gcf, 'InvertHardCopy', 'off'); % For keeping the black background when printing
+set(gcf, 'RendererMode', 'manual');
+set(gcf, 'Renderer', 'painters');
 
 text_labels = 'afcd';
 
 %% Plot data
 
+% Color plot
+% data_plot = subplot(5, 6, (1:3));
+% imagesc(raw_data'); cbar = colorbar; axis_defaults(gca);
+% set(gca, 'YTick', [1 2 3], 'XTickLabel', '');
+% xlabel(cbar, 'V');%'\muV');
+% ylabel('channel');
+% colormap(data_plot, 'jet');
+
+% Line plot
+line_colour = [0.85 0.325 0.098];
+nLines = size(raw_data, 2);
+line_offsets = (1:nLines)*(max(raw_data(:)) - min(raw_data(:)));
+medians = zeros(size(line_offsets));
 data_plot = subplot(5, 6, (1:3));
-imagesc(raw_data'); cbar = colorbar; axis_defaults(gca);
-set(gca, 'YTick', [1 2 3], 'XTickLabel', '');
-xlabel(cbar, '\muV');
+for line_counter = 1 : nLines
+    line([1 size(raw_data, 1)], repmat(median(raw_data(:, line_counter))-line_offsets(line_counter), [1 2]), 'Color', [0 0 0 0.5], 'LineWidth', 1);
+    medians(line_counter) = median(raw_data(:, line_counter)) - line_offsets(line_counter);
+    hold on;
+    plot(raw_data(:, line_counter)-line_offsets(line_counter), '-o', 'Color', line_colour, 'MarkerSize', 2, 'MarkerFaceColor', line_colour, 'LineWidth', 1); hold on;
+end
+line([20 20], [mean(medians)-12.5 mean(medians)+12.5], 'Color', 'k'); % Draw scale line
+text(20.5, mean(medians), '25\muV');
+axis_defaults(gca);
+set(gca, 'YTick', sort(medians), 'YTickLabel', (nLines:-1:1), 'XTick', [], 'XColor', [1 1 1 0]);
+xlim([0.5 size(raw_data, 1)+0.5]);
 ylabel('channel');
-colormap(data_plot, 'jet');
 
 fontsize = 11;
 textbox_width = 0.03;
@@ -65,8 +89,10 @@ text(0, 0.2, text_labels(1), 'HorizontalAlignment', 'center', 'VerticalAlignment
 binarised_plot = subplot(5, 6, (7:9));
 imagesc(channel_data'); axis_defaults(gca);
 set(gca, 'YTick', [1 2]);
-cbar = colorbar; caxis([0 1]);
+cbar = colorbar('location', 'eastoutside'); caxis([0 1]);
 set(cbar, 'YTick', [0.25 0.75], 'YTickLabel', {'off (0)', 'on (1)'});
+plot_pos = get(gca, 'Position'); pos_ref = get(data_plot, 'Position');
+plot_pos(3:4) = pos_ref(3:4); set(gca, 'Position', plot_pos);
 xlabel('time sample'); ylabel('channel');
 colormap(binarised_plot, [0 0 0; 1 1 1]);
 
@@ -79,7 +105,12 @@ plim = [0 1]; % Probability colourbar
 
 % Empirical TPM
 tpm_plot = subplot(5, 6, [4.5 5.2 10.5 11.2]);
-imagesc(tpm, plim); cbar = colorbar; xlabel(cbar, 'P'); axis_defaults(gca);
+imagesc(tpm, plim);
+plot_pos = get(gca, 'Position'); axis square;
+cbar = colorbar('location', 'eastoutside'); xlabel(cbar, 'P'); set(cbar, 'XTick', [0 0.5 1]); axis_defaults(gca);
+set(gca, 'Position', plot_pos);
+cbar_pos = get(cbar, 'Position'); pos_ref = get(gca, 'Position');
+cbar_pos(4) = pos_ref(4); set(cbar, 'Position', cbar_pos);
 set(gca, 'XTick', [1 2 3 4], 'YTick', [1 2 3 4], 'YTickLabel', states, 'XTickLabel', states);
 xlabel('state t+1'); ylabel('state t');
 %colormap(tpm_plot, 'gray');
@@ -87,10 +118,9 @@ ax_pos = get(gca, 'Position');
 axes('Visible', 'off', 'Position', [ax_pos(1) ax_pos(2)+ax_pos(4) textbox_width textbox_width]); axis_defaults(gca);
 text(0, 0.2, text_labels(2), 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom', 'FontSize', fontsize, 'FontWeight', 'bold');
 
-
 % Independent channel TPMs
 ind_a_plot = subplot(5, 6, [13 13.1]+6);
-imagesc(ind_a, plim); cbar = colorbar; cbar.Visible = 'off'; axis_defaults(gca);
+imagesc(ind_a, plim); cbar = colorbar; cbar.Visible = 'off'; axis_defaults(gca); axis square;
 set(gca, 'XTick', [1 2], 'YTick', [1 2], 'YTickLabel', states_ind, 'XTickLabel', states_ind);
 xlabel('t+1'); ylabel('t');
 title('ch1');
@@ -100,7 +130,7 @@ text(0, 0.2, text_labels(3), 'HorizontalAlignment', 'center', 'VerticalAlignment
 
 %colormap(ind_a_plot, 'gray');
 ind_b_plot = subplot(5, 6, [15 15.1]+6);
-imagesc(ind_b, plim); cbar = colorbar; cbar.Visible = 'off'; axis_defaults(gca);
+imagesc(ind_b, plim); cbar = colorbar; cbar.Visible = 'off'; axis_defaults(gca); axis square;
 set(gca, 'XTick', [1 2], 'YTick', [1 2], 'YTickLabel', states_ind, 'XTickLabel', states_ind);
 xlabel('t+1'); ylabel('t');
 title('ch2');
@@ -108,7 +138,13 @@ title('ch2');
 
 % Independent TPM (product of indepent channel TPMs)
 tpm_ind_plot = subplot(5, 6, [4.5 5.2 10.5 11.2]+18);
-imagesc(tpm_ind, plim); cbar = colorbar; xlabel(cbar, 'P'); axis_defaults(gca);
+imagesc(tpm_ind, plim);
+tmp_pos = get(gca, 'Position'); axis square;
+tmp_pos(3:4) = plot_pos(3:4); set(gca, 'Position', tmp_pos);
+plot_pos = get(gca, 'Position');
+cbar = colorbar('location', 'eastoutside'); xlabel(cbar, 'P'); set(cbar, 'XTick', [0 0.5 1]); axis_defaults(gca); set(gca, 'Position', plot_pos);
+cbar_pos = get(cbar, 'Position'); pos_ref = get(gca, 'Position');
+cbar_pos(4) = pos_ref(4); set(cbar, 'Position', cbar_pos);
 set(gca, 'XTick', [1 2 3 4], 'YTick', [1 2 3 4], 'YTickLabel', states, 'XTickLabel', states);
 xlabel('state t+1'); ylabel('state t');
 %colormap(tpm_ind_plot, 'gray');
@@ -119,10 +155,10 @@ text(0, 0.2, text_labels(4), 'HorizontalAlignment', 'center', 'VerticalAlignment
 
 %% Print figure
 
-% figure_name = 'fig1a';
+% figure_name = 'fig1b';
 % 
-% print(figure_name, '-dsvg'); % SVG
-% print(figure_name, '-dpdf', '-bestfit'); % PDF
+% print(figure_name, '-dsvg', '-painters'); % SVG
+% print(figure_name, '-dpdf', '-painters', '-bestfit'); % PDF
 % print(figure_name, '-dpng'); % PNG
 
 %% Show probability distributions for a given state

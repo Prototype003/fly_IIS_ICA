@@ -11,7 +11,7 @@ function [ handle ] = axis_defaults( handle )
 fontsize = 11; % FontSize
 titlefontsizemultiplier = 1; % TitleFontSizeMultiplier
 labelfontsizemultiplier = 1;
-fontname = 'helvetica';
+fontname = 'arial';
 
 set(handle,...
     'FontSize', fontsize,...

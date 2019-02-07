@@ -349,7 +349,7 @@ for nChannels_counter = 1 : length(accuracies)
         axis_defaults(gca);
         
         set(gca, 'TickDir', 'out');
-        set(gca, 'Box', 'on');
+        set(gca, 'Box', 'off');
         
         if value_type < 3
             
@@ -363,7 +363,7 @@ for nChannels_counter = 1 : length(accuracies)
             ax_pos = get(gca, 'Position');
             c = colorbar;
             set(c, 'Position', [ax_pos(1)+ax_pos(3) ax_pos(2) cbar_width ax_pos(4)]); % Reposition colourbar directly next to plot
-            set(c, 'Box', 'on');
+            set(c, 'Box', 'off');
             c.Ruler.Exponent = 0; % Get rid of scientific notation
             %set(c, 'Ticks', [1, ], 'TickLabels', [])% label min, mid, max values
             clims = get(c, 'Limits');
@@ -411,7 +411,7 @@ for nChannels_counter = 1 : length(accuracies)
             ylabel('set path distance');
         end
         
-        set(gca, 'color', [0 0 0]); % black background
+        %set(gca, 'color', [0 0 0]); % black background
         set(plot_handle, 'EdgeColor', 'none'); % remove grid outline
         
         % Add letter label to plot

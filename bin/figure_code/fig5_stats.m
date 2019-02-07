@@ -9,7 +9,7 @@ Figure 5 - correlation between mean 2ch mean values with 3/4ch values
 
 %% Setup
 
-measure = 'phi_star_gaussian'; % 'phi_three' or 'phi_star' or 'phi_star_gaussian' or 'phi_SI'
+measure = 'phi_three'; % 'phi_three' or 'phi_star' or 'phi_star_gaussian' or 'phi_SI'
 tau = 1; % 1 = 4ms; 2 = 8ms; 3 = 16ms
 if tau == 1
     tau_string = '4';
@@ -189,7 +189,7 @@ for nChannels_counter = 2 : length(phis)
     for condition = 1 : size(values_rebuilt, 4)
         flies = (1:13);
         %flies = flies(flies ~= 11);
-        x = mean(mean(values_rebuilt(:, :, flies, condition), 2), 3);
+        x = mean(mean(values_rebuilt(:, :, flies, condition), 2), 3); % Average across trials and flies
         y = mean(mean(values(:, :, flies, condition), 2), 3);
         scatter(x(:), y(:), [], colours(condition), shapes(condition)); hold on;
     end
@@ -220,7 +220,6 @@ for nChannels_counter = 2 : length(phis)
     
     %axis equal;
     xlim(xlims(subplot_counter, :));
-    axis equal;
     
     % Add letter label to plot
     ax_pos = get(gca, 'Position');
@@ -344,6 +343,65 @@ model_null = fitlme(tables{nChannels_counter}, model_null_spec);
 
 compare(model_null, model_full)
 
+%% Plot
+
+%figure;
+
+nChannels_counter = 3;
+
+channel_sets = phis{nChannels_counter}.channel_sets;
+
+values = phis{nChannels_counter}.phis(:, :, :, :, tau);
+channel_means = phis{1}.channel_means(:, :, :, :);
+
+% Build values from average of single channel average values
+values_rebuilt = zeros(size(values));
+for channel_set = 1 : size(values, 1)
+    channels = channel_sets(channel_set, :);
+    values_rebuilt(channel_set, :, :, :) = mean(channel_means(channels, :, :, :), 1);
+end
+
+% Store
+phis{nChannels_counter}.phis_rebuilt = values_rebuilt;
+
+% Plots wake and anest
+xs = []; ys = [];
+legend_items = [];
+for condition = 1 : size(values_rebuilt, 4)
+    flies = (1:13);
+    %flies = flies(flies ~= 11);
+    x = mean(mean(values_rebuilt(:, :, flies, condition), 2), 3); % Average across trials and flies
+    y = mean(mean(values(:, :, flies, condition), 2), 3);
+    legend_items(condition) = scatter(x(:), y(:), [], colours(condition), '.'); hold on;
+    xs = [xs; x(:)]; ys = [ys; y(:)];
+    %Plot line of best fit
+    p = polyfit(x, y, 1);
+    best_fit = polyval(p, x);
+    plot(x, best_fit, 'k', 'LineWidth', 2);
+    p
+end
+legend(legend_items, 'wake', 'anest', 'Location', 'northwest');
+
+handle = gca;
+handle.XRuler.Exponent = 0;
+set(gca, 'XTick', [0.001 0.0025 0.004], 'YTick', [0.015 0.035 0.055]);
+%axis([0.0009 0.005 -0.002 0.06]);
+axis([floor(1000*min(xs))/1000 ceil(1000*max(xs))/1000 floor(1000*min(ys))/1000 ceil(1000*max(ys))/1000])
+axis([0.001 0.004 0.013 0.06]);
+axis square
+
+% Plots wake - anest
+% flies = [1 2 3 4 5 6 7 8 9 10 11 12 13];
+% x = mean(mean(values_rebuilt(:, :, flies, 1) - values_rebuilt(:, :, flies, 2), 2), 3);
+% y = mean(mean(values(:, :, flies, 1) - values(:, :, flies, 2), 2), 3);
+% scatter(x(:), y(:), [], colours(condition), shapes(condition)); hold on;
+% xs = x(:); ys = y(:);
+% 
+% % Plot line of best fit
+% p = polyfit(xs, ys, 1);
+% best_fit = polyval(p, xs);
+% plot(xs, best_fit);
+
 %% Regress 3,4ch classification onto 2ch classification (within)
 
 % Make tables
@@ -439,7 +497,7 @@ for nChannels_counter = 1 : length(phis)
     disp(['2.25s/within-trial, ' num2str(nChannels) ' channels: r=' num2str(r) ' p=' num2str(p)]);
     
     % 18s trial phi vs across-fly classification
-    values = mean(mean(phis_a{nChannels_counter}.phis(:, :, flies, condition, tau), 2), 3); % Averaging across trials does nothing (dimension size = 1)
+    values = mean(mean(phis{nChannels_counter}.phis(:, :, flies, condition, tau), 2), 3); % Averaging across trials does nothing (dimension size = 1)
     accuracy_values = mean(accuracies_a{nChannels_counter}.accuracies, 2); % Averaging across flies does nothing (dimension size = 1)
     subplot(1, 2, 2);
     scatter(values, accuracy_values, [nChannels_colours(nChannels_counter) '.']); hold on;

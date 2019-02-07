@@ -50,9 +50,9 @@ composition_phis = permute(sum(composition_phis, 1), [2 3 4 5 6 7 1]);
 composition_phis = composition_phis ./ sum(phis{1}.state_counters(:, 1, 1, 1, 1));
 
 % Unpartitioned - partitioned
-%composition_phis = permute(composition_phis(1, :, :, :, :, :) - composition_phis(2, :, :, :, :, :), [2 3 4 5 6 7 1]);
+composition_phis = permute(composition_phis(1, :, :, :, :, :) - composition_phis(2, :, :, :, :, :), [2 3 4 5 6 7 1]);
 % Unpartitioned
-composition_phis = permute(composition_phis(1, :, :, :, :, :), [2 3 4 5 6 7 1]);
+%composition_phis = permute(composition_phis(1, :, :, :, :, :), [2 3 4 5 6 7 1]);
 % Partitioned
 %composition_phis = permute(composition_phis(2, :, :, :, :, :), [2 3 4 5 6 7 1]);
 %% Setup Hasse graph
@@ -168,6 +168,50 @@ for concept_order = 1 : size(channel_sets, 2) % 4th-order concepts aren't shared
     end
     concept_displacement = concept_displacement + nchoosek(size(channel_sets, 2), concept_order);
 end
+
+%% Plot wake and anest on single axis
+
+figure('pos', [0 0 1500 600]);
+set(gcf, 'color', 'w');
+condition_edges = [0 0 0; 0.9 0.9 0.9];
+for condition = 1 : 2
+    scatter3(x, y, comp_values(:, condition), marker_size, colours, 'o', 'filled', 'MarkerEdgeColor', condition_edges(condition, :));
+    hold on;
+    
+%     % Draw lines
+%     for concept = 1 : concepts_cum(end-1) % no lines from greatest-order concepts
+%         destinations = find(adj_mat(concept, :));
+%         for dest_counter = 1 : length(destinations)
+%             dest = destinations(dest_counter);
+%             tmp = line(...
+%                 [x(concept) x(dest)],...
+%                 [y(concept), y(dest)],...
+%                 [comp_values(concept, condition), comp_values(dest, condition)],...
+%                 'LineStyle', '-',...
+%                 'Color', 'k',...
+%                 'LineWidth', 0.5 ...
+%                 );
+%             tmp.Color(4) = 0.05;
+%         end
+%     end
+    
+end
+
+zlabel('\phi');
+xlabel('set-centre');
+ylabel('set-distance');
+
+set(gca, 'YTick', [min(y) max(y)], 'XTick', [min(x) max(x)], 'ZTick', linspace(min(comp_values(:)), max(comp_values(:)), 3));
+
+%axis([min(x)-1 max(x)+1 min(y)-1 max(y)+1 min(comp_values(:)) max(comp_values(:))]);
+axis([min(x)-1 max(x)+1 min(y)-1 max(y)+1 0 max(comp_values(:))]);
+
+box off
+grid off
+%axis square
+axis vis3d
+
+title('Mean concept \phi across all channel sets');
 
 %% Plot wake - anest
 

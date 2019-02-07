@@ -13,7 +13,7 @@ across fly analyses (for trying to extend within fly findings across flies)
 
 %% Setup
 
-measure = 'phi_star_gaussian'; % 'phi_three' or 'phi_star' or 'phi_star_gaussian' or 'phi_SI'
+measure = 'phi_three'; % 'phi_three' or 'phi_star' or 'phi_star_gaussian' or 'phi_SI'
 tau = 1; % 1 = 4ms; 2 = 8ms; 3 = 16ms
 if tau == 1
     tau_string = '4';
@@ -44,8 +44,8 @@ figure;
 set(gcf, 'Position', [0 0 2100/2 750]);
 set(gcf, 'Color', [1 1 1]);
 set(gcf, 'InvertHardCopy', 'off'); % For keeping the black background when printing
-% set(gcf, 'RendererMode', 'manual');
-% set(gcf, 'Renderer', 'painters');
+set(gcf, 'RendererMode', 'manual');
+set(gcf, 'Renderer', 'painters');
 
 colormap(inferno());
 subplot_counter = 1;
@@ -54,6 +54,7 @@ cbar_titles = {...
     [measure_string '_{A}'],...
     [measure_string '_{W} / ' measure_string '_{A}']...
     };
+%cbar_titles = {'W', 'A', 'W/A'};
 
 nChannels_yAspects = [1 2 4] ./ 2;
 
@@ -253,11 +254,11 @@ end
 
 %% Print figure
 
-% figure_name = 'fig3'; % 'fig3' for phi-3; 'figS1' for phi-star-gaussian
-% 
-% print(figure_name, '-dsvg'); % SVG
-% print(figure_name, '-dpdf', '-bestfit'); % PDF
-% print(figure_name, '-dpng'); % PNG
+figure_name = 'fig3'; % 'fig3' for phi-3; 'figS1' for phi-star-gaussian
+
+print(figure_name, '-dsvg', '-painters'); % SVG
+print(figure_name, '-dpdf', '-painters', '-bestfit'); % PDF
+print(figure_name, '-dpng'); % PNG
 
 %% Stats
 % Correlations with set center / set distance (no splitting)

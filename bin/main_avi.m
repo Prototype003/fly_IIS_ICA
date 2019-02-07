@@ -93,6 +93,8 @@ for fly = 1 : size(phis{1}.phis, 3)
     end
 end
 
+% Apply dummy coding to condition, set-size, tau
+
 % Natural ordering: fly, condition, tau, nChannels, set, trial
 table_headings = {'fly', 'condition', 'tau', 'nChannels', 'set', 'center', 'distance', 'trial', 'phi'};
 phi_table = table(table_raw.fly, table_raw.condition, table_raw.tau, (table_raw.nChannels), table_raw.set, table_raw.center, table_raw.distance, table_raw.trial, log(table_raw.phi), 'VariableNames', table_headings);
@@ -114,6 +116,9 @@ disp('table built');
 
 model_spec = 'phi ~ nChannels + condition + tau + (1|fly) + (1|fly:set)';
 %model_spec = 'phi ~ nChannels + tau + center*distance + (1|fly) + (1|fly:set)';
+model_spec = 'phi ~ nChannels + condition + tau + (1|fly)';
+
+model_spec = 'phi ~ condition + nChannels + tau + (1+condition+nChannels+tau|fly)';
 
 disp(['fitting model: ' model_spec]);
 
@@ -138,12 +143,21 @@ model_null_specs = {...
     'phi ~ nChannels + condition + tau + (1|fly) + (1|fly:set)'... % full main effect null model
     };
 
+model_null_specs = {...
+    'phi ~ nChannels + tau + (1+condition+nChannels+tau|fly)',... % condition null model
+    'phi ~ condition + tau + (1+condition+nChannels+tau|fly)',... % nChannels null model
+    'phi ~ nChannels + condition + (1+condition+nChannels+tau|fly)'... % tau null model
+    'phi ~ nChannels + condition + tau + (1+condition+nChannels+tau|fly)'... % full main effect null model
+    };
+
 % model_null_specs = {...
 %     'phi ~ nChannels + tau + center*distance + (1|fly) + (1|fly:set)',... % condition null model
 %     'phi ~ tau + center*distance + (1|fly) + (1|fly:set)',... % nChannels null model
 %     'phi ~ nChannels + center*distance + (1|fly) + (1|fly:set)'... % tau null model
 %     'phi ~ nChannels + tau + center + distance + (1|fly) + (1|fly:set)'... % center:distance interaction null model
 %     };
+
+model_null_specs = {'phi ~ nChannels + tau + (1+condition+nChannels+tau|fly)'};
 
 % Build null models
 model_nulls = cell(length(model_null_specs), 1);

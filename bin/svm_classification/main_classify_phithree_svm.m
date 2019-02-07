@@ -11,7 +11,7 @@ Within flies classification
 
 %% SETUP
 
-class_type = 'within'; % 'across' or 'within'
+class_type = 'across'; % 'across' or 'within'
 
 nFeatures = 15;
 
@@ -28,7 +28,7 @@ results_file = ['phi3_svm_' class_type '.mat'];
 %% Load phi values
 
 if strcmp(class_type, 'across')
-    global_tpm = 1;
+    global_tpm = 0;
 else % strcmp(class_type, 'within')
     global_tpm = 0;
 end
@@ -38,17 +38,16 @@ end
 values_all = phi_threes{3}.phis(:, :, :, :, tau);
 channel_sets = phi_threes{3}.channel_sets;
 
-%% Sort by phi values (for classification using top values)
-
-
-
 %% Classify using SVM
 
 if strcmp(class_type, 'across')
     
+    % Average across trials to obtain single phi value
+    values_all_trialMean = mean(values_all, 2);
+    
     % First classification round
     selected_sets = set_sample(channel_sets, nFeatures); % Select random set of channel sets
-    values = permute(mean(values_all(selected_sets, :, :, :), 2), [3 1 4 2]); % flies x sets x conditions
+    values = permute(mean(values_all_trialMean(selected_sets, :, :, :), 2), [3 1 4 2]); % flies x sets x conditions
     classifications = svm_lol_libsvm(values);
     
     % Store selected sets
@@ -63,7 +62,7 @@ if strcmp(class_type, 'across')
     for validation = 2 : size(classifications.leave_outs, 1)
         selected_sets = set_sample(channel_sets, nFeatures);
         classifications.sets(validation, :) = selected_sets;
-        values = permute(mean(values_all(selected_sets, :, :, :), 2), [3 1 4 2]); % flies x sets x conditions
+        values = permute(mean(values_all_trialMean(selected_sets, :, :, :), 2), [3 1 4 2]); % flies x sets x conditions
         tmp = svm_lol_libsvm(values, validation);
         
         % Store values used and results
@@ -78,6 +77,8 @@ if strcmp(class_type, 'across')
     % Summarise across validations
     classifications.accuracy_per_class = classifications.correct_total / size(classifications.leave_outs, 1);
     classifications.accuracy = sum(classifications.correct_total) / numel(classifications.leave_outs);
+    
+    classifications.accuracy
     
 elseif strcmp(class_type, 'within')
     
@@ -125,13 +126,14 @@ elseif strcmp(class_type, 'within')
         accuracy_mean = accuracy_mean + classifications{fly}.accuracy;
         accuracy_flies(fly) = classifications{fly}.accuracy;
     end
-    accuracy_mean = accuracy_mean / size(values_all, 3)
+    accuracy_mean = accuracy_mean / size(values_all, 3);
     
+    accuracy_mean
 end
 
 %% Save
 
-%save([results_location results_file], 'classifications');
+save([results_location results_file], 'classifications');
 
 %% PCA across features - for visualisation of class data in 2D
 % 

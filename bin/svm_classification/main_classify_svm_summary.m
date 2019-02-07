@@ -9,14 +9,15 @@ Summarise power and phi-3 SVM classification results
 %% Setup
 
 results_location = 'results/';
-measures = {'power', 'phi3'};
+measures = {'power', 'coherence', 'phi3'};
 
 %% Within-fly classification
 
 results = cell(1, 2);
 
 results{1} = load([results_location 'power_svm_within.mat']); % Power
-results{2} = load([results_location 'phi3_svm_within.mat']); % Phi-3
+results{2} = load([results_location 'coherence_svm_within.mat']); % Coherence
+results{3} = load([results_location 'phi3_svm_within.mat']); % Phi-3
 
 % Average accuracies across flies
 for measure = 1 : length(results)
@@ -38,7 +39,8 @@ end
 results = cell(1, 2);
 
 results{1} = load([results_location 'power_svm_across.mat']); % Power
-results{2} = load([results_location 'phi3_svm_across.mat']); % Phi-3
+results{2} = load([results_location 'coherence_svm_across.mat']); % Coherence
+results{3} = load([results_location 'phi3_svm_across.mat']); % Phi-3
 
 for measure = 1 : length(results)
     disp([measures{measure} ' - across-fly accuracy: ' num2str(results{measure}.classifications.accuracy)]);

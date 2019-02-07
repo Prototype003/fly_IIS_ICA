@@ -263,7 +263,7 @@ concept_labels = {...
     'A'...
     };
 
-conditions = 1;
+conditions = 2;
 
 figure('pos', [0 0 750*conditions 600]);
 set(gcf, 'color', 'w');

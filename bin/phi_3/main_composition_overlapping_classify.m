@@ -22,7 +22,7 @@ addpath('../');
 %% Load
 
 tic;
-%load('results/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_phithree_nChannels4_globalTPM0.mat');
+load('results/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_phithree_nChannels4_globalTPM0.mat');
 channel_sets = double(phis{1}.channel_sets);
 toc
 
@@ -89,17 +89,17 @@ end
 
 condition_titles = {'wake', 'anest'};
 
-% Average across trials (result is conditions x sets x concepts x flies)
-compositions = double(permute(mean(composition_phis(:, :, :, flies, :), 3), [4 5 2 1 3]));
+% Re-format into (flies x trials x conditions x sets x concepts)
+compositions = double(permute(composition_phis(:, :, :, flies, :), [4 3 5 2 1]));
 
 % Find average concept phis across ALL sets which include the concept
-comp_values = zeros(size(compositions, 1), length(x), size(compositions, 2));
+comp_values = zeros(size(compositions, 1), size(compositions, 2), length(x), size(compositions, 3));
 concept_counter = 1;
 concept_displacement = 0; % For skipping lower order concepts
 for concept_order = 1 : size(channel_sets, 2) % 4th-order concepts aren't shared
     concepts = nchoosek((min(channel_sets(:)):max(channel_sets(:))), concept_order);
     for concept = 1 : size(concepts, 1)
-        value_sum = zeros(size(compositions, 1), size(compositions, 2), 1); % values for each condition
+        value_sum = zeros(size(compositions, 1), size(compositions, 2), size(compositions, 3)); % values for each condition
         share_counter = 0;
         for network = 1 : size(channel_sets, 1)
             if all(ismember(concepts(concept, :), channel_sets(network, :))) % If concept is a subset of the channel set
@@ -113,8 +113,8 @@ for concept_order = 1 : size(channel_sets, 2) % 4th-order concepts aren't shared
 %                             value_sum = compositions(:, network, network_concept + concept_displacement);
 %                         end
                         
-                        % Average values
-                        value_sum = value_sum + compositions(:, :, network, network_concept + concept_displacement);
+                        % Average values across networks
+                        value_sum = value_sum + compositions(:, :, :, network, network_concept + concept_displacement);
                         share_counter = share_counter + 1;
                         break;
                     end
@@ -126,7 +126,7 @@ for concept_order = 1 : size(channel_sets, 2) % 4th-order concepts aren't shared
 %         comp_values(concept_counter, :) = value_sum;
         
         % Average values
-        comp_values(:, concept_counter, :) = permute(value_sum ./ share_counter, [1 3 2]);
+        comp_values(:, :, concept_counter, :) = value_sum ./ share_counter;
         
         concept_counter = concept_counter + 1;
         
@@ -142,7 +142,7 @@ addpath('../svm_classification/');
 
 cost = 1;
 
-cost_powers = (-20:20);
+cost_powers = (-20:20);%0;%(-20:20);
 costs = 2 .^ cost_powers;
 cost_accuracies = zeros(size(costs));
 
@@ -150,8 +150,37 @@ tic;
 
 for cost_counter = 1 : length(costs) % ~60 seconds
     cost = costs(cost_counter);
-    results = svm_lol_liblinear_manual(comp_values, cost);
+    results = svm_lol_liblinear_manual(permute(mean(comp_values, 2), [1 3 4 2]), cost); % Use trial-averaged values
     cost_accuracies(cost_counter) = results.accuracy;
 end
 
 toc
+
+accuracies_across = cost_accuracies; % Assuming only one cost value
+
+%% Classify within flies
+
+addpath('C:\Users\this_\Documents\MATLAB\Toolboxes\liblinear-2.20\windows');
+
+addpath('../svm_classification/');
+
+cost = 1;
+
+cost_powers = 0;%(-20:20);
+costs = 2 .^ cost_powers;
+cost_accuracies = zeros(size(costs));
+
+accuracies_within = zeros(size(comp_values, 1), 1);
+for fly_counter = 1 : size(comp_values, 1)
+    tic;
+    
+    for cost_counter = 1 : length(costs) % ~60 seconds
+        cost = costs(cost_counter);
+        results = svm_lol_liblinear_manual(permute(comp_values(fly_counter, :, :, :), [2 3 4 1]), cost);
+        cost_accuracies(cost_counter) = results.accuracy;
+    end
+    
+    accuracies_within(fly_counter) = cost_accuracies; % Assuming only one cost value
+    
+    toc
+end
