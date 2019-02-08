@@ -25,7 +25,7 @@ addpath('C:\Users\this_\Documents\MATLAB\Toolboxes\liblinear-2.20\windows');
 
 addpath('../svm_classification/');
 
-results_dir = 'results/';
+results_location = 'results/';
 
 nChannels = 4;
 flies = (1:13);
@@ -91,26 +91,40 @@ big_mips = permute(sum(big_mips, 1), [2 3 4 5 6 7 1]);
 big_mips = big_mips ./ single(sum(phis.state_counters(:, 1, 1, 1, 1)));
 
 %% Classify within fly
-% ~10 hours for all flies, with cost search
+% ~10 hours for all flies, with cost search (when using just 1 cpu)
+% ~300 seconds for 1 fly, with cost search (when using 4 cpus)
 
 class_type = 'within';
-results_file = ['phi3Composition_' constellation_type '_' class_type.mat'];
+results_file = ['phi3Composition_' constellation_type '_' class_type '.mat'];
 
 cost_powers = (-20:20);%0;%(-20:20);
 costs = 2 .^ cost_powers;
 cost_accuracies = zeros(length(costs), size(big_mips, 2), size(big_mips, 4));
 
+big_mips_par = parallel.pool.Constant(big_mips);
+costs_par = parallel.pool.Constant(costs);
+
 for fly = 1 : size(big_mips, 4) % Roughly 70s per fly, cost-level
-    disp(fly); tic;
-    for network = 1 : size(big_mips, 2)
-        features = permute(big_mips(:, network, :, fly, :), [3 1 5 2 4]); % trials x comp-phis x conditions
-        for cost_counter = 1 : length(costs)
-            cost = costs(cost_counter);
+    disp(['fly ' num2str(fly)]); tic;
+    
+    parfor network = 1 : size(big_mips, 2)
+        disp(network);
+        
+        features = permute(big_mips_par.Value(:, network, :, fly, :), [3 1 5 2 4]); % trials x comp-phis x conditions
+        accuracies = zeros(size(costs_par.Value));
+        
+        for cost_counter = 1 : length(costs_par.Value)
+            cost = costs_par.Value(cost_counter);
             results = svm_lol_liblinear_manual(features, cost); % observations x features x classes
-            cost_accuracies(cost_counter, network, fly) = results.accuracy;
+            accuracies(cost_counter) = results.accuracy;
         end
+        
+        cost_accuracies(:, network, fly) = accuracies;
+        
     end
+    
     toc
+    
 end
 
 accuracy = zeros(size(cost_accuracies, 2), size(cost_accuracies, 3));
@@ -127,30 +141,38 @@ save([results_location results_file], 'accuracy', 'cost_accuracies', 'costs', 'n
 disp('saved within');
 
 %% Classify across flies
+% ~40 minutes
 
 class_type = 'across';
-results_file = ['phi3Composition_' constellation_type '_' class_type.mat'];
+results_file = ['phi3Composition_' constellation_type '_' class_type '.mat'];
 
 cost_powers = (-20:20);%0;%(-20:20);
 costs = 2 .^ cost_powers;
 cost_accuracies = zeros(length(costs), size(big_mips, 2));
 
-for network = 1 : size(big_mips, 2)
+big_mips_par = parallel.pool.Constant(big_mips);
+costs_par = parallel.pool.Constant(costs);
+
+tic;
+parfor network = 1 : size(big_mips, 2)
     disp(network); tic;
     
-    features = permute(mean(big_mips(:, network, :, :, :), 3), [4 1 5 2 3]); % flies x comp-phis x conditions
+    features = permute(mean(big_mips_par.Value(:, network, :, :, :), 3), [4 1 5 2 3]); % flies x comp-phis x conditions
+    accuracies = zeros(size(costs_par.Value));
     
-    for cost_counter = 1 : length(costs)
-        cost = costs(cost_counter);
+    for cost_counter = 1 : length(costs_par.Value)
+        cost = costs_par.Value(cost_counter);
         
         results = svm_lol_liblinear_manual(features, cost);
-        cost_accuracies(cost_counter, network);
+        accuracies(cost_counter) = results.accuracy;
         
     end
+    
+    cost_accuracies(:, network) = accuracies;
 
 end
-
-accuracy = max(cost_accuracies, 1);
+toc
+accuracy = max(cost_accuracies, [], 1);
 
 %% Save accuracies
 
@@ -166,23 +188,23 @@ load([results_dir results_file]);
 
 %% Plot
 
-flies = (1:13);
-
-order_labels = {'1st', '2nd', '3rd', '4th', '1/2/3/4th', '\Phi'};
-
-% Plots average across flies, for all channel sets
-figure;
-imagesc(squeeze(mean(accuracies(flies, :, 1:6), 1)));
-c = colorbar; ylabel(c, 'accuracy');
-set(gca, 'XTickLabels', order_labels);
-xlabel('concept-orders used');
-ylabel('channel set');
-
-% Plots average across channel sets, and average + std across flies
-figure;
-errorbar((1:6), squeeze(mean(mean(accuracies(flies, :, :), 2), 1)), squeeze(std(mean(accuracies(flies, :, :), 2), [], 1) / size(accuracies, 1)));
-%errorbar((1:6), squeeze(mean(mean(accuracies, 2), 1)), squeeze(std(mean(accuracies, 2), [], 1)));
-set(gca, 'XTickLabels', order_labels);
-xlabel('concept-orders used');
-ylabel('accuracy');
-xlim([0.5 6.5]);
+% flies = (1:13);
+% 
+% order_labels = {'1st', '2nd', '3rd', '4th', '1/2/3/4th', '\Phi'};
+% 
+% % Plots average across flies, for all channel sets
+% figure;
+% imagesc(squeeze(mean(accuracies(flies, :, 1:6), 1)));
+% c = colorbar; ylabel(c, 'accuracy');
+% set(gca, 'XTickLabels', order_labels);
+% xlabel('concept-orders used');
+% ylabel('channel set');
+% 
+% % Plots average across channel sets, and average + std across flies
+% figure;
+% errorbar((1:6), squeeze(mean(mean(accuracies(flies, :, :), 2), 1)), squeeze(std(mean(accuracies(flies, :, :), 2), [], 1) / size(accuracies, 1)));
+% %errorbar((1:6), squeeze(mean(mean(accuracies, 2), 1)), squeeze(std(mean(accuracies, 2), [], 1)));
+% set(gca, 'XTickLabels', order_labels);
+% xlabel('concept-orders used');
+% ylabel('accuracy');
+% xlim([0.5 6.5]);

@@ -2,7 +2,7 @@
 
 %{
 
-Classifies awake/anest using 15 features - power of 15 channels (at lowest frequency)
+Classifies awake/anest using 105 features - coherence of 15 channels (at lowest frequency)
 
 Across flies classification
 Within flies classification
@@ -13,6 +13,7 @@ Within flies classification
 
 nChannels = 4;
 networks = nchoosek((1:15), 4); % 15 channels in total
+pairs = nchoosek((1:15), 2); % coherence is always pairwise
 
 freq_range = (1:42); % (1:42) = 0-5Hz; Vector of which frequency bins to use, we want to use the lowest frequency bin
 freq_range = (43:165); % 10-20Hz
@@ -24,34 +25,54 @@ results_location = 'results/';
 
 addpath('../svm_classification/');
 
-%% Load power
+%% Load coherence
 
-powers = load_power(bin_dir);
+coherencies = load_coherence(bin_dir);
 
 % Mean across frequency bins
-powers = mean(powers(freq_range, :, :, :, :), 1);
-powers = permute(powers, [2 3 4 5 1]); % trials x channels x conditions x flies
+coherencies = mean(coherencies(freq_range, :, :, :, :), 1);
+coherencies = permute(coherencies, [2 3 4 5 1]); % trials x channels x conditions x flies
+
+%% Determine which channel pairs correspond to which channel sets a priori
+
+% nchannels choose 2 (coherence is always pairwise)
+network_pairs = zeros(size(networks, 1), nchoosek(size(networks, 2), 2));
+
+for network_counter = 1 : size(networks, 1)
+    network = networks(network_counter, :);
+    
+    % Every possible pair for this set of channels
+    matching_pairs = nchoosek(network, 2);
+    
+    % Find indices of each pair
+    for pair_counter = 1 : size(matching_pairs, 1)
+        pair = matching_pairs(pair_counter, :);
+        [match, index] = ismember(pair, pairs, 'rows'); % there should only be one match
+        network_pairs(network_counter, pair_counter) = index;
+    end
+    
+end
 
 %% Classify across flies
 
 class_type = 'across';
-results_file = ['power_svm_' class_type '.mat'];
+results_file = ['coherence_svm_' class_type '.mat'];
 
 cost_powers = (-20:20);%0;%(-20:20);
 costs = 2 .^ cost_powers;
-cost_accuracies = zeros(length(costs), size(networks, 1));
+cost_accuracies = zeros(size(costs));
 
-powers_par = parallel.pool.Constant(powers);
+coherencies_par = parallel.pool.Constant(coherencies);
 costs_par = parallel.pool.Constant(costs);
 
 tic;
 parfor network_counter = 1 : size(networks, 1)
     %tic;
-    network = networks(network_counter, :);
+    network = network_pairs(network_counter, :);
     disp(network_counter);
     
     % Average across trials
-    values = permute(mean(powers_par.Value(:, network, :, :), 1), [4 2 3 1]); % flies x channels x conditions
+    values = permute(mean(coherencies_par.Value(:, network, :, :), 1), [4 2 3 1]); % flies x pairs x conditions
     
     accuracies = zeros(size(costs_par.Value));
     
@@ -79,13 +100,13 @@ disp('saved across');
 %% Classify within flies
 
 class_type = 'within';
-results_file = ['power_svm_' class_type '.mat'];
+results_file = ['coherence_svm_' class_type '.mat'];
 
 cost_powers = (-20:20);%0;%(-20:20);
 costs = 2 .^ cost_powers;
-cost_accuracies = zeros(length(costs), size(networks, 1), size(powers, 4));
+cost_accuracies = zeros(length(costs), size(coherencies, 4));
 
-powers_par = parallel.pool.Constant(powers);
+coherencies_par = parallel.pool.Constant(coherencies);
 costs_par = parallel.pool.Constant(costs);
 
 for fly = 1 : size(powers, 4)
@@ -95,8 +116,9 @@ for fly = 1 : size(powers, 4)
     
     parfor network_counter = 1 : size(networks, 1)
         disp(network_counter);
+        network = network_pairs(network_counter, :);
         
-        values = powers_par.Value(:, network, :, fly); % trials x channels x conditions
+        values = coherencies_par.Value(:, network, :, fly); % trials x channels x conditions
         accuracies = zeros(size(costs_par.Value));
         
         for cost_counter = 1 : length(costs_par.Value)
