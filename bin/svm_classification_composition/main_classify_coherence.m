@@ -109,7 +109,7 @@ cost_accuracies = zeros(length(costs), size(coherencies, 4));
 coherencies_par = parallel.pool.Constant(coherencies);
 costs_par = parallel.pool.Constant(costs);
 
-for fly = 1 : size(powers, 4)
+for fly = 1 : size(coherencies, 4)
     disp(['fly ' num2str(fly)]);
     
     tic;
