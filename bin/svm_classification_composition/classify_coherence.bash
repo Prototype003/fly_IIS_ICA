@@ -46,7 +46,7 @@
 
 # Job script
 
-module load matlab/r2018b
+module load matlab/r2018a
 
 #matlab -nodisplay -nosplash -nodesktop -r "2+2;exit"
 matlab -nodisplay -nosplash -nodesktop -r "main_classify_coherence; exit"
