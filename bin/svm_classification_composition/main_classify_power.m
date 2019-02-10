@@ -49,9 +49,6 @@ addpath('../svm_classification/');
 
 tic;
 parfor network_counter = 1 : size(networks, 1)
-    pool = gcp;
-    addAttachedFiles(pool, '');
-    
     %tic;
     network = networks(network_counter, :);
     disp(network_counter);
