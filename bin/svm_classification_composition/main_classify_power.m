@@ -44,7 +44,8 @@ cost_accuracies = zeros(length(costs), size(networks, 1));
 % These commands create a parallel pool
 powers_par = parallel.pool.Constant(powers);
 costs_par = parallel.pool.Constant(costs);
-addpath('../svm_classification/'); % addpath after creating pool, for workers
+poolobj = gcp;
+addAttachedFiles(poolobj,{'../svm_classification/train.mexw64','../svm_classification/train.mexw64'})
 
 tic;
 parfor network_counter = 1 : size(networks, 1)
@@ -91,7 +92,8 @@ cost_accuracies = zeros(length(costs), size(networks, 1), size(powers, 4));
 % These commands create a parallel pool
 powers_par = parallel.pool.Constant(powers);
 costs_par = parallel.pool.Constant(costs);
-addpath('../svm_classification/'); % addpath after creating pool, for workers
+poolobj = gcp;
+addAttachedFiles(poolobj,{'../svm_classification/train.mexw64','../svm_classification/train.mexw64'})
 
 for fly = 1 : size(powers, 4)
     disp(['fly ' num2str(fly)]);
