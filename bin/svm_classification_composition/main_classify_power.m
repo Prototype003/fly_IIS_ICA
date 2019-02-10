@@ -41,14 +41,14 @@ cost_powers = (-20:20);%0;%(-20:20);
 costs = 2 .^ cost_powers;
 cost_accuracies = zeros(length(costs), size(networks, 1));
 
+% These commands create a parallel pool
 powers_par = parallel.pool.Constant(powers);
 costs_par = parallel.pool.Constant(costs);
-
-parpool;
-addpath('../svm_classification/');
+addpath('../svm_classification/'); % addpath after creating pool, for workers
 
 tic;
 parfor network_counter = 1 : size(networks, 1)
+    
     %tic;
     network = networks(network_counter, :);
     disp(network_counter);

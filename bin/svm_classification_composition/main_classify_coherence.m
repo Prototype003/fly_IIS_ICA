@@ -62,11 +62,10 @@ cost_powers = (-20:20);%0;%(-20:20);
 costs = 2 .^ cost_powers;
 cost_accuracies = zeros(size(costs));
 
+% These create a parallel pool
 coherencies_par = parallel.pool.Constant(coherencies);
 costs_par = parallel.pool.Constant(costs);
-
-parpool;
-addpath('../svm_classification/');
+addpath('../svm_classification/'); % addpath after creating pool, for workers
 
 tic;
 parfor network_counter = 1 : size(networks, 1)
