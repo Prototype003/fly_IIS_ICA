@@ -44,8 +44,14 @@ cost_accuracies = zeros(length(costs), size(networks, 1));
 powers_par = parallel.pool.Constant(powers);
 costs_par = parallel.pool.Constant(costs);
 
+parpool;
+addpath('../svm_classification/');
+
 tic;
 parfor network_counter = 1 : size(networks, 1)
+    pool = gcp;
+    addAttachedFiles(pool, '');
+    
     %tic;
     network = networks(network_counter, :);
     disp(network_counter);

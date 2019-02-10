@@ -65,6 +65,9 @@ cost_accuracies = zeros(size(costs));
 coherencies_par = parallel.pool.Constant(coherencies);
 costs_par = parallel.pool.Constant(costs);
 
+parpool;
+addpath('../svm_classification/');
+
 tic;
 parfor network_counter = 1 : size(networks, 1)
     %tic;
