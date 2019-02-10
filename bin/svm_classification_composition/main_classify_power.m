@@ -98,6 +98,7 @@ for fly = 1 : size(powers, 4)
     
     parfor network_counter = 1 : size(networks, 1)
         disp(network_counter);
+        network = networks(network_counter, :);
         
         values = powers_par.Value(:, network, :, fly); % trials x channels x conditions
         accuracies = zeros(size(costs_par.Value));
