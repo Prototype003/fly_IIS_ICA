@@ -108,8 +108,10 @@ cost_powers = (-20:20);%0;%(-20:20);
 costs = 2 .^ cost_powers;
 cost_accuracies = zeros(length(costs), size(coherencies, 4));
 
+% These create a parallel pool
 coherencies_par = parallel.pool.Constant(coherencies);
 costs_par = parallel.pool.Constant(costs);
+addpath('../svm_classification/'); % addpath after creating pool, for workers
 
 for fly = 1 : size(coherencies, 4)
     disp(['fly ' num2str(fly)]);
