@@ -44,14 +44,6 @@ cost_accuracies = zeros(length(costs), size(networks, 1));
 % These commands create a parallel pool
 powers_par = parallel.pool.Constant(powers);
 costs_par = parallel.pool.Constant(costs);
-poolobj = gcp;
-addAttachedFiles(poolobj,{'../svm_classification/train.mexw64','../svm_classification/train.mexw64'})
-
-disp('out of function');
-which predict
-spmd, which predict, end
-which -all predict
-dist(' ');
 
 tic;
 parfor network_counter = 1 : size(networks, 1)
@@ -98,8 +90,6 @@ cost_accuracies = zeros(length(costs), size(networks, 1), size(powers, 4));
 % These commands create a parallel pool
 powers_par = parallel.pool.Constant(powers);
 costs_par = parallel.pool.Constant(costs);
-poolobj = gcp;
-addAttachedFiles(poolobj,{'../svm_classification/train.mexw64','../svm_classification/predict.mexw64'})
 
 for fly = 1 : size(powers, 4)
     disp(['fly ' num2str(fly)]);

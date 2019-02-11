@@ -65,8 +65,6 @@ cost_accuracies = zeros(size(costs));
 % These create a parallel pool
 coherencies_par = parallel.pool.Constant(coherencies);
 costs_par = parallel.pool.Constant(costs);
-poolobj = gcp;
-addAttachedFiles(poolobj,{'../svm_classification/train.mexw64','../svm_classification/train.mexw64'})
 
 tic;
 parfor network_counter = 1 : size(networks, 1)
@@ -112,8 +110,6 @@ cost_accuracies = zeros(length(costs), size(coherencies, 4));
 % These create a parallel pool
 coherencies_par = parallel.pool.Constant(coherencies);
 costs_par = parallel.pool.Constant(costs);
-poolobj = gcp;
-addAttachedFiles(poolobj,{'../svm_classification/train.mexw64','../svm_classification/predict.mexw64'})
 
 for fly = 1 : size(coherencies, 4)
     disp(['fly ' num2str(fly)]);
