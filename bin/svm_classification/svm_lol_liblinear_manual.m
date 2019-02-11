@@ -9,6 +9,12 @@ function [classification] = svm_lol_liblinear_manual(values, cost, leave_out_cou
 % Outputs:
 %   classification: struct holding classification results
 
+disp('inside function');
+which predict
+spmd, which predict, end
+which -all predict
+dist(' ');
+
 nObservations = size(values, 1);
 nFeatures = size(values, 2);
 nClasses = size(values, 3);
