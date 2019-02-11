@@ -60,7 +60,7 @@ results_file = ['coherence_svm_' class_type '.mat'];
 
 cost_powers = (-20:20);%0;%(-20:20);
 costs = 2 .^ cost_powers;
-cost_accuracies = zeros(size(costs));
+cost_accuracies = zeros(size(costs), size(networks, 1));
 
 % These create a parallel pool
 coherencies_par = parallel.pool.Constant(coherencies);
@@ -105,7 +105,7 @@ results_file = ['coherence_svm_' class_type '.mat'];
 
 cost_powers = (-20:20);%0;%(-20:20);
 costs = 2 .^ cost_powers;
-cost_accuracies = zeros(length(costs), size(coherencies, 4));
+cost_accuracies = zeros(length(costs), size(networks, 1), size(coherencies, 4));
 
 % These create a parallel pool
 coherencies_par = parallel.pool.Constant(coherencies);
