@@ -95,7 +95,7 @@ big_mips = big_mips ./ single(sum(phis.state_counters(:, 1, 1, 1, 1)));
 % ~300 seconds for 1 fly, with cost search (when using 4 cpus)
 
 class_type = 'within';
-results_file = ['phi3Composition_' constellation_type '_' class_type '.mat'];
+results_file = ['phi3Composition_' constellation_type '_svm_' class_type '.mat'];
 
 cost_powers = (-20:20);%0;%(-20:20);
 costs = 2 .^ cost_powers;
@@ -144,7 +144,7 @@ disp('saved within');
 % ~40 minutes
 
 class_type = 'across';
-results_file = ['phi3Composition_' constellation_type '_' class_type '.mat'];
+results_file = ['phi3Composition_' constellation_type '_svm_' class_type '.mat'];
 
 cost_powers = (-20:20);%0;%(-20:20);
 costs = 2 .^ cost_powers;
@@ -183,7 +183,7 @@ disp('saved across');
 %% Load accuracies
 
 results_dir = 'results/';
-results_file = ['phi3Composition_' constellation_type '_' class_type.mat'];
+results_file = ['phi3Composition_' constellation_type '_svm_' class_type.mat'];
 load([results_dir results_file]);
 
 %% Plot
