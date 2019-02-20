@@ -10,7 +10,7 @@ Using big phi from 2- and 3-channels as compositional structure
 
 %% SETUP
 
-gaussian = 0;
+gaussian = 1;
 if gaussian == 1
     load_string = 'phi_star_gaussian';
     file_string = 'phiStarGaussianComposition';
