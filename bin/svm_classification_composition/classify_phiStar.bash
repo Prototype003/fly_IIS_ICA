@@ -35,10 +35,10 @@
 
 
 # Set the file for output (stdout)
-#SBATCH --output=classify_power.out
+#SBATCH --output=classify_phiStar.out
 
 # Set the file for error log (stderr)
-#SBATCH --error=classify_power.err
+#SBATCH --error=classify_phiStar.err
 
 
 # Use reserved node to run job when a node reservation is made for you already
