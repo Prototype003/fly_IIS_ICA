@@ -200,7 +200,7 @@ save([results_location results_file], 'accuracy', 'cost_accuracies', 'costs');
 
 disp('saved_within');
 
-%% MDS
+%% MDS using overlapping composition 
 comp_vals = permute(comp_values, [3 2 1 4]);
 comp_dims = size(comp_vals);
 
@@ -221,7 +221,39 @@ rep_dis_mat = 1 - corr(rep_mat);
 coords = cmdscale(rep_dis_mat);
 
 figure;
-scatter(coords(1:104, 1), coords(1:104, 2)); hold on;
-scatter(coords((105:end), 1), coords((105:end), 2));
+fly_colours = repmat((1:comp_dims(3)), comp_dims(2));
+fly_colours = fly_colours(:); fly_colours = fly_colours(1:104);
+scatter(coords(1:104, 1), coords(1:104, 2), [], fly_colours, 'o'); hold on;
+scatter(coords((105:end), 1), coords((105:end), 2), [], fly_colours, 'x');
 
-figure; plot(coords((1:104), 1)-coords((105:end), 1));
+%figure; plot(coords((1:104), 1)-coords((105:end), 1));
+
+%% MDS using each phi value
+
+comp_vals = phis{1}.phis;
+comp_dims = size(comp_vals);
+
+rep_mat = zeros(comp_dims(1), prod(comp_dims(2:end)));
+
+col = 1;
+for condition = 1 : comp_dims(4)
+    for fly = 1 : comp_dims(3)
+        for trial = 1 : comp_dims(2)
+            rep_mat(:, col) = comp_vals(:, trial, fly, condition);
+            col = col+1;
+        end
+    end
+end
+
+rep_dis_mat = 1 - corr(rep_mat).^2;
+
+coords = cmdscale(rep_dis_mat);
+
+figure;
+fly_colours = repmat((1:comp_dims(3)), comp_dims(2));
+fly_colours = fly_colours(:); fly_colours = fly_colours(1:prod(comp_dims(2:3)));
+scatter(coords(1:prod(comp_dims(2:3)), 1), coords(1:prod(comp_dims(2:3)), 2), [], fly_colours, 'o'); hold on;
+scatter(coords((prod(comp_dims(2:3))+1:end), 1), coords((prod(comp_dims(2:3))+1:end), 2), [], fly_colours, 'x');
+
+
+figure; plot(coords((1:prod(comp_dims(2:3))), 1)-coords((prod(comp_dims(2:3))+1:end), 1));

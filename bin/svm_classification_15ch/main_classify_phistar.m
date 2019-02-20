@@ -11,6 +11,15 @@ Within flies classification
 
 %% SETUP
 
+gaussian = 0;
+if gaussian == 1
+    load_string = 'phi_star_gaussian';
+    file_string = 'phiStarGaussian';
+else
+    load_string = 'phi_star';
+    file_string = 'phiStar';
+end
+
 tau = 1;
 global_tpm = 0;
 
@@ -25,7 +34,7 @@ results_location = 'results/';
 
 %% Load phi values
 
-[phi_threes, measure_strings{1}] = phi_load('phi_star_gaussian', global_tpm, bin_location);
+[phi_threes, measure_strings{1}] = phi_load(load_string, global_tpm, bin_location);
 
 values_all = phi_threes{3}.phis(:, :, :, :, tau);
 channel_sets = phi_threes{3}.channel_sets;
@@ -33,7 +42,7 @@ channel_sets = phi_threes{3}.channel_sets;
 %% Classify across flies
 
 class_type = 'across';
-results_file = ['phiStarGaussian_svm_' class_type '.mat'];
+results_file = [file_string '_svm_' class_type '.mat'];
 
 cost_powers = (-20:20);%0;%(-20:20);
 costs = 2 .^ cost_powers;
@@ -59,7 +68,7 @@ disp('saved across');
 %% Classify within flies
 
 class_type = 'within';
-results_file = ['phiStarGaussian_svm_' class_type '.mat'];
+results_file = [file_string '_svm_' class_type '.mat'];
 
 cost_powers = (-20:20);%0;%(-20:20);
 costs = 2 .^ cost_powers;
