@@ -52,7 +52,7 @@ subplot_counter = 1;
 cbar_titles = {...
     [measure_string '_{W}'],...
     [measure_string '_{A}'],...
-    [measure_string '_{W} / ' measure_string '_{A}']...
+    [measure_string '_{W} - ' measure_string '_{A}']...
     };
 %cbar_titles = {'W', 'A', 'W/A'};
 
@@ -81,6 +81,9 @@ xStarts(3) = xStarts(3) + cbar_width + xSpacing + cbar_spacing;
 % Store values for stats
 values_mapped = cell(size(phis));
 
+set_starts = [1 1 1]; % Use all sets, including sets with outermost channel
+%set_starts = [15 92 365]; % For excluding all sets containing outermost channel
+
 for nChannels_counter = 1 : length(phis)
     nChannels = phis{nChannels_counter}.nChannels;
     channel_sets = double(phis{nChannels_counter}.channel_sets);
@@ -88,10 +91,10 @@ for nChannels_counter = 1 : length(phis)
     % Get values to plot
     % Mean across trials and flies
     values = permute(mean(mean(phis{nChannels_counter}.phis(:, :, flies, :, tau), 2), 3), [1 4 2 3]);
-    plot_values = zeros(size(values, 1), 3);
-    plot_values(:, 1) = values(:, 1);
-    plot_values(:, 2) = values(:, 2);
-    plot_values(:, 3) = values(:, 1) ./ values(:, 2);
+    plot_values = zeros(size(values, 1)-set_starts(nChannels_counter)+1, 3);
+    plot_values(:, 1) = values(set_starts(nChannels_counter):end, 1);
+    plot_values(:, 2) = values(set_starts(nChannels_counter):end, 2);
+    plot_values(:, 3) = values(set_starts(nChannels_counter):end, 1) - values(set_starts(nChannels_counter):end, 2);
     
     % Set center / set path distance mapping
     centers = mean(channel_sets, 2); % Mean across channels in each set
@@ -205,7 +208,7 @@ for nChannels_counter = 1 : length(phis)
                 c.Ruler.TickLabelFormat = '%.3f';
             end
             if value_type == 3
-                c.Ruler.TickLabelFormat = '%.2f';
+                c.Ruler.TickLabelFormat = '%.4f';
             end
             set(gca, 'Position', ax_pos); % Reposition plot to original specs
             
@@ -254,7 +257,7 @@ end
 
 %% Print figure
 
-figure_name = 'fig3'; % 'fig3' for phi-3; 'figS1' for phi-star-gaussian
+figure_name = 'fig3'; % 'fig3' for phi-3; 'fig3Sgauss' for phi-star-gaussian
 
 print(figure_name, '-dsvg', '-painters'); % SVG
 print(figure_name, '-dpdf', '-painters', '-bestfit'); % PDF
