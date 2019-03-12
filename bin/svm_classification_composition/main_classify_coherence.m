@@ -56,7 +56,7 @@ end
 %% Classify across flies
 
 class_type = 'across';
-results_file = ['coherence_svm_' class_type '.mat'];
+results_file = ['medianSplit_coherence_svm_' class_type '.mat'];
 
 cost_powers = (-20:20);%0;%(-20:20);
 costs = 2 .^ cost_powers;
@@ -101,7 +101,7 @@ disp('saved across');
 %% Classify within flies
 
 class_type = 'within';
-results_file = ['coherence_svm_' class_type '.mat'];
+results_file = ['medianSplit_coherence_svm_' class_type '.mat'];
 
 cost_powers = (-20:20);%0;%(-20:20);
 costs = 2 .^ cost_powers;
