@@ -24,17 +24,26 @@ chronux_params.pad = 1; % I think Dror used 1, apparently higher padding gives h
 nFlies = length(flies);
 nConditions = length(conditions);
 
-across_flies = 1;
+across_flies = 0;
 
 data_directory = 'workspace_results/';
 data_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim.mat';
 
 results_directory = 'workspace_results/';
 results_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_coherence_classification_across' num2str(across_flies) '.mat'];
+results_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_coherence_medianSplit_classification_across' num2str(across_flies) '.mat'];
 
 %% Load
 
 load([data_directory data_filename]);
+
+%% Preprocessing
+% If required
+
+% Median split
+fly_meds = median(fly_data, 1);
+fly_meds = repmat(fly_meds, [size(fly_data, 1) 1 1 1 1]);
+fly_data = fly_data > fly_meds;
 
 %% Calculate coherence
 disp('Computing coherencies');

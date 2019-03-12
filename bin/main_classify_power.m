@@ -31,6 +31,7 @@ data_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim.ma
 
 results_directory = 'workspace_results/';
 results_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_power_classification_across' num2str(across_flies) '.mat'];
+results_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_medianSplit_power_classification_across' num2str(across_flies) '.mat'];
 
 %% Load
 
@@ -38,12 +39,21 @@ disp('loading');
 load([data_directory data_filename]);
 disp('loaded');
 
+%% Preprocessing
+% If required
+
+% Median split
+fly_meds = median(fly_data, 1);
+fly_meds = repmat(fly_meds, [size(fly_data, 1) 1 1 1 1]);
+fly_data = fly_data > fly_meds;
+
 %% Calculate power
 % Chronux continuous data - first dimension is time, second dimension is trials/channels
 
 disp('Calculating power');
 
 if across_flies >= 0
+    % Preserve trials
     
     % Results matrix: frequencies x trials x channels x condition x fly
     powers = zeros(410, size(fly_data, 3), nChannels, nConditions, nFlies);
@@ -69,6 +79,7 @@ if across_flies >= 0
     end
     
 else % across == 1
+    % Calculate across concatenated trials
     
     % Results matrix: frequencies x trials x channels x condition x fly
     powers = zeros(3277, 1, nChannels, nConditions, nFlies);
@@ -123,6 +134,7 @@ if across_flies == 1 % across flies
         for frequency = 1 : length(frequencies)
             
             % Classes are awake and anest, each column is a class
+            % Take mean across trials
             class_data = [...
                 permute(mean(powers(frequency, :, channel, 1, :), 2), [5 1 2 3 4])...
                 permute(mean(powers(frequency, :, channel, 2, :), 2), [5 1 2 3 4])...
