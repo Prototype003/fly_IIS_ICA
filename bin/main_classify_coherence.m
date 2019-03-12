@@ -31,7 +31,7 @@ data_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim.ma
 
 results_directory = 'workspace_results/';
 results_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_coherence_classification_across' num2str(across_flies) '.mat'];
-results_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_coherence_medianSplit_classification_across' num2str(across_flies) '.mat'];
+results_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_medianSplit_coherence_classification_across' num2str(across_flies) '.mat'];
 
 %% Load
 
