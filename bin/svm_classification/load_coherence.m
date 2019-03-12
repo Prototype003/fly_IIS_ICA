@@ -12,7 +12,8 @@ function [coherencies, frequencies, chronux_params] = load_coherence(bin_locatio
 
 results_directory = [bin_location 'workspace_results/'];
 %results_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_coherence_classification_across' num2str(0) '.mat'];
-results_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_coherence_classification.mat'];
+%results_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_coherence_classification_across0.mat'];
+results_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_medianSplit_coherence_classification_across0.mat'];
 
 load([results_directory results_filename]);
 

@@ -12,7 +12,8 @@ function [powers, frequencies, chronux_params] = load_power(bin_location)
 
 results_directory = [bin_location 'workspace_results/'];
 %results_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_power_classification_across' num2str(0) '.mat'];
-results_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_power_classification.mat'];
+%results_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_power_classification_across0.mat'];
+results_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_medianSplit_power_classification_across0.mat'];
 
 load([results_directory results_filename]);
 
