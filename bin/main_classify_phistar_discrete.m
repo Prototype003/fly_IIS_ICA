@@ -34,6 +34,8 @@ end
 
 addpath('figure_code/');
 
+across_flies = 1; global_covariance = 'nonGlobal';
+
 results_directory = 'workspace_results/';
 results_filename = ['split2250_bipolarRerefType1_lineNoiseRemoved_phistar_discrete_' global_covariance '_classification_across' num2str(across_flies) '.mat'];
 
@@ -61,8 +63,8 @@ for nChannels_counter = 1 : length(nChannels)
             
             % Classes are awake and anest, each column is a class
             class_data = [...
-                permute(phis{nChannels_counter}.phis(set, trials, :, 1, tau), [3 1 2 4 5])...
-                permute(phis{nChannels_counter}.phis(set, trials, :, 2, tau), [3 1 2 4 5])...
+                permute(mean(phis{nChannels_counter}.phis(set, trials, :, 1, tau), 2), [3 1 2 4 5])...
+                permute(mean(phis{nChannels_counter}.phis(set, trials, :, 2, tau), 2), [3 1 2 4 5])...
                 ];
             
             % Classify
