@@ -1,5 +1,5 @@
 #!/bin/bash
-nChannels=4
+nChannels=3
 flies=13 # 13
 conditions=(1 2)
 set_ids=($(seq 1 1 455)) # ($(seq first step last)) # (1036)
