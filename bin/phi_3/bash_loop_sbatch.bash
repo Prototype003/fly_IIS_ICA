@@ -13,7 +13,6 @@
 # To set a project account for credit charging, 
 #SBATCH --account=qb48
 
-
 # Request CPU resource for a serial job
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
@@ -21,11 +20,12 @@
 #SBATCH --cpus-per-task=1
 
 # Memory usage (MB)
-#SBATCH --mem-per-cpu=8000
+#SBATCH --mem-per-cpu=4000
 
 # Set your minimum acceptable walltime, format: day-hours:minutes:seconds
-#SBATCH --time=0-00:30:00
+#SBATCH --time=0-00:20:00
 
+#SBATCH --qos=shortq
 
 # To receive an email when job completes or fails
 # SBATCH --mail-user=aleu6@student.monash.edu
