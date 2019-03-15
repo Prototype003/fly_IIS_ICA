@@ -2,7 +2,7 @@
 
 %{
 
-Joins 4-channel results (across all parameters)
+Joins 2-channel results (across all parameters)
 
 %}
 
@@ -14,7 +14,7 @@ flies = (1:13);
 conditions = (1:2);
 taus = [4];
 tau_type = 'step'; % 'step' or 'bin'
-tau_offset = 0; % Currently this script only works for a single tau_offset
+bin_offsets = 0; % Currently this script only works for a single tau_offset
 trials = (1:8);
 
 % _nChannels4_globalTPM1_f01c2tauBin4500tauOffset21s1036t1
@@ -27,8 +27,10 @@ source_prefix = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_n
 
 if strcmp(tau_type, 'step')
     tau_string = 'tau';
+    binOffset_string = '';
 else % strcmp(tau_type, 'bin')
     tau_string = 'tauBin';
+    binOffset_string = 'binOffset1';
 end
 
 channel_sets = nchoosek((1:15), nChannels);
@@ -78,7 +80,7 @@ for fly = flies
                         '_f' sprintf('%02d', fly)...
                         'c' num2str(condition)...
                         tau_string num2str(tau)...
-                        'tauOffset' num2str(tau_offset)...
+                        binOffset_string...
                         's' sprintf('%04d', set_counter)...
                         't' num2str(trial)...
                         '.mat'...
