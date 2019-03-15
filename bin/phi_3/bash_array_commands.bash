@@ -15,7 +15,7 @@ for (( fly=1; fly<=$flies; fly++ )); do
 			for tau in "${taus[@]}"; do
 				for (( trial=1; trial<=$trials; trial++ )); do
 					
-					echo "python3 phi_compute.py $nChannels $fly $condition $set $tau $trial $global_tpm $tau_bin $start_sample" >> array_commands
+					echo "python3 phi_compute.py $nChannels $fly $condition $set $tau $trial $global_tpm $tau_bin $sample_offset" >> array_commands
 					
 				done
 			done
