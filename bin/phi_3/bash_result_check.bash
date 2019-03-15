@@ -30,7 +30,7 @@ for (( fly=1; fly<=$flies; fly++ )); do
 					for (( start_sample=1; start_sample<=start_samples; start_sample++ )); do
 						sample_offset=$((${start_sample}-1))
 						
-						id="f${fly_padded}c${condition}${tau_string}${tau}tauOffset${sample_offset}s${set_padded}t${trial}"
+						id="f${fly_padded}c${condition}${tau_string}${tau}binOffset${sample_offset}s${set_padded}t${trial}"
 						
 						results_file="results_split/${prefix}${id}${suffix}"
 						
