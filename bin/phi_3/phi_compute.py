@@ -37,9 +37,10 @@ if not os.path.exists(results_directory):
 # tau string for results file
 if tau_bin == 1:
 	tau_type = "tauBin"
+	tau_string = tau_type + str(tau) + "binOffsets" + str(sample_offsets)
 else:
 	tau_type = "tau"
-tau_string = tau_type + str(tau) + "binOffsets" + str(sample_offsets)
+	tau_string = tau_type + str(tau)
 
 # Results file
 results_file_suffix = "_nChannels" + str(nChannels) + "_globalTPM" + str(global_tpm) + "_f" + "{0:0>2}".format(fly) + "c" + str(condition) + tau_string + "s" + "{0:0>4}".format(set) + "t" + str(trial)
