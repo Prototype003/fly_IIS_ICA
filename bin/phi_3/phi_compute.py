@@ -74,19 +74,22 @@ print("Specific data obtained")
 
 # Preprocess ############################################################################
 
-if sample_offsets == 1:
-	n_values = 2
-	tpm, transition_counters = build_tpm_bin_offsets(fly_data, n_values, tau)
-	tpm_formatted = tpm
-else:
-	if tau_bin == 1:
+tpm_built = 0
+if tau_bin == 1:
+	if sample_offsets == 1:
+		n_values = 2
+		tpm, transition_counters = build_tpm_bin_offsets(fly_data, n_values, tau)
+		tpm_formatted = tpm
+		tpm_built = 1
+	else:
 		# Downsample by averaging in bins of length tau
 		fly_data = tau_resample(fly_data[:, :, None, None, None], tau)
 		fly_data = fly_data[:, :, 0, 0, 0] # Get rid of those appended singleton dimensions
 		tau_step = 1
-	else:
-		tau_step = tau
-	
+else:
+	tau_step = tau
+
+if tpm_built == 0:
 	# Binarise by median split
 	fly_data, n_values, medians = binarise_trial_median(fly_data[:, :, None, None, None])
 	fly_data = fly_data[:, :, 0, 0, 0] # Get rid of those appended singleton dimensions
@@ -94,9 +97,32 @@ else:
 	# Build TPM
 	tpm = build_tpm(fly_data[:, :, None], tau_step, n_values)
 	tpm_formatted = pyphi.convert.state_by_state2state_by_node(tpm)
-	#tpm = build_tpm(np.flip(fly_data[:, :, None], 0), tau_step, n_values)
-	#tpm, tmp = build_tpm_sbn_normalise(fly_data[:, :, None], tau_step, n_values, 9000)
+
 print("TPM built")
+
+# if sample_offsets == 1:
+	# n_values = 2
+	# tpm, transition_counters = build_tpm_bin_offsets(fly_data, n_values, tau)
+	# tpm_formatted = tpm
+# else:
+	# if tau_bin == 1:
+		# # Downsample by averaging in bins of length tau
+		# fly_data = tau_resample(fly_data[:, :, None, None, None], tau)
+		# fly_data = fly_data[:, :, 0, 0, 0] # Get rid of those appended singleton dimensions
+		# tau_step = 1
+	# else:
+		# tau_step = tau
+	
+	# # Binarise by median split
+	# fly_data, n_values, medians = binarise_trial_median(fly_data[:, :, None, None, None])
+	# fly_data = fly_data[:, :, 0, 0, 0] # Get rid of those appended singleton dimensions
+
+	# # Build TPM
+	# tpm = build_tpm(fly_data[:, :, None], tau_step, n_values)
+	# tpm_formatted = pyphi.convert.state_by_state2state_by_node(tpm)
+	# #tpm = build_tpm(np.flip(fly_data[:, :, None], 0), tau_step, n_values)
+	# #tpm, tmp = build_tpm_sbn_normalise(fly_data[:, :, None], tau_step, n_values, 9000)
+# print("TPM built")
 
 # Build the network and subsystem
 # We are assuming full connection
