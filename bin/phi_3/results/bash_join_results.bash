@@ -49,4 +49,4 @@
 module load matlab/r2017a
 
 #matlab -nodisplay -nosplash -nodesktop -r "2+2;exit"
-matlab -nodisplay -nosplash -nodesktop -r "join_split_3ch; exit"
+matlab -nodisplay -nosplash -nodesktop -r "join_split_4ch; exit"
