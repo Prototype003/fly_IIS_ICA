@@ -9,8 +9,8 @@ Summarise SVM classification results
 %% Setup
 
 results_location = 'results/';
-measures = {'power', 'coherence', 'phi3Composition_unpart', 'phiStarComposition', 'phiStarGaussianComposition'};
-measure_labels = {'P', 'C', '\phi3comp', '\Phi*comp', '\Phi*gcomp'};
+measures = {'4ch_medianSplit_power', '4ch_medianSplit_coherence', '4ch_phi3Composition_unpart', '4ch_phiStarComposition', '4ch_phiStarGaussianComposition'};
+measure_labels = {'P', 'C', '4ch\phi3comp', '\Phi*comp', '\Phi*gcomp'};
 
 clim = [0 1];
 
