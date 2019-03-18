@@ -126,7 +126,7 @@ results_file = [num2str(nChannels) 'ch_phi3Composition_' constellation_type '_sv
 
 cost_powers = (-20:20);%0;%(-20:20);
 costs = 2 .^ cost_powers;
-cost_accuracies = zeros(length(costs), size(big_mips, 2), size(big_mips, 4));
+cost_accuracies = zeros(length(costs), size(networks_match, 1), size(big_mips, 4));
 
 big_mips_par = parallel.pool.Constant(big_mips);
 costs_par = parallel.pool.Constant(costs);
@@ -134,10 +134,10 @@ costs_par = parallel.pool.Constant(costs);
 for fly = 1 : size(big_mips, 4) % Roughly 70s per fly, cost-level
     disp(['fly ' num2str(fly)]); tic;
     
-    parfor network = 1 : size(big_mips, 2)
+    parfor network = 1 : size(networks_match, 1)
         disp(network);
         
-        features = permute(big_mips_par.Value(:, network, :, fly, :), [3 5 1 2 4]); % trials x  conditions x comp-phis x networks
+        features = permute(big_mips_par.Value(:, network_sets(network, :), :, fly, :), [3 5 1 2 4]); % trials x  conditions x comp-phis x networks
         features = permute(reshape(features, size(features, 1), size(features, 2), []), [1 3 2]); % trials x comp-phis x conditions
         accuracies = zeros(size(costs_par.Value));
         
@@ -176,16 +176,16 @@ results_file = [num2str(nChannels) 'ch_phi3Composition_' constellation_type '_sv
 
 cost_powers = (-20:20);%0;%(-20:20);
 costs = 2 .^ cost_powers;
-cost_accuracies = zeros(length(costs), size(big_mips, 2));
+cost_accuracies = zeros(length(costs), size(networks_match, 1));
 
 big_mips_par = parallel.pool.Constant(big_mips);
 costs_par = parallel.pool.Constant(costs);
 
 tic;
-parfor network = 1 : size(big_mips, 2)
+parfor network = 1 : size(networks_match, 1)
     disp(network); tic;
     
-    features = permute(mean(big_mips_par.Value(:, network, :, :, :), 3), [4 5 1 2 3]); % flies x conditions x comp-phis x networks
+    features = permute(mean(big_mips_par.Value(:, network_sets(network, :), :, :, :), 3), [4 5 1 2 3]); % flies x conditions x comp-phis x networks
     features = permute(reshape(features, size(features, 1), size(features, 2), []), [1 3 2]); % flies x comp-phis x conditions
     accuracies = zeros(size(costs_par.Value));
     
