@@ -35,10 +35,10 @@
 
 
 # Set the file for output (stdout)
-#SBATCH --output=classify_phi3_match2.out
+#SBATCH --output=classify_phi3_match3.out
 
 # Set the file for error log (stderr)
-#SBATCH --error=classify_phi3_match2.err
+#SBATCH --error=classify_phi3_match3.err
 
 
 # Use reserved node to run job when a node reservation is made for you already
@@ -50,4 +50,4 @@
 module load matlab/r2018a
 
 #matlab -nodisplay -nosplash -nodesktop -r "2+2;exit"
-matlab -nodisplay -nosplash -nodesktop -r "main_classify_phi3_match(2); exit"
+matlab -nodisplay -nosplash -nodesktop -r "main_classify_phi3_match(3); exit"
