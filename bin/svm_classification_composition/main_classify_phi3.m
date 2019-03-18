@@ -45,7 +45,7 @@ nConcepts = 15;
 %% Load
 
 source_dir = '../phi_3/results/';
-source_file = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_phithree_nChannels4_globalTPM0.mat';
+source_file = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_phithree_nChannels' num2str(nChannels) '_globalTPM0.mat'];
 tic
 disp('loading');
 tmp = load([source_dir source_file]);
@@ -95,7 +95,7 @@ big_mips = big_mips ./ single(sum(phis.state_counters(:, 1, 1, 1, 1)));
 % ~300 seconds for 1 fly, with cost search (when using 4 cpus)
 
 class_type = 'within';
-results_file = ['phi3Composition_' constellation_type '_svm_' class_type '.mat'];
+results_file = [num2str(nChannels) 'ch_phi3Composition_' constellation_type '_svm_' class_type '.mat'];
 
 cost_powers = (-20:20);%0;%(-20:20);
 costs = 2 .^ cost_powers;
@@ -144,7 +144,7 @@ disp('saved within');
 % ~40 minutes
 
 class_type = 'across';
-results_file = ['phi3Composition_' constellation_type '_svm_' class_type '.mat'];
+results_file = [num2str(nChannels) 'ch_phi3Composition_' constellation_type '_svm_' class_type '.mat'];
 
 cost_powers = (-20:20);%0;%(-20:20);
 costs = 2 .^ cost_powers;
