@@ -7,7 +7,7 @@
 
 # $1: line counter
 # Need to use variables OUTSIDE of this script, #SBATCH doesn't support variables: https://help.rc.ufl.edu/doc/Using_Variables_in_SLURM_Jobs
-#SBATCH --job-name=power
+#SBATCH --job-name=phi3_match
 
 
 # To set a project account for credit charging, 
