@@ -10,7 +10,7 @@ for (( line=1; line<=$lines; line=$line+$line_increment )); do
 	squeue -u aleung > job_list
 	jobs=$(wc -l < job_list)
 	echo "there are $jobs jobs"
-	while [ $jobs -ge 495 ]; do # Job limit is 500, to leave n spare jobs for anything else, specify 500-n as the limit
+	while [ $jobs -ge 281 ]; do # Job limit is 500, to leave n spare jobs for anything else, specify 500-n as the limit
 		echo "too many jobs, sleeping"
 		sleep 30s
 		squeue -u aleung > job_list
