@@ -35,10 +35,10 @@
 
 
 # Set the file for output (stdout)
-#SBATCH --output=classify_coherence.out
+#SBATCH --output=classify_correlation.out
 
 # Set the file for error log (stderr)
-#SBATCH --error=classify_coherence.err
+#SBATCH --error=classify_correlation.err
 
 
 # Use reserved node to run job when a node reservation is made for you already
