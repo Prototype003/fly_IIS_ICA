@@ -126,7 +126,7 @@ costs_par = parallel.pool.Constant(costs);
 
 tic;
 parfor network = 1 : size(big_mips, 2)
-    disp(network); tic;
+    disp(network);
     
     features = permute(mean(big_mips_par.Value(:, network, :, :, :), 3), [4 1 5 2 3]); % flies x comp-phis x conditions
     accuracies = zeros(size(costs_par.Value));
