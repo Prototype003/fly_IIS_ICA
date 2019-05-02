@@ -182,7 +182,7 @@ end
 
 %% Save accuracies
 
-save([results_location results_file], 'accuracy', 'cost_accuracies', 'costs', 'nChannels', 'tau');
+save([results_location results_file], 'cost_accuracies', 'costs', 'nChannels', 'tau');
 
 disp('saved across');
 
