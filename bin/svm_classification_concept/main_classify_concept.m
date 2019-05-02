@@ -139,6 +139,7 @@ costs = 2 .^ cost_powers;
 cost_accuracies = zeros(size(big_mips, 2), nConcepts+1, length(costs));
 
 % Broadcast variables
+parpool
 phis_p = parallel.pool.Constant(phis.phis);
 big_mips_p = parallel.pool.Constant(big_mips);
 const_starts_p = parallel.pool.Constant(const_starts);
