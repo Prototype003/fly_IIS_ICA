@@ -48,4 +48,4 @@
 # Job script
 module load matlab/r2018a
 echo "${1}"
-time "${1}"
+time eval "${1}"
