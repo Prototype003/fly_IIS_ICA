@@ -19,7 +19,7 @@ For
 
 % 'unpart': unpartitioned; 'part': partitioned
 % 'diff': unpartitioned-partitioned; 'both': unpartitioned AND partitioned
-constellation_type = 'unpart';
+constellation_type = 'part';
 
 addpath('C:\Users\this_\Documents\MATLAB\Toolboxes\liblinear-2.20\windows');
 
@@ -145,6 +145,12 @@ for fly = 1 : size(big_mips, 4) % Roughly 70s per fly
     toc
 end
 
+%% Save accuracies
+
+results_dir = 'results/';
+results_file = ['composition_' constellation_type '_classifyWithin.mat'];
+save([results_dir results_file], 'accuracies', 'tau', 'nChannels');
+
 %% Classify across flies
 
 accuracies = zeros(size(big_mips, 2), size(classification_features, 2)+1);
@@ -161,7 +167,7 @@ for network = 1 : size(big_mips, 2)
             mean(big_mips(concepts, network, :, :, :), 3),...
             [4 1 5 2 3]...
             ); % flies x features x conditions (observations x features x classes)
-        fig
+        
         % Classify
         results = svm_lol_liblinear_manual(features, cost);
         accuracies(network, concept_features) = results.accuracy;
@@ -177,19 +183,59 @@ for network = 1 : size(big_mips, 2)
     toc
 end
 
+%% Classify across flies (parallel)
+
+accuracies = zeros(size(big_mips, 2), size(classification_features, 2)+1);
+
+cost = 1;
+
+phis_p = parallel.pool.Constant(phis);
+big_mips_p = parallel.pool.Constant(big_mips);
+%%
+parfor network = 1 : size(big_mips, 2)
+    disp(network); tic;
+    
+    tmp_accuracies = zeros(size(classification_features, 2)+1, 1);
+    for concept_features = 1 : size(classification_features, 2)
+        
+        % Get features (concepts)
+        concepts = classification_features{1, concept_features}.concepts;
+        features = permute(...
+            mean(big_mips_p.Value(concepts, network, :, :, :), 3),...
+            [4 1 5 2 3]...
+            ); % flies x features x conditions (observations x features x classes)
+        
+        % Classify
+        results = svm_lol_liblinear_manual(features, cost);
+        %accuracies(network, concept_features) = results.accuracy;
+        tmp_accuracies(concept_features) = results.accuracy;
+        
+    end
+    
+    % Big phi classification
+    features = permute(mean(phis_p.Value.phis(network, :, :, :), 2), [3 1 4 2]);
+    %features = cat(2, features, permute(mean(phis.phis(network, :, :, :), 2), [3 1 4 2]));
+    results = svm_lol_liblinear_manual(features, cost);
+    tmp_accuracies(concept_features+1) = results.accuracy;
+    accuracies(network, :) = tmp_accuracies;
+   
+    toc
+end
+
 %% Save accuracies
 
 results_dir = 'results/';
-results_file = ['composition_' constellation_type '_classify.mat'];
+results_file = ['composition_' constellation_type '_classifyAcross.mat'];
 save([results_dir results_file], 'accuracies', 'tau', 'nChannels');
+disp(['saved ' results_file]);
 
 %% Load accuracies
 
 results_dir = 'results/';
-results_file = ['composition_' constellation_type '_classify.mat'];
+results_file = ['composition_' constellation_type '_classifyAcross.mat'];
 load([results_dir results_file]);
 
-%% Plot
+%% Plot (for within)
 
 flies = (1:13);
 
@@ -206,6 +252,27 @@ ylabel('channel set');
 % Plots average across channel sets, and average + std across flies
 figure;
 errorbar((1:6), squeeze(mean(mean(accuracies(flies, :, :), 2), 1)), squeeze(std(mean(accuracies(flies, :, :), 2), [], 1) / size(accuracies, 1)));
+%errorbar((1:6), squeeze(mean(mean(accuracies, 2), 1)), squeeze(std(mean(accuracies, 2), [], 1)));
+set(gca, 'XTickLabels', order_labels);
+xlabel('concept-orders used');
+ylabel('accuracy');
+xlim([0.5 6.5]);
+
+%% Plot (for across)
+
+order_labels = {'1st', '2nd', '3rd', '4th', '1/2/3/4th', '\Phi'};
+
+% Plots average across flies, for all channel sets
+figure;
+imagesc(accuracies(:, 1:6));
+c = colorbar; ylabel(c, 'accuracy');
+set(gca, 'XTickLabels', order_labels);
+xlabel('concept-orders used');
+ylabel('channel set');
+
+% Plots average across channel sets, and average + std across flies
+figure;
+errorbar((1:6), squeeze(mean(accuracies(:, :), 1)), squeeze(std(accuracies(:, :), [], 1) / sqrt(size(accuracies, 1))));
 %errorbar((1:6), squeeze(mean(mean(accuracies, 2), 1)), squeeze(std(mean(accuracies, 2), [], 1)));
 set(gca, 'XTickLabels', order_labels);
 xlabel('concept-orders used');
