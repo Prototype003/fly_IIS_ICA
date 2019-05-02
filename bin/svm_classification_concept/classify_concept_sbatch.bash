@@ -47,5 +47,5 @@
 
 # Job script
 module load matlab/r2018a
-echo "${command}"
-"${command}"
+echo "${1}"
+"${1}"
