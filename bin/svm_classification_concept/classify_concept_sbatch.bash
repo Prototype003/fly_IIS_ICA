@@ -17,7 +17,7 @@
 # Request CPU resource for a serial job
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
-# SBATCH --exclusive
+#SBATCH --exclusive
 #SBATCH --cpus-per-task=12
 
 # Memory usage (MB)
