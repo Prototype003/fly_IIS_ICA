@@ -21,7 +21,7 @@ For
 
 % 'unpart': unpartitioned; 'part': partitioned
 % 'diff': unpartitioned-partitioned; 'both': unpartitioned AND partitioned
-%constellation_type = 'both';
+%constellation_type = 'unpart';
 
 addpath('C:\Users\this_\Documents\MATLAB\Toolboxes\liblinear-2.20\windows');
 
@@ -114,14 +114,14 @@ elseif strcmp(constellation_type, 'unpart')
     % Unpartitioned
     big_mips = permute(...
         big_mips(1, :, :, :, :, :),...
-        [2 3 4 5 6]...
+        [2 3 4 5 6 1]...
         );
     const_starts = [0];
 elseif strcmp(constellation_type, 'part')
     % Unpartitioned
     big_mips = permute(...
         big_mips(2, :, :, :, :, :),...
-        [2 3 4 5 6]...
+        [2 3 4 5 6 1]...
         );
     const_starts = [0];
 end
@@ -172,7 +172,7 @@ parfor network = 1 : size(big_mips, 2)
         % Big phi classification
         features = permute(mean(phis_p.Value(network, :, :, :), 2), [3 1 4 2]);
         results = svm_lol_liblinear_manual(features, cost);
-        accuracies(concept_features+1, cost_counter) = results.accuracy;
+        accuracies(nConcepts+1, cost_counter) = results.accuracy;
         cost_accuracies(network, :, :) = accuracies;
         
     end
