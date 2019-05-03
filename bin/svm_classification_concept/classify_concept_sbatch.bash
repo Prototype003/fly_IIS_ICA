@@ -50,7 +50,7 @@ module load matlab/r2018a
 echo "${1}"
 
 # Create temporary directory for MATLAB parallelisation files, specific to job
-mkdir -p matlab/$SLURM_JOB_ID
+mkdir -p matlab_pct/$SLURM_JOB_ID
 echo "matlab_pct/${SLURM_JOB_ID}"
 
 # Run job command
