@@ -150,10 +150,10 @@ parfor network = 1 : size(big_mips, 2)
     
     nConcepts = size(big_mips_p.Value, 1) / length(const_starts_p.Value);
     
+    accuracies = zeros(nConcepts+1, length(costs_p.Value));
+    
     for cost_counter = 1 : length(costs_p.Value)
         cost = costs_p.Value(cost_counter);
-        
-        accuracies = zeros(nConcepts+1, length(costs_p.Value));
         
         for concept = 1 : nConcepts
             concept_inds = const_starts_p.Value + concept;
