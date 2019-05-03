@@ -139,7 +139,7 @@ costs = 2 .^ cost_powers;
 cost_accuracies = zeros(size(big_mips, 2), nConcepts+1, length(costs));
 
 % Broadcast variables
-parpool
+parpool(16)
 phis_p = parallel.pool.Constant(phis.phis);
 big_mips_p = parallel.pool.Constant(big_mips);
 const_starts_p = parallel.pool.Constant(const_starts);
@@ -174,16 +174,17 @@ parfor network = 1 : size(big_mips, 2)
         features = permute(mean(phis_p.Value(network, :, :, :), 2), [3 1 4 2]);
         results = svm_lol_liblinear_manual(features, cost);
         accuracies(nConcepts+1, cost_counter) = results.accuracy;
-        cost_accuracies(network, :, :) = accuracies;
         
     end
+    
+    cost_accuracies(network, :, :) = accuracies;
    
     toc
 end
 
 %% Save accuracies
 
-save([results_location results_file], 'cost_accuracies', 'costs', 'nChannels', 'tau');
+save([results_location results_file], 'cost_accuracies', 'costs', 'cost_powers', 'nChannels', 'tau');
 
 disp('saved across');
 
