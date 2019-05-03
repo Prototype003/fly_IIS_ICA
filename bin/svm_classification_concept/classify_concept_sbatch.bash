@@ -17,7 +17,7 @@
 # Request CPU resource for a serial job
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --exclusive
+# SBATCH --exclusive
 #SBATCH --cpus-per-task=16
 
 # Memory usage (MB)
@@ -48,4 +48,14 @@
 # Job script
 module load matlab/r2018a
 echo "${1}"
+
+# Create temporary directory for MATLAB parallelisation files, specific to job
+mkdir -p matlab/$SLURM_JOB_ID
+echo "matlab_pct/${SLURM_JOB_ID}"
+
+# Run job command
 time eval "${1}"
+
+# Remove temporary directory
+rm -rf matlab/$SLURM_JOB_ID
+echo "temp dir ${SLURM_JOB_ID} deleted"

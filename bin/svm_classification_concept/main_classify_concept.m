@@ -138,8 +138,16 @@ costs = 2 .^ cost_powers;
 % networks x concepts+Phi x costs
 cost_accuracies = zeros(size(big_mips, 2), nConcepts+1, length(costs));
 
+% Create local cluster
+pc = parcluster('local');
+
+% Set JobStorageLocation to specific directory for this particular job
+pc.JobStorageLocation = strcat('matlab_pct/', getenv('SLURM_JOB_ID'))';
+
+% Start pool
+parpool(pc, 16)
+
 % Broadcast variables
-parpool(16)
 phis_p = parallel.pool.Constant(phis.phis);
 big_mips_p = parallel.pool.Constant(big_mips);
 const_starts_p = parallel.pool.Constant(const_starts);
