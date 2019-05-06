@@ -132,7 +132,7 @@ end
 class_type = 'across';
 results_file = [num2str(nChannels) 'ch_phi3Concept_' constellation_type '_svm_' class_type '.mat'];
 
-cost_powers = (-20:10:20);
+cost_powers = (-20:20);
 costs = 2 .^ cost_powers;
 
 % networks x concepts+Phi x costs
