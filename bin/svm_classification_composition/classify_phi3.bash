@@ -35,10 +35,10 @@
 
 
 # Set the file for output (stdout)
-#SBATCH --output=classify_correlation.out
+#SBATCH --output=classify_phi3.out
 
 # Set the file for error log (stderr)
-#SBATCH --error=classify_correlation.err
+#SBATCH --error=classify_phi3.err
 
 
 # Use reserved node to run job when a node reservation is made for you already
