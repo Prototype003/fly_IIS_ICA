@@ -94,51 +94,51 @@ big_mips = big_mips ./ single(sum(phis.state_counters(:, 1, 1, 1, 1)));
 % ~10 hours for all flies, with cost search (when using just 1 cpu)
 % ~300 seconds for 1 fly, with cost search (when using 4 cpus)
 
-class_type = 'within';
-results_file = [num2str(nChannels) 'ch_phi3Composition_' constellation_type '_svm_' class_type '.mat'];
-
-cost_powers = (-20:20);%0;%(-20:20);
-costs = 2 .^ cost_powers;
-cost_accuracies = zeros(length(costs), size(big_mips, 2), size(big_mips, 4));
-
-big_mips_par = parallel.pool.Constant(big_mips);
-costs_par = parallel.pool.Constant(costs);
-
-for fly = 1 : size(big_mips, 4) % Roughly 70s per fly, cost-level
-    disp(['fly ' num2str(fly)]); tic;
-    
-    parfor network = 1 : size(big_mips, 2)
-        disp(network);
-        
-        features = permute(big_mips_par.Value(:, network, :, fly, :), [3 1 5 2 4]); % trials x comp-phis x conditions
-        accuracies = zeros(size(costs_par.Value));
-        
-        for cost_counter = 1 : length(costs_par.Value)
-            cost = costs_par.Value(cost_counter);
-            results = svm_lol_liblinear_manual(features, cost); % observations x features x classes
-            accuracies(cost_counter) = results.accuracy;
-        end
-        
-        cost_accuracies(:, network, fly) = accuracies;
-        
-    end
-    
-    toc
-    
-end
-
-accuracy = zeros(size(cost_accuracies, 2), size(cost_accuracies, 3));
-for fly = 1 : size(cost_accuracies, 3)
-    for network = 1 : size(cost_accuracies, 2)
-        accuracy(network, fly) = max(cost_accuracies(:, network, fly));
-    end
-end
-
-%% Save accuracies
-
-save([results_location results_file], 'accuracy', 'cost_accuracies', 'costs', 'nChannels', 'tau');
-
-disp('saved within');
+% class_type = 'within';
+% results_file = [num2str(nChannels) 'ch_phi3Composition_' constellation_type '_svm_' class_type '.mat'];
+% 
+% cost_powers = (-20:20);%0;%(-20:20);
+% costs = 2 .^ cost_powers;
+% cost_accuracies = zeros(length(costs), size(big_mips, 2), size(big_mips, 4));
+% 
+% big_mips_par = parallel.pool.Constant(big_mips);
+% costs_par = parallel.pool.Constant(costs);
+% 
+% for fly = 1 : size(big_mips, 4) % Roughly 70s per fly, cost-level
+%     disp(['fly ' num2str(fly)]); tic;
+%     
+%     parfor network = 1 : size(big_mips, 2)
+%         disp(network);
+%         
+%         features = permute(big_mips_par.Value(:, network, :, fly, :), [3 1 5 2 4]); % trials x comp-phis x conditions
+%         accuracies = zeros(size(costs_par.Value));
+%         
+%         for cost_counter = 1 : length(costs_par.Value)
+%             cost = costs_par.Value(cost_counter);
+%             results = svm_lol_liblinear_manual(features, cost); % observations x features x classes
+%             accuracies(cost_counter) = results.accuracy;
+%         end
+%         
+%         cost_accuracies(:, network, fly) = accuracies;
+%         
+%     end
+%     
+%     toc
+%     
+% end
+% 
+% accuracy = zeros(size(cost_accuracies, 2), size(cost_accuracies, 3));
+% for fly = 1 : size(cost_accuracies, 3)
+%     for network = 1 : size(cost_accuracies, 2)
+%         accuracy(network, fly) = max(cost_accuracies(:, network, fly));
+%     end
+% end
+% 
+% %% Save accuracies
+% 
+% save([results_location results_file], 'accuracy', 'cost_accuracies', 'costs', 'nChannels', 'tau');
+% 
+% disp('saved within');
 
 %% Classify across flies
 % ~40 minutes
