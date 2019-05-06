@@ -19,7 +19,7 @@ For
 
 % 'unpart': unpartitioned; 'part': partitioned
 % 'diff': unpartitioned-partitioned; 'both': unpartitioned AND partitioned
-constellation_type = 'unpart';
+constellation_type = 'part';
 
 addpath('C:\Users\this_\Documents\MATLAB\Toolboxes\liblinear-2.20\windows');
 
