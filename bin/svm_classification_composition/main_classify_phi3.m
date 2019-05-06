@@ -19,7 +19,7 @@ For
 
 % 'unpart': unpartitioned; 'part': partitioned
 % 'diff': unpartitioned-partitioned; 'both': unpartitioned AND partitioned
-constellation_type = 'part';
+constellation_type = 'both';
 
 addpath('C:\Users\this_\Documents\MATLAB\Toolboxes\liblinear-2.20\windows');
 
@@ -182,9 +182,9 @@ disp('saved across');
 
 %% Load accuracies
 
-results_dir = 'results/';
-results_file = ['phi3Composition_' constellation_type '_svm_' class_type.mat'];
-load([results_dir results_file]);
+% results_dir = 'results/';
+% results_file = ['phi3Composition_' constellation_type '_svm_' class_type '.mat'];
+% load([results_dir results_file]);
 
 %% Plot
 
