@@ -4,16 +4,12 @@ function [] = main_classify_phi3_match(nChannels)
 
 %{
 
-Classification across trials for all channel sets and flies
+Classification across trials for all channel sets and flies using
+constellations all subsets of channels
 
-Need to classify:
-    Using 2nd order concepts only
-    Using 3rd order concepts only
-    Using 4th order concepts only
-For
-    State dependent (all states x concepts)
-    Unweighted mean (sum of concept phis across possible states / number of possible states)
-    Weighted mean (weighted mean of concept phis across states)
+if nChannels_match == 4 and nChannels == 2
+then for every set of 4, ABCD, classify using constellations of AB, AC,
+AD, BC, BD, and CD
 
 %}
 

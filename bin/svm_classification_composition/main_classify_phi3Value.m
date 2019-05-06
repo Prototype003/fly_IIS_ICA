@@ -2,16 +2,8 @@
 
 %{
 
-Classification across trials for all channel sets and flies
-
-Need to classify:
-    Using 2nd order concepts only
-    Using 3rd order concepts only
-    Using 4th order concepts only
-For
-    State dependent (all states x concepts)
-    Unweighted mean (sum of concept phis across possible states / number of possible states)
-    Weighted mean (weighted mean of concept phis across states)
+Classification across trials for all channel sets and flies, using big phi
+value
 
 %}
 
@@ -19,7 +11,6 @@ For
 
 % 'unpart': unpartitioned; 'part': partitioned
 % 'diff': unpartitioned-partitioned; 'both': unpartitioned AND partitioned
-constellation_type = 'unpart';
 
 addpath('C:\Users\this_\Documents\MATLAB\Toolboxes\liblinear-2.20\windows');
 
