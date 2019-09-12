@@ -23,7 +23,7 @@ For
 % 'diff': unpartitioned-partitioned; 'both': unpartitioned AND partitioned
 %constellation_type = 'unpart';
 
-addpath('C:\Users\this_\Documents\MATLAB\Toolboxes\liblinear-2.20\windows');
+%addpath('C:\Users\this_\Documents\MATLAB\Toolboxes\liblinear-2.20\windows');
 
 addpath('../svm_classification/');
 
@@ -145,7 +145,7 @@ if strcmp(class_type, 'across')
     pc.JobStorageLocation = strcat('matlab_pct/', getenv('SLURM_JOB_ID'));
     
     % Start pool
-    parpool(pc, 16)
+    parpool(pc, 8)
     
     % Broadcast variables
     phis_p = parallel.pool.Constant(phis.phis);
@@ -197,6 +197,7 @@ if strcmp(class_type, 'across')
     disp('saved across');
     
 %% Classify within flies (parallel)
+% ~20 seconds per network with cost search (-20:10:20)
 elseif strcmp(class_type, 'within')
     
     results_file = [num2str(nChannels) 'ch_phi3Concept_' constellation_type '_svm_' class_type '.mat'];
@@ -214,7 +215,7 @@ elseif strcmp(class_type, 'within')
     pc.JobStorageLocation = strcat('matlab_pct/', getenv('SLURM_JOB_ID'));
     
     % Start pool
-    parpool(pc, 16)
+    parpool(pc, 8)
     
     % Broadcast variables
     phis_p = parallel.pool.Constant(phis.phis);
@@ -222,13 +223,12 @@ elseif strcmp(class_type, 'within')
     const_starts_p = parallel.pool.Constant(const_starts);
     costs_p = parallel.pool.Constant(costs);
 
-    
     parfor network = 1 : size(big_mips, 2)
         disp(network); tic;
         
         nConcepts = size(big_mips_p.Value, 1) / length(const_starts_p.Value);
         
-        accuracies = zeros(nConcepts+1, length(costs_p.Value));
+        accuracies = zeros(size(big_mips, 4), nConcepts+1, length(costs_p.Value));
         
         for cost_counter = 1 : length(costs_p.Value)
             cost = costs_p.Value(cost_counter);
@@ -251,7 +251,7 @@ elseif strcmp(class_type, 'within')
                 end
                 
                 % Big phi classification
-                features = permute(mean(phis_p.Value(network, :, :, :), 2), [3 1 4 2]);
+                features = permute(phis_p.Value(network, :, fly, :), [2 1 4 3]);
                 results = svm_lol_liblinear_manual(features, cost);
                 accuracies(fly, nConcepts+1, cost_counter) = results.accuracy;
                 
