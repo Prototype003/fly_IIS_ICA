@@ -1,4 +1,4 @@
-function [] = main_classify_concept(constellation_type)
+function [] = main_classify_concept(constellation_type, class_type)
 
 %% Description
 
@@ -129,71 +129,148 @@ end
 %% Classify across flies (parallel)
 % ~12 seconds per network with cost search (-20:10:20)
 
-class_type = 'across';
-results_file = [num2str(nChannels) 'ch_phi3Concept_' constellation_type '_svm_' class_type '.mat'];
-
-cost_powers = (-20:20);
-costs = 2 .^ cost_powers;
-
-% networks x concepts+Phi x costs
-cost_accuracies = zeros(size(big_mips, 2), nConcepts+1, length(costs));
-
-% Create local cluster
-pc = parcluster('local');
-
-% Set JobStorageLocation to specific directory for this particular job
-pc.JobStorageLocation = strcat('matlab_pct/', getenv('SLURM_JOB_ID'));
-
-% Start pool
-parpool(pc, 16)
-
-% Broadcast variables
-phis_p = parallel.pool.Constant(phis.phis);
-big_mips_p = parallel.pool.Constant(big_mips);
-const_starts_p = parallel.pool.Constant(const_starts);
-costs_p = parallel.pool.Constant(costs);
-
-parfor network = 1 : size(big_mips, 2)
-    disp(network); tic;
+if strcmp(class_type, 'across')
+    results_file = [num2str(nChannels) 'ch_phi3Concept_' constellation_type '_svm_' class_type '.mat'];
     
-    nConcepts = size(big_mips_p.Value, 1) / length(const_starts_p.Value);
+    cost_powers = (-20:10:20);
+    costs = 2 .^ cost_powers;
     
-    accuracies = zeros(nConcepts+1, length(costs_p.Value));
+    % networks x concepts+Phi x costs
+    cost_accuracies = zeros(size(big_mips, 2), nConcepts+1, length(costs));
     
-    for cost_counter = 1 : length(costs_p.Value)
-        cost = costs_p.Value(cost_counter);
+    % Create local cluster
+    pc = parcluster('local');
+    
+    % Set JobStorageLocation to specific directory for this particular job
+    pc.JobStorageLocation = strcat('matlab_pct/', getenv('SLURM_JOB_ID'));
+    
+    % Start pool
+    parpool(pc, 16)
+    
+    % Broadcast variables
+    phis_p = parallel.pool.Constant(phis.phis);
+    big_mips_p = parallel.pool.Constant(big_mips);
+    const_starts_p = parallel.pool.Constant(const_starts);
+    costs_p = parallel.pool.Constant(costs);
+    
+    parfor network = 1 : size(big_mips, 2)
+        disp(network); tic;
         
-        for concept = 1 : nConcepts
-            concept_inds = const_starts_p.Value + concept;
+        nConcepts = size(big_mips_p.Value, 1) / length(const_starts_p.Value);
+        
+        accuracies = zeros(nConcepts+1, length(costs_p.Value));
+        
+        for cost_counter = 1 : length(costs_p.Value)
+            cost = costs_p.Value(cost_counter);
             
-            % Get features (concepts), average across trials
-            features = permute(...
-                mean(big_mips_p.Value(concept_inds, network, :, :, :), 3),...
-                [4 1 5 2 3]...
-                ); % flies x features x conditions (observations x features x classes)
+            for concept = 1 : nConcepts
+                concept_inds = const_starts_p.Value + concept;
+                
+                % Get features (concepts), average across trials
+                features = permute(...
+                    mean(big_mips_p.Value(concept_inds, network, :, :, :), 3),...
+                    [4 1 5 2 3]...
+                    ); % flies x features x conditions (observations x features x classes)
+                
+                % Classify
+                results = svm_lol_liblinear_manual(features, cost);
+                accuracies(concept, cost_counter) = results.accuracy;
+                
+            end
             
-            % Classify
+            % Big phi classification
+            features = permute(mean(phis_p.Value(network, :, :, :), 2), [3 1 4 2]);
             results = svm_lol_liblinear_manual(features, cost);
-            accuracies(concept, cost_counter) = results.accuracy;
+            accuracies(nConcepts+1, cost_counter) = results.accuracy;
             
         end
         
-        % Big phi classification
-        features = permute(mean(phis_p.Value(network, :, :, :), 2), [3 1 4 2]);
-        results = svm_lol_liblinear_manual(features, cost);
-        accuracies(nConcepts+1, cost_counter) = results.accuracy;
+        cost_accuracies(network, :, :) = accuracies;
         
+        toc
     end
     
-    cost_accuracies(network, :, :) = accuracies;
-   
-    toc
+    %% Save accuracies
+    
+    save([results_location results_file], 'cost_accuracies', 'costs', 'cost_powers', 'nChannels', 'tau');
+    
+    disp('saved across');
+    
+%% Classify within flies (parallel)
+elseif strcmp(class_type, 'within')
+    
+    results_file = [num2str(nChannels) 'ch_phi3Concept_' constellation_type '_svm_' class_type '.mat'];
+    
+    cost_powers = (-20:10:20);
+    costs = 2 .^ cost_powers;
+    
+    % flies x networks x concepts+Phi x costs
+    cost_accuracies = zeros(size(big_mips, 2), size(big_mips, 4), nConcepts+1, length(costs));
+    
+    % Create local cluster
+    pc = parcluster('local');
+    
+    % Set JobStorageLocation to specific directory for this particular job
+    pc.JobStorageLocation = strcat('matlab_pct/', getenv('SLURM_JOB_ID'));
+    
+    % Start pool
+    parpool(pc, 16)
+    
+    % Broadcast variables
+    phis_p = parallel.pool.Constant(phis.phis);
+    big_mips_p = parallel.pool.Constant(big_mips);
+    const_starts_p = parallel.pool.Constant(const_starts);
+    costs_p = parallel.pool.Constant(costs);
+
+    
+    parfor network = 1 : size(big_mips, 2)
+        disp(network); tic;
+        
+        nConcepts = size(big_mips_p.Value, 1) / length(const_starts_p.Value);
+        
+        accuracies = zeros(nConcepts+1, length(costs_p.Value));
+        
+        for cost_counter = 1 : length(costs_p.Value)
+            cost = costs_p.Value(cost_counter);
+            
+            for fly = 1 : size(big_mips, 4)
+                
+                for concept = 1 : nConcepts
+                    concept_inds = const_starts_p.Value + concept;
+                    
+                    % Get features (concepts), average across trials
+                    features = permute(...
+                        big_mips_p.Value(concept_inds, network, :, fly, :),...
+                        [3 1 5 2 4]...
+                        ); % trials x features x conditions (observations x features x classes)flies x features x conditions (observations x features x classes)
+                    
+                    % Classify
+                    results = svm_lol_liblinear_manual(features, cost);
+                    accuracies(fly, concept, cost_counter) = results.accuracy;
+                    
+                end
+                
+                % Big phi classification
+                features = permute(mean(phis_p.Value(network, :, :, :), 2), [3 1 4 2]);
+                results = svm_lol_liblinear_manual(features, cost);
+                accuracies(fly, nConcepts+1, cost_counter) = results.accuracy;
+                
+            end
+            
+        end
+        
+        cost_accuracies(network, :, :, :) = accuracies;
+        
+        toc
+    end
+    
+    
+    %% Save accuracies
+    
+    save([results_location results_file], 'cost_accuracies', 'costs', 'cost_powers', 'nChannels', 'tau');
+    
+    disp('saved across');
+    
 end
-
-%% Save accuracies
-
-save([results_location results_file], 'cost_accuracies', 'costs', 'cost_powers', 'nChannels', 'tau');
-
-disp('saved across');
 
 end
