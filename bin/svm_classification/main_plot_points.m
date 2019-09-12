@@ -22,17 +22,17 @@ results_file = ['phi3_svm_' class_type '_singleFeature.mat'];
 
 %% Load phi values
 
-% if strcmp(class_type, 'across')
-%     global_tpm = 1;
-% else % strcmp(class_type, 'within')
-%     global_tpm = 0;
-% end
-% 
-% [phi_threes, measure_strings{1}] = phi_load('phi_three', global_tpm, bin_location);
-% 
-% values_all = phi_threes{3}.phis(:, :, :, :, tau);
-% channel_sets = phi_threes{3}.channel_sets;
-% nSets = size(channel_sets, 1);
+if strcmp(class_type, 'across')
+    global_tpm = 1;
+else % strcmp(class_type, 'within')
+    global_tpm = 0;
+end
+
+[phi_threes, measure_strings{1}] = phi_load('phi_three', global_tpm, bin_location);
+
+values_all = phi_threes{3}.phis(:, :, :, :, tau);
+channel_sets = phi_threes{3}.channel_sets;
+nSets = size(channel_sets, 1);
 
 %% Plot
 
