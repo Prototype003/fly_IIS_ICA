@@ -36,8 +36,14 @@ for class = 1 : nClasses
 end
 
 % Generate comprehensive leave-one-out combinations
-observation_labels = repmat((1:nObservations), [1 nClasses]);
-leave_outs = unique(nchoosek(observation_labels, nClasses), 'rows'); % Each row gives a unique combo of observations to leave out
+%observation_labels = repmat((1:nObservations), [1 nClasses]);
+%leave_outs = unique(nchoosek(observation_labels, nClasses), 'rows'); % Each row gives a unique combo of observations to leave out
+
+% Leave-one-out combinations
+% Leave out first of each class, then second, then third, etc
+% Leave-outs x classes
+% Each row gives combo of observations (which observations from which class to leave out
+leave_outs = repmat((1:nObservations)', [1 nClasses]);
 
 % Training and test labels will always be the same
 data_train_labels = zeros((nObservations-1) * nClasses, 1);
