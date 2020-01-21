@@ -138,7 +138,8 @@ cost_powers = (-50:10:50);
 costs = 2 .^ cost_powers;
 
 % flies x networks x concepts+Phi x costs
-net_accuracies = zeros(size(big_mips, 2), size(big_mips, var_source_dim), nConcepts+1);
+net_accuracies = zeros(size(big_mips, 2), size(big_mips, var_source_dim), nConcepts+2);
+net_accuracy_details = cell(size(big_mips, 2), size(big_mips, var_source_dim), nConcepts+2);
 
 % Create local cluster
 pc = parcluster('local');
