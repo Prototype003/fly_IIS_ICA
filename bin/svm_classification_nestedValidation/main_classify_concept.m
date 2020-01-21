@@ -233,7 +233,7 @@ end
 
 %% Save accuracies
 
-save([results_location results_file], 'net_accuracies', 'net_accuracy_details', 'costs', 'cost_powers', 'nChannels', 'tau');
+save([results_location results_file], 'net_accuracies', 'net_accuracy_details', 'costs', 'cost_powers', 'nChannels', 'tau', '-v7.3');
 
 disp(['saved ' class_type]);
 
