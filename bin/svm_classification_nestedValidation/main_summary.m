@@ -12,115 +12,45 @@ trial-averaged values)
 
 %% Setup
 
-const_types = {'unpart'}; %{'unpart', 'part', 'both'};
-class_type = 'across';
+const_type = 'unpart'; % 'part'; 'both'
+class_type = 'within';
 
 %% Load accuracies
 
-c_accuracies = struct(); % accuracies for each individual concept
-
 results_dir = 'results/';
-for const_type_c = 1 : length(const_types)
-    const_type = const_types{const_type_c};
-    results_file = ['4ch_phi3Concept_' const_type '_svm_' class_type '.mat'];
-    acc_tmp = load([results_dir results_file]);
-    
-    % Take the values at a specific cost
-    cost_param = 1;
-    c_accuracies.(const_type) = permute(mean(acc_tmp.cost_accuracies(:, :, :, cost_param), 2), [1 3 4 2]);
-    
-    % Take the maximum across costs
-    %c_accuracies.(const_type) = permute(mean(max(acc_tmp.cost_accuracies, [], 4), 2), [1 3 4 2]);
-    
-end
+results_file = ['4ch_phi3Concept_' const_type '_svm_' class_type '.mat'];
+acc = load([results_dir results_file]);
+
+% Accuracies of individual concepts
+c_accuracies = permute(mean(acc.net_accuracies(:, :, 1:15), 2), [1 3 2]);
+
+% Accuracy of IIS
+comp_accuracies = permute(mean(acc.net_accuracies(:, :, 16), 2), [1 3 2]);
+
+% Accuracy of SII
+p_accuracies = permute(mean(acc.net_accuracies(:, :, 17), 2), [1 3 2]);
 
 %% Processing
-
 % Average across all concepts within the same order
 
-o_accuracies = c_accuracies; % accuracies averaged across concepts with the same order
+max_order = 4;
 
-max_order = acc_tmp.nChannels; % from the last loaded file, but all should have the same value
+o_accuracies = zeros(size(c_accuracies, 1), max_order);
 
-for const_type_c = 1 : length(const_types)
-    const_type = const_types{const_type_c};
-    
-    % (networks x orders)
-    o_accuracies.(const_type) = zeros(size(c_accuracies.(const_type), 1), max_order);
-    
-    concept_ind = 1; % 0 because we will add counters to it
-    for order_c = 1 : max_order % for each order
-        
-        nConcepts = nchoosek(max_order, order_c);
-        concept_indices = (concept_ind : concept_ind+nConcepts-1);
-        
-        o_accuracies.(const_type)(:, order_c) = mean(c_accuracies.(const_type)(:, concept_indices), 2);
-        %o_accuracies.(const_type)(:, order_c) = max(c_accuracies.(const_type)(:, concept_indices), [], 2);
-        
-        concept_ind = concept_ind + nConcepts;
-        
-    end
-    
-end
-
-% Big phi
-p_accuracies = c_accuracies.(const_type)(:, end); % big-phi is same for all constellation types
-
-%% Add big Phi results
-
-% % Load classification results from using big phi (need to redo, using SVM?)
-% results_dir = '../svm_classification_composition/results/';
-% results_file = ['4ch_phiStarComposition_svm_' class_type '.mat'];
-% 
-% value_accuracies = struct();
-% acc_tmp = load([results_dir results_file]);
-% 
-% % Take the values at a specific cost
-% cost_param = 1;
-% p_accuracies = acc_tmp.cost_accuracies(cost_param, :);
-% 
-% % Take the maximum across costs
-% %p_accuracies = max(acc_tmp.cost_accuracies, [], 1);
-
-%% Add full constellation results
-
-% Load classification results from using full small phi constellation
-
-results_dir = '../svm_classification_composition/results/';
-
-comp_accuracies = struct(); % accuracies from using all concepts
-for const_type_c = 1 : length(const_types)
-    const_type = const_types{const_type_c};
-    
-    results_file = ['4ch_phi3Composition_' const_type '_svm_' class_type '.mat'];
-    acc_tmp = load([results_dir results_file]);
-    
-    % Take the values at a specific cost
-    cost_param = 1;
-    comp_accuracies.(const_type) = permute(mean(acc_tmp.cost_accuracies(cost_param, :, :), 3), [2 1 3]);
-    
-    % Take the maximum across costs
-    %comp_accuracies.(const_type) = permute(mean(max(acc_tmp.cost_accuracies, [], 1), 3), [2 1 3]);
+concept_ind = 1;
+for order_c = 1 : max_order % for each order
+    nConcepts = nchoosek(max_order, order_c);
+    concept_indices = (concept_ind : concept_ind+nConcepts-1);
+    o_accuracies(:, order_c) = mean(c_accuracies(:, concept_indices), 2); % mean across concepts
+    %o_accuracies(:, order_c) = max(c_accuracies(:, concept_indices), [], 2); % max across concepts
+    concept_ind = concept_ind + nConcepts;
 end
 
 %% Plot raincloud (for all; single concept, full constellation, big phi)
-% For only one const_type
-
-const_type = const_types{1};
-
-% Single concept results
-o_acc_all = o_accuracies.(const_type);
-
-% Max instead of mean across concepts within order
-%o_acc_all(:, 1) = max(c_accuracies.(const_type)(:, (1:4)), [], 2);
-%o_acc_all(:, 2) = max(c_accuracies.(const_type)(:, (5:10)), [], 2);
-%o_acc_all(:, 3) = max(c_accuracies.(const_type)(:, (11:14)), [], 2);
-
-% Full constellation results
-comp_acc_all = comp_accuracies.(const_type);
 
 % Join together with big phi accuracies
-acc_all = [o_acc_all comp_acc_all p_accuracies];
+acc_all = [o_accuracies comp_accuracies p_accuracies];
+%acc_all = [normrnd(1, 0.5, [1000 1]) normrnd(2, 0.5, [1000 1]) normrnd(5, 0.5, [1000, 1])];
 
 % Get correlation results
 %tmp = load('../svm_classification_composition/results/4ch_medianSplit_correlation_svm_across.mat');
@@ -218,7 +148,13 @@ end
 
 %% Print
 
-figure_name = '../phi_3/figures/fig4a_raw'; % 4a = within-fly; 4b = across-flies
+if strcmp(class_type, 'within')
+    figure_name = 'figures/fig4a_raw'; % 4a = within-fly; 4b = across-flies
+elseif strcmp(class_type, 'across')
+    figure_name = 'figures/fig4b_raw';
+else
+    figure_name = 'figures/most_recent';
+end
 
 set(gcf, 'PaperOrientation', 'Landscape');
 
@@ -231,13 +167,12 @@ print(figure_name, '-dpng'); % PNG
 channel_sets = nchoosek((1:15), 4);
 
 % Concatenate accuracies into one matrix (sets x measures)
-values = c_accuracies.unpart;
-values = cat(2, values, comp_accuracies.unpart);
+values = cat(2, c_accuracies, comp_accuracies, p_accuracies);
 
 % label feature type (mechanism order, big-phi, composition)
 % 1-4 = mechanism order
 % 5 = composition; 6 = big-phi
-type_labels = [1 1 1 1 2 2 2 2 2 2 3 3 3 3 4 6 5];
+type_labels = [1 1 1 1 2 2 2 2 2 2 3 3 3 3 4 5 6];
 
 % Create table
 tic;
@@ -281,60 +216,213 @@ for comparison = 1 : size(comparisons, 1)
     disp('=================================================================');
 end
 
-%% LME - does including network location explain more variance?
+%% Load SII values
+
+nChannels = 4;
+
+source_dir = '../phi_3/results/';
+source_file = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_phithree_nChannels' num2str(nChannels) '_globalTPM0.mat'];
+tic
+disp('loading');
+tmp = load([source_dir source_file]);
+disp('loaded');
+toc
+
+phis = tmp.phis{1};
+
+%% Set-center regression (LME) for SII
+
+channel_sets = nchoosek((1:15), nChannels);
+
+% SII values
+condition = 2;
+values = permute(mean(phis.phis(:, :, :, condition), 2), [1 3 2 4]); % mean across trials
+
+% Create table
+tic;
+table_array = zeros(numel(values), 5);
+row_counter = 1;
+for repeat = 1 : size(values, 2)
+    for network = 1 : size(values, 1)
+        row = [network repeat mean(channel_sets(network, :)) channel_set_distance(channel_sets(network, :)) values(network, repeat)];
+        table_array(row_counter, :) = row;
+        row_counter = row_counter + 1;
+    end
+end
+toc
+
+acc_table = array2table(table_array, 'VariableNames', {'set', 'repeat', 'set_center', 'dist', 'x'});
+acc_table.set = categorical(acc_table.set);
+acc_table.repeat = nominal(acc_table.repeat);
+
+%acc_table.x = zscore(acc_table.x);
+%acc_table.set_center = zscore(acc_table.set_center);
+
+%% LME - does include network location explain more variance?
 
 % LME
-model_full_spec = 'accuracy ~ feature_type + set_center + (1|set)';
+model_full_spec = 'x ~ set_center*dist + (1|repeat)';
 model_full = fitlme(acc_table, model_full_spec);
 
 % Null
-model_null_spec = 'accuracy ~ feature_type + (1|set)';
+model_null_spec = 'x ~ set_center + (1|repeat)';
 model_null = fitlme(acc_table, model_null_spec);
 compare(model_null, model_full)
 
-%% Set-center LME
+%% Plot model
+% Assuming x ~ set_center * dist + (1|repeat)
 
-feature_type = categorical(4); % 5 = composition; 6 = big-phi
-feature_table = acc_table(acc_table.feature_type == feature_type, :);
+x = acc_table.set_center;
+y = acc_table.dist;
+zF = double(model_full.Coefficients(1, 2)) +...
+    double(model_full.Coefficients(2, 2)).*x +...
+    double(model_full.Coefficients(3, 2)).*y +...
+    double(model_full.Coefficients(4, 2)).*x.*y;
 
-% LME
-model_full_spec = 'accuracy ~ set_center + (1|set)';
-model_full = fitlme(feature_table, model_full_spec);
+figure;
+scatter3(x, y, zF, [], zF, 'filled');
 
-% Null
-model_null_spec = 'accuracy ~ 1 + (1|set)';
-model_null = fitlme(feature_table, model_null_spec);
-compare(model_null, model_full)
-
-[r, p] = corr(feature_table.set_center, feature_table.accuracy)
-
-%% Set-center, set-distance plot
+%% Plot SII actual values on center-distance map
 
 addpath('../phi_3/');
+networks = nchoosek((1:15), 4);
+condition_labels = {'wake', 'anest'};
 
-[foo, foo2] = center_distance_map(nchoosek((1:15), 4), acc_all(:, 5)); % average across mechanisms with the same order
-[foo, foo2] = center_distance_map(nchoosek((1:15), 4), c_accuracies.unpart(:, 2)); % individual mechanisms
-figure; pcolor(foo); colorbar; caxis([min(acc_all(:)) max(acc_all(:))]); colormap inferno
+[map_interp, map, centers, distances] = center_distance_map(networks(acc_table.set, :), acc_table.x);
 
-%% Run 'Set-center, set-distance plot' section first
+figure;
+colormap inferno
+imagesc(map_interp); colorbar;
+set(gca, 'YDir', 'normal');
+title(['SII map ' condition_labels{condition}]); ylabel('channel distance'); xlabel('set center');
 
-% All individual mechanisms
-foos = zeros([size(foo) size(c_accuracies.unpart, 2)]);
-for measure = 1 : size(c_accuracies.unpart, 2)
-    foos(:, :, measure) = center_distance_map(nchoosek((1:15), 4), c_accuracies.unpart(:, measure));
+%% Set-center regression (LME) for classification accuracy
+
+% Accuracy values
+measure = 17;
+values = mean(acc.net_accuracies(:, :, measure), 2);
+
+% Create table
+tic;
+table_array = zeros(numel(values), 4);
+row_counter = 1;
+for network = 1 : size(values, 1)
+    row = [network mean(channel_sets(network, :)) channel_set_distance(channel_sets(network, :)) values(network)];
+    table_array(row_counter, :) = row;
+    row_counter = row_counter + 1;
 end
-figure; pcolor(max(foos(:, :, 1:4), [], 3)); colorbar; caxis([min(acc_all(:)) max(acc_all(:))]); colormap inferno
+toc
 
-%% Channel specificity
+acc_table = array2table(table_array, 'VariableNames', {'set', 'set_center', 'dist', 'x'});
+acc_table.set = categorical(acc_table.set);
 
-channel_sets = nchoosek((1:15), 4);
+%acc_table.x = zscore(acc_table.x);
+%acc_table.set_center = zscore(acc_table.set_center);
 
-channel_acc = zeros(15, 1);
+%% LME - does include network location explain more variance?
 
-for channel = 1 : length(channel_acc)
-    relevant_sets = any(channel_sets == channel, 2);
-    channel_acc(channel) = mean(acc_all(relevant_sets, 5)); % average across mechanisms
-    %channel_acc(channel) = mean(c_accuracies.unpart(relevant_sets, 16)); % individual mechanisms
+% LME
+model_full_spec = 'x ~ set_center + (1|set)';
+model_full = fitlme(acc_table, model_full_spec);
+
+% Null
+model_null_spec = 'x ~ 1 + (1|set)';
+model_null = fitlme(acc_table, model_null_spec);
+compare(model_null, model_full)
+
+%% Plot classification accuracies on center-distance map
+
+addpath('../phi_3/');
+networks = nchoosek((1:15), 4);
+measure_labels{16} = 'IIS'; measure_labels{17} = 'SII';
+
+[map_interp, map, centers, distances] = center_distance_map(networks(acc_table.set, :), acc_table.x);
+
+figure;
+colormap inferno
+imagesc(map_interp); colorbar;
+set(gca, 'YDir', 'normal');
+title(['class. map ' measure_labels{measure} ' ' class_type]); ylabel('channel distance'); xlabel('set center');
+
+%% Plot SII and classification accuracies on center-distance map, one figure
+
+addpath('../phi_3/');
+networks = nchoosek((1:15), 4);
+
+figure;
+colormap inferno
+
+% Plot SII values
+condition_labels = {'wake', 'anest'};
+values = permute(mean(mean(phis.phis(:, :, :, :), 2), 3), [1 3 2 4]); % mean across trials, and flies
+clim = [min(values(:)) max(values(:))];
+positions = [1 4];
+for condition = 1 : size(values, 4)
+    subplot(2, 3, positions(condition));
+    values_cond = values(:, :, :, condition);
+    [map_interp, map, centers, distances, centers_axis, distances_axis] = center_distance_map(...
+        repmat(networks, [size(values_cond, 2) 1]),... % values are (sets x repeats)
+        values_cond(:));
+    nan_locations = isnan(map_interp);
+    imagesc(map_interp, 'AlphaData', ~nan_locations, clim); colorbar;
+    set(gca, 'YDir', 'normal');
+    set(gca, 'XTick', find(ismember(centers_axis, linspace(1, 15, 3))), 'XTickLabel', linspace(1, 15, 3));
+    set(gca, 'YTick', linspace(1, length(distances_axis), 4), 'YTickLabel', distances_axis(linspace(1, length(distances_axis), 4)));
+    set(gca, 'colorscale', 'log');
+    title(['SII map ' condition_labels{condition}]);
+    ylabel('channel distance'); xlabel('set center');
 end
 
-figure; plot(channel_acc);
+% Load classification values for IIS and SII
+class_types = {'within', 'across'};
+accuracies = []; % sets x IIS/SII x within/across
+for class_type = 1 : length(class_types)
+    
+    % Load
+    results_file = ['4ch_phi3Concept_' const_type '_svm_' class_types{class_type} '.mat'];
+    acc = load([results_dir results_file]);
+    
+    % Accuracy of IIS
+    type_accuracies = permute(mean(acc.net_accuracies(:, :, 16), 2), [1 3 2]); % average across repeats
+    
+    % Concatenate accuracy of SII
+    type_accuracies = cat(2, type_accuracies,...
+        permute(mean(acc.net_accuracies(:, :, 17), 2), [1 3 2])); % average across repeats
+    
+    accuracies = cat(3, accuracies, type_accuracies);
+    
+end
+
+% Plot classification values
+measure_labels = {'IIS', 'SII'};
+%clim = [min(accuracies(:)) max(accuracies(:))];
+positions = [2 3 5 6]; % within-IIS, within-SII, across-IIS, across-SII
+pos_counter = 1;
+for class_type = 1 : length(class_types)
+    tmp = accuracies(:, :, class_type);
+    clim = [min(tmp(:)) max(tmp(:))];
+    for measure = 1 : size(accuracies, 2)
+        subplot(2, 3, positions(pos_counter));
+        [map_interp, map, centers, distances, centers_axis, distances_axis] = center_distance_map(...
+            networks,...
+            accuracies(:, measure, class_type));
+        nan_locations = isnan(map_interp);
+        imagesc(map_interp, 'AlphaData', ~nan_locations, clim); colorbar;
+        set(gca, 'YDir', 'normal');
+        set(gca, 'XTick', find(ismember(centers_axis, linspace(1, 15, 3))), 'XTickLabel', linspace(1, 15, 3));
+        set(gca, 'YTick', linspace(1, length(distances_axis), 4), 'YTickLabel', distances_axis(linspace(1, length(distances_axis), 4)));
+        title([measure_labels{measure} ' ' class_types{class_type}]);
+        ylabel('channel distance'); xlabel('set center');
+        pos_counter = pos_counter + 1;
+    end
+end
+
+%% Print
+
+figure_name = 'figures/fig5_raw';
+
+set(gcf, 'PaperOrientation', 'Landscape');
+
+print(figure_name, '-dsvg', '-painters'); % SVG
+print(figure_name, '-dpdf', '-painters', '-bestfit'); % PDF
+print(figure_name, '-dpng'); % PNG
