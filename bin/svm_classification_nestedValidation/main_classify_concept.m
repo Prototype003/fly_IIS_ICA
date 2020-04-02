@@ -156,7 +156,7 @@ big_mips_p = parallel.pool.Constant(double(big_mips));
 const_starts_p = parallel.pool.Constant(const_starts);
 costs_p = parallel.pool.Constant(costs);
 
-parfor network = 1 : 8 %size(big_mips, 2)
+parfor network = 1 : size(big_mips, 2)
     disp(network); tic;
     
     nConcepts = size(big_mips_p.Value, 1) / length(const_starts_p.Value);
@@ -233,7 +233,7 @@ end
 %% Save accuracies
 % Save select things
 
-validation_costs = zeros([length(accuracy_details{1}.validation_costs) size(net_accuracies)]);
+validation_costs = zeros([length(net_accuracy_details{1}.validation_costs) size(net_accuracies)]);
 validation_cost_ids = zeros(size(validation_costs));
 for network = 1 : size(net_accuracies, 1)
     for repeat = 1 : size(net_accuracies, 2)
