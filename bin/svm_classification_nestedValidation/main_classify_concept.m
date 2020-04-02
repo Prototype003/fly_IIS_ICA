@@ -238,8 +238,8 @@ validation_cost_ids = zeros(size(validation_costs));
 for network = 1 : size(net_accuracies, 1)
     for repeat = 1 : size(net_accuracies, 2)
         for concept = 1 : size(net_accuracies, 3)
-            validation_costs(network, repeat, concept) = net_accuracy_details{network, repeat, concept}.validation_costs;
-            validation_cost_ids(network, repeat, concept) = net_accuracy_details{network, repeat, concept}.validation_cost_ids;
+            validation_costs(:, network, repeat, concept) = net_accuracy_details{network, repeat, concept}.validation_costs;
+            validation_cost_ids(:, network, repeat, concept) = net_accuracy_details{network, repeat, concept}.validation_cost_ids;
         end
     end
 end
