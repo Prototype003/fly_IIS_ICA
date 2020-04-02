@@ -156,7 +156,7 @@ big_mips_p = parallel.pool.Constant(double(big_mips));
 const_starts_p = parallel.pool.Constant(const_starts);
 costs_p = parallel.pool.Constant(costs);
 
-parfor network = 1 : size(big_mips, 2)
+parfor network = 1 : 8 %size(big_mips, 2)
     disp(network); tic;
     
     nConcepts = size(big_mips_p.Value, 1) / length(const_starts_p.Value);
@@ -209,7 +209,7 @@ parfor network = 1 : size(big_mips, 2)
                 ); % trials x features x conditions (observations x features x classes)
         end
         results = svm_loo_liblinear_manual(features, costs_p.Value);
-        accuracy_details{var_instance, concept} = results;
+        accuracy_details{var_instance, nConcepts+1} = results;
         accuracies(var_instance, nConcepts+1) = results.accuracy;
         
         % Big phi classification
@@ -219,7 +219,7 @@ parfor network = 1 : size(big_mips, 2)
             features = permute(phis_p.Value(network, :, var_instance, :), [2 1 4 3]);
         end
         results = svm_loo_liblinear_manual(features, costs_p.Value);
-        accuracy_details{var_instance, concept} = results;
+        accuracy_details{var_instance, nConcepts+2} = results;
         accuracies(var_instance, nConcepts+2) = results.accuracy;
         
     end
@@ -230,11 +230,27 @@ parfor network = 1 : size(big_mips, 2)
     toc
 end
 
+%% Save accuracies
+% Save select things
+
+validation_costs = zeros([length(accuracy_details{1}.validation_costs) size(net_accuracies)]);
+validation_cost_ids = zeros(size(validation_costs));
+for network = 1 : size(net_accuracies, 1)
+    for repeat = 1 : size(net_accuracies, 2)
+        for concept = 1 : size(net_accuracies, 3)
+            validation_costs(network, repeat, concept) = net_accuracy_details{network, repeat, concept}.validation_costs;
+            validation_cost_ids(network, repeat, concept) = net_accuracy_details{network, repeat, concept}.validation_cost_ids;
+        end
+    end
+end
+
+save([results_location results_file], 'net_accuracies', 'validation_costs', 'validation_cost_ids', 'costs', 'cost_powers', 'nChannels', 'tau');
 
 %% Save accuracies
+% Save everything (big file)
 
-save([results_location results_file], 'net_accuracies', 'net_accuracy_details', 'costs', 'cost_powers', 'nChannels', 'tau', '-v7.3');
+save(['results_svmDetails/' results_file], 'net_accuracies', 'net_accuracy_details', 'costs', 'cost_powers', 'nChannels', 'tau', '-v7.3');
 
-disp(['saved ' class_type]);
+disp(['saved everything for ' class_type]);
 
 end
