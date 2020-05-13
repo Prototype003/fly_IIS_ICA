@@ -13,7 +13,7 @@ Outputs:
 
 function [ z ] = fisher_rz(r)
 
-z = (0.5) * log((1+r)/(1-r));
+z = (0.5) * log((1+r)./(1-r));
 
 end
 

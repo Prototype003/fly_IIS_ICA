@@ -126,151 +126,99 @@ elseif strcmp(constellation_type, 'part')
     const_starts = [0];
 end
 
-%% Classify across flies (parallel)
-% ~12 seconds per network with cost search (-20:10:20)
-
 if strcmp(class_type, 'across')
-    results_file = [num2str(nChannels) 'ch_phi3Concept_' constellation_type '_svm_' class_type '.mat'];
+    var_source_dim = 3; % trial dimension
+else % if strcmp(class_type, 'within')
+    var_source_dim = 4; % fly dimension
+end
+
+%% Classify
+
+results_file = [num2str(nChannels) 'ch_phi3Concept_' constellation_type '_svm_' class_type '.mat'];
+
+cost_powers = (-20:10:20);
+costs = 2 .^ cost_powers;
+
+% flies x networks x concepts+Phi x costs
+cost_accuracies = zeros(size(big_mips, 2), size(big_mips, var_source_dim), nConcepts+1, length(costs));
+
+% Create local cluster
+pc = parcluster('local');
+
+% Set JobStorageLocation to specific directory for this particular job
+%pc.JobStorageLocation = strcat('matlab_pct/', getenv('SLURM_JOB_ID'));
+
+% Start pool
+%parpool(pc, 8)
+
+% Broadcast variables
+phis_p = parallel.pool.Constant(phis.phis);
+big_mips_p = parallel.pool.Constant(big_mips);
+const_starts_p = parallel.pool.Constant(const_starts);
+costs_p = parallel.pool.Constant(costs);
+
+parfor network = 1 : size(big_mips, 2)
+    disp(network); tic;
     
-    cost_powers = (-20:10:20);
-    costs = 2 .^ cost_powers;
+    nConcepts = size(big_mips_p.Value, 1) / length(const_starts_p.Value);
     
-    % networks x concepts+Phi x costs
-    cost_accuracies = zeros(size(big_mips, 2), nConcepts+1, length(costs));
+    accuracies = zeros(size(big_mips, var_source_dim), nConcepts+1, length(costs_p.Value));
     
-    % Create local cluster
-    pc = parcluster('local');
-    
-    % Set JobStorageLocation to specific directory for this particular job
-    pc.JobStorageLocation = strcat('matlab_pct/', getenv('SLURM_JOB_ID'));
-    
-    % Start pool
-    parpool(pc, 8)
-    
-    % Broadcast variables
-    phis_p = parallel.pool.Constant(phis.phis);
-    big_mips_p = parallel.pool.Constant(big_mips);
-    const_starts_p = parallel.pool.Constant(const_starts);
-    costs_p = parallel.pool.Constant(costs);
-    
-    parfor network = 1 : size(big_mips, 2)
-        disp(network); tic;
+    for cost_counter = 1 : length(costs_p.Value)
+        cost = costs_p.Value(cost_counter);
         
-        nConcepts = size(big_mips_p.Value, 1) / length(const_starts_p.Value);
-        
-        accuracies = zeros(nConcepts+1, length(costs_p.Value));
-        
-        for cost_counter = 1 : length(costs_p.Value)
-            cost = costs_p.Value(cost_counter);
+        for var_instance = 1 : size(big_mips, var_source_dim)
             
             for concept = 1 : nConcepts
                 concept_inds = const_starts_p.Value + concept;
                 
-                % Get features (concepts), average across trials
-                features = permute(...
-                    mean(big_mips_p.Value(concept_inds, network, :, :, :), 3),...
-                    [4 1 5 2 3]...
-                    ); % flies x features x conditions (observations x features x classes)
+                if strcmp(class_type, 'across')
+                    
+                    % Get features (concepts), average across trials
+                    features = permute(...
+                        big_mips_p.Value(concept_inds, network, var_instance, :, :),...
+                        [4 1 5 2 3]...
+                        ); % flies x features x conditions (observations x features x classes)
+                    
+                else % if strcmp(class_type, 'within')
+                    
+                    % Get features (concepts), average across trials
+                    features = permute(...
+                        big_mips_p.Value(concept_inds, network, :, var_instance, :),...
+                        [3 1 5 2 4]...
+                        ); % trials x features x conditions (observations x features x classes)
+                    
+                end
                 
                 % Classify
                 results = svm_lol_liblinear_manual(features, cost);
-                accuracies(concept, cost_counter) = results.accuracy;
+                accuracies(var_instance, concept, cost_counter) = results.accuracy;
                 
             end
             
             % Big phi classification
-            features = permute(mean(phis_p.Value(network, :, :, :), 2), [3 1 4 2]);
-            results = svm_lol_liblinear_manual(features, cost);
-            accuracies(nConcepts+1, cost_counter) = results.accuracy;
-            
-        end
-        
-        cost_accuracies(network, :, :) = accuracies;
-        
-        toc
-    end
-    
-    %% Save accuracies
-    
-    save([results_location results_file], 'cost_accuracies', 'costs', 'cost_powers', 'nChannels', 'tau');
-    
-    disp('saved across');
-    
-%% Classify within flies (parallel)
-% ~20 seconds per network with cost search (-20:10:20)
-elseif strcmp(class_type, 'within')
-    
-    results_file = [num2str(nChannels) 'ch_phi3Concept_' constellation_type '_svm_' class_type '.mat'];
-    
-    cost_powers = (-20:10:20);
-    costs = 2 .^ cost_powers;
-    
-    % flies x networks x concepts+Phi x costs
-    cost_accuracies = zeros(size(big_mips, 2), size(big_mips, 4), nConcepts+1, length(costs));
-    
-    % Create local cluster
-    pc = parcluster('local');
-    
-    % Set JobStorageLocation to specific directory for this particular job
-    pc.JobStorageLocation = strcat('matlab_pct/', getenv('SLURM_JOB_ID'));
-    
-    % Start pool
-    parpool(pc, 8)
-    
-    % Broadcast variables
-    phis_p = parallel.pool.Constant(phis.phis);
-    big_mips_p = parallel.pool.Constant(big_mips);
-    const_starts_p = parallel.pool.Constant(const_starts);
-    costs_p = parallel.pool.Constant(costs);
-
-    parfor network = 1 : size(big_mips, 2)
-        disp(network); tic;
-        
-        nConcepts = size(big_mips_p.Value, 1) / length(const_starts_p.Value);
-        
-        accuracies = zeros(size(big_mips, 4), nConcepts+1, length(costs_p.Value));
-        
-        for cost_counter = 1 : length(costs_p.Value)
-            cost = costs_p.Value(cost_counter);
-            
-            for fly = 1 : size(big_mips, 4)
-                
-                for concept = 1 : nConcepts
-                    concept_inds = const_starts_p.Value + concept;
-                    
-                    % Get features (concepts), average across trials
-                    features = permute(...
-                        big_mips_p.Value(concept_inds, network, :, fly, :),...
-                        [3 1 5 2 4]...
-                        ); % trials x features x conditions (observations x features x classes)flies x features x conditions (observations x features x classes)
-                    
-                    % Classify
-                    results = svm_lol_liblinear_manual(features, cost);
-                    accuracies(fly, concept, cost_counter) = results.accuracy;
-                    
-                end
-                
-                % Big phi classification
-                features = permute(phis_p.Value(network, :, fly, :), [2 1 4 3]);
-                results = svm_lol_liblinear_manual(features, cost);
-                accuracies(fly, nConcepts+1, cost_counter) = results.accuracy;
-                
+            if strcmp(class_type, 'across')
+                features = permute(phis_p.Value(network, var_instance, :, :), [3 1 4 2]);
+            else % if strcmp(class_type, 'within')
+                features = permute(phis_p.Value(network, :, var_instance, :), [2 1 4 3]);
             end
+            results = svm_lol_liblinear_manual(features, cost);
+            accuracies(var_instance, nConcepts+1, cost_counter) = results.accuracy;
             
         end
         
-        cost_accuracies(network, :, :, :) = accuracies;
-        
-        toc
     end
     
+    cost_accuracies(network, :, :, :) = accuracies;
     
-    %% Save accuracies
-    
-    save([results_location results_file], 'cost_accuracies', 'costs', 'cost_powers', 'nChannels', 'tau');
-    
-    disp('saved across');
-    
+    toc
 end
+
+
+%% Save accuracies
+
+save([results_location results_file], 'cost_accuracies', 'costs', 'cost_powers', 'nChannels', 'tau');
+
+disp(['saved ' class_type]);
 
 end

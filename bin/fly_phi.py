@@ -449,7 +449,27 @@ def sort_constellation_by_mechanism(constellation):
 	sorted_const = sorted(sorted_const, key=lambda k: len(k['mechanism']))
 	
 	return sorted_const
+	
 
+def sort_constellation_by_mechanism_orig(constellation):
+	"""
+	Sorts a constellation's mechanisms
+	
+	Mechanisms are sorted as to give an "ordered powerset order" (with the smallest sets first, etc)
+	Depends on stable sorting by python
+	
+	Inputs:
+		constellation: constellation from compute.pyphi.big_mip() (.partitioned_constellation or .unpartitioned_constellation)
+	Outputs:
+		sorted_const: constellation dict with sorted mechanisms
+	"""
+	
+	# Standard sorting of lists
+	sorted_const = sorted(constellation, key=lambda k: k.mechanism)
+	# Sort by length of lists (sorting is stable so previous order is maintained within second sorting)
+	sorted_const = sorted(sorted_const, key=lambda k: len(k.mechanism))
+	
+	return sorted_const
 
 # Old functions which may no longer be useful ################################################################################
 

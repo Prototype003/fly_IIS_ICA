@@ -166,6 +166,9 @@ else
         stds_mat = repmat(stds, [size(data_test, 1), 1]);
         data_test = (data_test - means_mat) ./ stds_mat;
         
+        data_train(isnan(data_train)) = 0;
+        data_test(isnan(data_test)) = 0;
+        
         % Search for cost parameter
         %c_param = train(data_train_labels, sparse(data_train), '-C -s 2');
         

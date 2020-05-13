@@ -1,0 +1,18 @@
+%% Function: global median split
+
+function [binarised] = binarise_global_median(data)
+% Binarised data based on median (median across first dimension
+%
+% Inputs:
+%   fly_data = matrix (time-samples x ...)
+%
+% Outputs:
+%   binarsed = matrix (time-samples x ...)
+
+% Get median across time
+medians = repmat(median(data, 1), [size(data, 1) ones(1, length(size(data))-1)]);
+
+% Binarised based on median
+binarised = data > medians;
+
+end

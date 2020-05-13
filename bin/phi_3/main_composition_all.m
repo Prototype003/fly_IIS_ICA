@@ -44,11 +44,69 @@ composition_phis = composition_phis ./ sum(phis{1}.state_counters(:, 1, 1, 1, 1)
 
 
 % Unpartitioned - partitioned
-composition_phis = permute(composition_phis(1, :, :, :, :, :) - composition_phis(2, :, :, :, :, :), [2 3 4 5 6 7 1]);
+%composition_phis = permute(composition_phis(1, :, :, :, :, :) - composition_phis(2, :, :, :, :, :), [2 3 4 5 6 7 1]);
 % Unpartitioned
-%composition_phis = permute(composition_phis(1, :, :, :, :, :), [2 3 4 5 6 7 1]);
+composition_phis = permute(composition_phis(1, :, :, :, :, :), [2 3 4 5 6 7 1]);
 % Partitioned
 %composition_phis = permute(composition_phis(2, :, :, :, :, :), [2 3 4 5 6 7 1]);
+
+%% Get center-distance maps
+
+channel_sets = double(phis{1}.channel_sets);
+
+% Average across trials
+mech_values = permute(mean(composition_phis, 3), [1 2 4 5 3]);
+
+% Exclude outermost channel
+valid_sets = ~any(channel_sets == max(channel_sets(:)), 2);
+channel_sets = channel_sets(valid_sets, :);
+mech_values = mech_values(:, valid_sets, :, :);
+
+% Get map dimensions
+[map_interp, map_raw, centers, distances] = center_distance_map(channel_sets, squeeze(mech_values(1, :, 1, 1, 1)));
+dims = size(mech_values);
+maps = zeros([size(map_interp) dims([1 3 4])]);
+
+tic;
+for condition = 1 : size(mech_values, 4)
+    for fly = 1 : size(mech_values, 3)
+        for mechanism = 1 : size(mech_values, 1)
+            [maps(:, :, mechanism, fly, condition), map_raw, centers, distances] =...
+                center_distance_map(channel_sets, squeeze(mech_values(mechanism, :, fly, condition)));
+        end
+    end
+end
+toc
+
+%% Plot using center-distance map
+
+mechanism = 15;
+condition = 2;
+
+maps_flyMean = permute(mean(maps, 4), [1 2 3 5 4]);
+
+figure;
+
+p = pcolor(maps_flyMean(:, :, mechanism, 1) ./ maps_flyMean(:, :, mechanism, 2));
+%caxis([min(maps_flyMean(:)) max(maps_flyMean(:))]);
+set(p, 'EdgeColor', 'none');
+colorbar;
+
+%% Plot channel specific effects
+
+fly = 1;
+condition = 1;
+mechanism = 15;
+
+channel_phi = zeros(max(channel_sets(:)), 1);
+
+for channel = 1 : length(channel_phi)
+    relevant_sets = any(channel_sets == channel, 2);
+    channel_phi(channel) = mean(mech_values(mechanism, relevant_sets, fly, 1) - mech_values(mechanism, relevant_sets, fly, 2));
+end
+
+figure; plot(channel_phi);
+
 %% Setup Hasse graph
 
 % Hard coded coordinates assumes order:
@@ -87,7 +145,7 @@ x = [1 zeros(size(space_4))+2 zeros(size(space_6))+3 zeros(size(space_4))+4];
 % figure;
 % scatter(x, y);
 
-%% Convert phi composition into z axis
+%% Convert phi composition into z axis (single axis for both conditions)
 
 condition_titles = {'wake', 'anest'};
 
@@ -134,7 +192,6 @@ set(gcf, 'color', 'w');
 subplots = zeros(1, 4);
 subplot_counter = 1;
 for condition = 1 : 2
-    subplots(condition) = subplot(1, 2, subplot_counter);
     scatter3(x, y, compositions(condition, :), marker_size, colours, '.');
     text(x+0.1, y+0.1, compositions(condition, :), concept_labels);
     
@@ -151,13 +208,95 @@ for condition = 1 : 2
     axis([min(x)-1 max(x)+1 min(y)-1 max(y)+1 0 max(compositions(:))]);
     
     %title([condition_titles{condition} ': \Phi=' num2str(phis{condition}.phi)]);
-    title([condition_titles{condition}]);
+    %title([condition_titles{condition}]);
     
     set(gca, 'YTick', [min(y) max(y)], 'XTick', [min(x) max(x)], 'ZTick', linspace(0, max(compositions(:)), 3));
     set(gca, 'YTickLabel', [], 'XTickLabel', []);
     
     box off
     grid off
+    %axis square
+    axis vis3d
+    
+    hold on;
+end
+
+%% Convert phi composition into z axis (1 plot per condition)
+
+condition_titles = {'Awake', 'Anaesthesia'};
+
+% Average across trials, channel-sets, flies
+compositions = double(permute(mean(mean(mean(composition_phis, 3), 2), 4), [5 1 2 3 4]));
+compositions = double(permute(mean(mean(mean(composition_phis(:, 876, :, 11, :), 3), 2), 4), [5 1 2 3 4]));
+
+% % Single set of parameters
+% fly = 1;
+% network = 100;
+% compositions = double(permute(mean(composition_phis(:, network, :, fly, :), 3), [5 1 2 3 4]));
+
+compositions = fliplr(compositions);
+
+% Hardcoded lines for Hasse Diagram
+% Cleanest way to plot these?
+% Cell array for each concept, contains list of indexes to which a line should be drawn
+% ABCD to BCD, ACD, ABD, ABC (1 > 2, 3, 4, 5)
+% BCD to CD, BD, BC (2 > 6, 7, 8)
+% ACD to CD, AD, AC (3 > 6, 9, 10)
+% ABD to BD, AD, AB (4 > 7, 9, 11)
+% ABC to BC, AC, AB (5 > 8, 10, 11)
+% CD to D, C (6 > 12, 13)
+% BD to D, B (7 > 12, 14)
+% BC to C, B (8 > 13, 14)
+% AD to D, A (9 > 12, 15)
+% AC to C, A (10 > 13, 15)
+% AB to B, A (11 > 14, 15)
+
+lines = cell(length(y) - nChannels, 1);
+lines{1} = [2 3 4 5];
+lines{2} = [6 7 8];
+lines{3} = [6 9 10];
+lines{4} = [7 9 11];
+lines{5} = [8 10 11];
+lines{6} = [12 13];
+lines{7} = [12 14];
+lines{8} = [13 14];
+lines{9} = [12 15];
+lines{10} = [13 15];
+lines{11} = [14 15];
+
+figure('pos', [0 0 1500 600]);
+marker_size = 750;
+set(gcf, 'color', 'w');
+subplots = zeros(1, 4);
+subplot_counter = 1;
+for condition = 1 : 2
+    subplots(condition) = subplot(1, 2, subplot_counter);
+    scatter3(x, y, compositions(condition, :), marker_size, colours, '.');
+    text(x+0.2, y+0.1, compositions(condition, :), concept_labels, 'FontSize', 10);
+    
+    % Draw lines
+    for source = 1:length(lines)
+        for dest = lines{source}
+            line([x(source) x(dest)], [y(source) y(dest)], [compositions(condition, source) compositions(condition, dest)], 'Color', 'k');
+        end
+    end
+    
+    zlabel('integrated information');
+    xlabel('x');
+    ylabel('y');
+    axis([min(x)-1 max(x)+1 min(y)-1 max(y)+1 min(compositions(:)) max(compositions(:))]);
+    
+    set(gca, 'FontSize', 12);
+    
+    %title([condition_titles{condition} ': \Phi=' num2str(phis{condition}.phi)]);
+    title([condition_titles{condition}], 'FontSize', 16);
+    
+    set(gca, 'YTick', [min(y) max(y)], 'XTick', [min(x) max(x)], 'ZTick', linspace(0, max(compositions(:)), 3));
+    set(gca, 'YTickLabel', [], 'XTickLabel', []);
+    
+    box off
+    grid on
+    grid minor
     %axis square
     axis vis3d
     subplot_counter = subplot_counter + 1;

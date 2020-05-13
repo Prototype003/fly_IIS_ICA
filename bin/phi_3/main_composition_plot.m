@@ -10,13 +10,53 @@ See figures/videos from http://www.eneuro.org/content/4/5/ENEURO.0085-17.2017
 
 %% Setup
 
-output_file = 'composition_both';
+output_file = '../figures/iis_example';
 
 marker_size = 500;
 
-%% Load
+%% Load phi compositions
 
-load('results_split/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM0_f01c1tauBin16s1036t1');
+load('results/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_phithree_nChannels4_globalTPM0.mat');
+
+%% Average across states, trials
+
+composition_phis = phis{1}.big_mips;
+%nonzero = composition_phis(composition_phis~=0);
+%composition_phis = log(composition_phis+min(nonzero));
+%composition_phis = log(composition_phis+1);
+
+% Weight by state occurences (multiply phi by number of times the state occurred)
+for partitioned = 1 : 2
+    for concept = 1 : 15
+        composition_phis(:, partitioned, concept, :, :, :, :) = ...
+            permute(composition_phis(:, partitioned, concept, :, :, :, :), [1 4 5 6 7 2 3]) .* ...
+            double(phis{1}.state_counters);
+    end
+end
+
+% Sum across states
+composition_phis = permute(sum(composition_phis, 1), [2 3 4 5 6 7 1]);
+
+% Divide by total number of states (for weighted average)
+% Assumes equal number of samples for all parameters
+composition_phis = composition_phis ./ sum(phis{1}.state_counters(:, 1, 1, 1, 1));
+
+% Average across trials
+composition_phis = mean(composition_phis, 4);
+
+% concepts x channel-sets x trials x flies x conditions x part-types
+dims = size(composition_phis);
+compositions = zeros([dims(2:end) 3]);
+
+% Unpartitioned
+composition_unpart = permute(composition_phis(1, :, :, :, :, :), [2 3 4 5 6 7 1]);
+compositions(:, :, :, :, :, 1) = composition_unpart;
+% Partitioned
+composition_part = permute(composition_phis(2, :, :, :, :, :), [2 3 4 5 6 7 1]);
+compositions(:, :, :, :, :, 2) = composition_part;
+% Unpartitioned - partitioned
+composition_diff = permute(composition_phis(1, :, :, :, :, :) - composition_phis(2, :, :, :, :, :), [2 3 4 5 6 7 1]);
+compositions(:, :, :, :, :, 3) = composition_diff;
 
 %% Setup Hasse graph
 
@@ -27,7 +67,14 @@ load('results_split/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim
 space_min = 0;
 space_max = 7;
 
+% Each row corresponds to a mechanism size
+order_colours = [233 163 50; 131 197 90; 70 146 207; 69 60 151] / 255;
+
 colours = [1 2 2 2 2 3 3 3 3 3 3 4 4 4 4];
+colours = cat(1, order_colours(4, :),...
+    repmat(order_colours(3, :), [4 1]),...
+    repmat(order_colours(2, :), [6 1]),...
+    repmat(order_colours(1, :), [4 1])); 
 
 space_1 = space_max / 2;
 space_4 = linspace(space_min, space_max, 4+2); space_4 = space_4(2:end-1);
@@ -41,21 +88,23 @@ x = [1 zeros(size(space_4))+2 zeros(size(space_6))+3 zeros(size(space_4))+4];
 
 %% Convert phi composition into z axis
 
-condition_titles = {'wake', 'anest'};
-phis = cell(1, 2);
-
 nChannels = 4;
-[phis{1}, wake] = composition_table(nChannels, 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM1_f01c1tauBin24tauOffset0s1036t1.mat');
-[phis{2}, anest] = composition_table(nChannels, 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM1_f01c2tauBin24tauOffset0s1036t1.mat');
 
-[phis{1}, ~, wake, wake2] = composition_table(nChannels, 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM1_f01c1tauBin24tauOffset0s0002t1.mat');
-[phis{2}, ~, anest, anest2] = composition_table(nChannels, 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM1_f01c2tauBin24tauOffset0s0002t1.mat');
+% Select channel set, fly to plot
+channel_set = 1;
+fly = 1;
+part_type = 1;
+compositions_plot = permute(compositions(:, channel_set, :, fly, :, part_type), [5 1 2 3 4 6]);
 
-%[phis{1}, wake] = composition_table(nChannels, 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM0_f01c1tau4tauOffset0s0002t1.mat');
-%[phis{2}, anest] = composition_table(nChannels, 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM0_f01c2tau4tauOffset0s0002t1.mat');
+% Repeat the first composition
+compositions_plot = cat(1, compositions_plot(1, :), compositions_plot);
 
-compositions = [wake(end, :); anest(end, :); wake2(end, :); anest2(end, :)];
-compositions = fliplr(compositions);
+% Set the first composition to all min values
+vals = compositions_plot(2:end, :);
+compositions_plot(1, :) = min(vals(:));
+
+% Higher orders first (because lines are in reverse order)
+compositions_plot = fliplr(compositions_plot);
 
 % Hardcoded lines for Hasse Diagram
 % Cleanest way to plot these?
@@ -86,48 +135,73 @@ lines{10} = [13 15];
 lines{11} = [14 15];
 
 figure;
-subplots = zeros(1, 4);
+subplots = zeros(1, size(compositions_plot, 1));
 subplot_counter = 1;
-for condition = 1 : 4
-    subplots(condition) = subplot(2, 2, subplot_counter);
-    scatter3(x, y, compositions(condition, :), marker_size, colours, '.');
+subtitles = {'', 'wake', 'anest'};
+for condition = 1 : size(compositions_plot, 1)
+    subplots(condition) = subplot(1, size(compositions_plot, 1), subplot_counter);
+    scatter3(x, y, compositions_plot(condition, :), marker_size, colours, '.');
     
     % Draw lines
     for source = 1:length(lines)
         for dest = lines{source}
-            line([x(source) x(dest)], [y(source) y(dest)], [compositions(condition, source) compositions(condition, dest)], 'Color', 'k');
+            line([x(source) x(dest)], [y(source) y(dest)], [compositions_plot(condition, source) compositions_plot(condition, dest)], 'Color', 'k');
         end
     end
     
-    zlabel('\phi');
-    xlabel('x');
+    zlabel('\phi', 'Rotation', 90);
     ylabel('y');
-    axis([min(x)-1 max(x)+1 min(y)-1 max(y)+1 0 max(compositions(:))]);
-    
-    if condition <=2
-        title([condition_titles{condition} ': \Phi=' num2str(phis{condition}.phi)]);
+    if subplot_counter == 1
+        xlabel('mechanism size');
     end
     
-    set(gca, 'YTick', [min(y) max(y)], 'XTick', [min(x) max(x)], 'ZTick', linspace(0, max(compositions(:)), 3));
-    set(gca, 'YTickLabel', [], 'XTickLabel', []);
+    % Set axis limits (based on other plots)
+    axis([min(x)-1 max(x)+1 min(y)-1 max(y)+1 min(compositions_plot(:)) max(compositions_plot(:))]);
+    set(gca, 'ZTick', linspace(0, max(compositions_plot(:)), 3));
+    
+%     % Set axis limits (based on own values)
+%     axis([min(x)-1 max(x)+1 min(y)-1 max(y)+1 min(compositions(:)) max(compositions(condition, :))]);
+%     set(gca, 'ZTick', linspace(0, max(compositions(end, :)), 3));
+    
+%     if condition <=2
+%         title([condition_titles{condition} ': \Phi=' num2str(phis{condition}.phi)]);
+%     end
+    
+    title(subtitles{condition});
+    
+    set(gca, 'YTick', [min(y) max(y)], 'XTick', [min(x) max(x)]);
+    set(gca, 'YTickLabel', [], 'XTickLabel', [4 1]);
     
     box off
-    grid off
+    grid on
     axis square
     axis vis3d
+    view([10+135 10]);
+    if condition == 1
+        view([180 90]);
+    end
     subplot_counter = subplot_counter + 1;
 end
 
-linkprop(subplots, {'CameraPosition','CameraUpVector'});
+linkprop(subplots(2:end), {'CameraPosition','CameraUpVector'});
+
+%% Output still figure
+
+figure_name = '../figures/fig2_raw';
+
+set(gcf, 'PaperOrientation', 'Landscape');
+
+print(figure_name, '-dsvg', '-painters'); % SVG
+print(figure_name, '-dpdf', '-painters', '-bestfit'); % PDF
+print(figure_name, '-dpng'); % PNG
 
 %% Rotate and turn into video frames
 
 % Angles of elevation for top and side views
 el_top = 89; % at 90-89, the y axis location flips from one side of the plot to the other, so start from 89
 el_hor = 0;
-az_min = 0;
+az_min = 180;
 az_max = 360 + az_min;
-
 
 % Rotation angles
 top2hor = linspace(el_top, el_hor, 100); % rotate from top view to side view
@@ -163,7 +237,7 @@ end
 %% Write frames into video
 
  % create the video writer with 1 fps
- writerObj = VideoWriter([output_file '.avi']);
+ writerObj = VideoWriter([output_file], 'MPEG-4');
  writerObj.FrameRate = 1 / (video_duration / length(frames));
 
  % open the video writer

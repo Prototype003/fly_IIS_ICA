@@ -165,8 +165,6 @@ for state_index in range(0, n_states):
 	# Compute phi values for all partitions
 	big_mip = pyphi.compute.big_mip(subsystem)
 	
-	#sys.exit()
-	
 	# Store phi and associated MIP
 	state_phis[state_index] = big_mip.phi
 	mips[state_index] = big_mip.cut

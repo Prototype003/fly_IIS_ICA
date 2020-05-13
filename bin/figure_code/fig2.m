@@ -34,7 +34,7 @@ addpath(bin_location);
 
 [phi_threes, measure_strings{1}] = phi_load('phi_three', global_tpm, bin_location);
 
-[phi_stars, measure_strings{2}] = phi_load('phi_star_gaussian', 0, bin_location);
+[phi_stars, measure_strings{2}] = phi_load('phi_star', 0, bin_location);
 
 % %% Rename some stuff
 % 
@@ -144,10 +144,10 @@ metric_labels = {'^{3.0}', '*'};
 metric_lims = struct();
 metric_limits.threes = [0.05 0.05 0.02];
 metric_limits.stars = [0.005 0.005 0.002]; % 0.005 0.005 0.002 % For Gaussian assumption values
-%metric_limits.stars = [0.05 0.05 0.002];
+metric_limits.stars = [0.05 0.05 0.002]; % For non-gaussian assumption
 metric_exponents.threes = -2;
 metric_exponents.stars = -3; % For Gaussian assumption values
-%metric_exponents.stars = -2;
+metric_exponents.stars = -2; % For non-gaussian assumption
 
 yticks = struct();
 yticks.threes = [0 metric_limits.threes/2 metric_limits.threes];

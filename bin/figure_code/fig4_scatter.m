@@ -42,7 +42,7 @@ nMeasures = 8;
 fly_means = zeros(nFlies, nMeasures);
 
 % Power
-results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_power_classification.mat';
+results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_power_classification_across0.mat';
 load([results_directory results_filename]);
 % values = permute(mean(accuracies(freq_range_w, :, :), 1), [3 2 1]); % average across frequency range; flies x channels
 % values = permute(mean(mean(accuracies(freq_range_w, :, :), 1), 2), [3 1 2]); % average across frequency range and channels
@@ -51,16 +51,18 @@ values = permute(mean(mean(accuracies(freq_range_w, :, :), 1), 3), [2 1 3]); % a
 % fly_mean = repmat(mean(values, 1), [size(values, 1) 1]);
 % grand_mean = repmat(mean(fly_mean, 1), [size(values, 1) 1]);
 % values = values - grand_mean + fly_mean;
+values_w = values; values_w_groups = zeros(size(values)) + 1;
 measure_accuracies_w = mean(values);
 measure_accuracies_w_std = std(values);% / sqrt(length(values));
 measure_groups_w = zeros(size(measure_accuracies_w)) + 1;
 
 % Coherence
-results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_coherence_classification.mat';
+results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_coherence_classification_across0.mat';
 load([results_directory results_filename]);
 %values = permute(mean(mean(accuracies(freq_range_w, :, :), 1), 2), [3 1 2]); % average across frequency range and sets
 %fly_means(:, 2) = values;
 values = permute(mean(mean(accuracies(freq_range_w, :, :), 1), 3), [2 1 3]); % average across frequency range and flies
+values_w = [values_w; values]; values_w_groups = [values_w_groups; zeros(size(values))+2];
 measure_accuracies_w = [measure_accuracies_w; mean(values)];
 measure_accuracies_w_std = [measure_accuracies_w_std; std(values)];% / sqrt(length(values))];
 measure_groups_w = [measure_groups_w; 2];
@@ -74,6 +76,7 @@ for nChannels = 1 : length(accuracies)
     %values = permute(mean(values, 1), [2 1]); % Average across sets
     %fly_means(:, group_counter) = values;
     values = mean(values, 2); % Average across flies
+    values_w = [values_w; values]; values_w_groups = [values_w_groups; zeros(size(values))+group_counter];
     measure_accuracies_w = [measure_accuracies_w; mean(values)];
     measure_accuracies_w_std = [measure_accuracies_w_std; std(values)];% / sqrt(length(values))];
     measure_groups_w = [measure_groups_w; group_counter];
@@ -90,6 +93,7 @@ for nChannels = 1 : length(accuracies)
     %values = permute(mean(values, 1), [2 1]); % Average across sets
     %fly_means(:, group_counter) = values;
     values = mean(values, 2); % Average across flies
+    values_w = [values_w; values]; values_w_groups = [values_w_groups; zeros(size(values))+group_counter];
     measure_accuracies_w = [measure_accuracies_w; mean(values)];
     measure_accuracies_w_std = [measure_accuracies_w_std; std(values)];% / sqrt(length(values))];
     measure_groups_w = [measure_groups_w; group_counter];
@@ -102,6 +106,7 @@ end
 results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_power_classification_across1.mat';
 load([results_directory results_filename]);
 values = permute(mean(accuracies(freq_range_a, :), 1), [2 1]); % average across frequency range
+values_a = values; values_a_groups = zeros(size(values)) + 1;
 measure_accuracies_a = mean(values);
 measure_accuracies_a_std = std(values);% / sqrt(length(values));
 measure_groups_a = zeros(size(measure_accuracies_a)) + 1;
@@ -110,6 +115,7 @@ measure_groups_a = zeros(size(measure_accuracies_a)) + 1;
 results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_coherence_classification_across1.mat';
 load([results_directory results_filename]);
 values = permute(mean(accuracies(freq_range_a, :, :), 1), [2 1]); % average across frequency range and sets
+values_a = [values_a; values]; values_a_groups = [values_a_groups; zeros(size(values))+2];
 measure_accuracies_a = [measure_accuracies_a; mean(values)];
 measure_accuracies_a_std = [measure_accuracies_a_std; std(values)];% / sqrt(length(values))];
 measure_groups_a = [measure_groups_a; 2];
@@ -120,6 +126,7 @@ load([results_directory results_filename]);
 group_counter = 3;
 for nChannels = 1 : length(accuracies)
     values = accuracies{nChannels}.accuracies;
+    values_a = [values_a; values]; values_a_groups = [values_a_groups; zeros(size(values))+group_counter];
     measure_accuracies_a = [measure_accuracies_a; mean(values)];
     measure_accuracies_a_std = [measure_accuracies_a_std; std(values)];% / sqrt(length(values))];
     measure_groups_a = [measure_groups_a; group_counter];
@@ -127,12 +134,13 @@ for nChannels = 1 : length(accuracies)
 end
 
 % Phi-star
-results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_nonGlobal_classification_across1.mat';
-%results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_discrete_global_classification_across1.mat';
+%results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_nonGlobal_classification_across1.mat';
+results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_discrete_nonGlobal_classification_across1.mat';
 %results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phiSI_discrete_global_classification_across1.mat';
 load([results_directory results_filename]);
 for nChannels = 1 : length(accuracies)
     values = accuracies{nChannels}.accuracies;
+    values_a = [values_a; values]; values_a_groups = [values_a_groups; zeros(size(values))+group_counter];
     measure_accuracies_a = [measure_accuracies_a; mean(values)];
     measure_accuracies_a_std = [measure_accuracies_a_std; std(values)];% / sqrt(length(values))];
     measure_groups_a = [measure_groups_a; group_counter];
@@ -163,14 +171,14 @@ if strcmp(measure, 'phi_three')
     accuracies_w = accuracies;
 else % strcmp(measure, 'phi_star')
     % Load ACROSS
-    results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_nonGlobal_classification_across1.mat';
-    %results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_discrete_global_classification_across1.mat';
+    %results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_nonGlobal_classification_across1.mat';
+    results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_discrete_nonGlobal_classification_across1.mat';
     %results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phiSI_discrete_global_classification_across1.mat';
     load([results_directory results_filename]);
     accuracies_a = accuracies;
     % Load WITHIN
-    results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_nonGlobal_classification.mat';
-    %results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_discrete_nonGlobal_classification_across0.mat';
+    %results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_nonGlobal_classification.mat';
+    results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_discrete_nonGlobal_classification_across0.mat';
     %results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phiSI_discrete_nonGlobal_classification_across0.mat';
     load([results_directory results_filename]);
     accuracies_w = accuracies;

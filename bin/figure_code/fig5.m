@@ -9,7 +9,7 @@ Figure 5 - correlation between mean 2ch mean values with 3/4ch values
 
 %% Setup
 
-measure = 'phi_three'; % 'phi_three' or 'phi_star' or 'phi_star_gaussian' or 'phi_SI'
+measure = 'phi_star'; % 'phi_three' or 'phi_star' or 'phi_star_gaussian' or 'phi_SI'
 tau = 1; % 1 = 4ms; 2 = 8ms; 3 = 16ms
 if tau == 1
     tau_string = '4';
@@ -63,10 +63,12 @@ if strcmp(measure, 'phi_three')
 else % strcmp(measure, 'phi_star')
     % Load ACROSS
     results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_global_classification_across1.mat';
+    results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_discrete_nonGlobal_classification_across1.mat';
     load([results_directory results_filename]);
     accuracies_a = accuracies;
     % Load WITHIN
     results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_nonGlobal_classification.mat';
+    results_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_phistar_discrete_nonGlobal_classification_across0.mat';
     load([results_directory results_filename]);
     accuracies_w = accuracies;
 end

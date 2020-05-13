@@ -13,7 +13,7 @@ trial-averaged values)
 %% Setup
 
 const_type = 'unpart'; % 'part'; 'both'
-class_type = 'within';
+class_type = 'across'; % 'within'; 'across'
 
 %% Load accuracies
 
@@ -235,7 +235,7 @@ phis = tmp.phis{1};
 channel_sets = nchoosek((1:15), nChannels);
 
 % SII values
-condition = 2;
+condition = 1;
 values = permute(mean(phis.phis(:, :, :, condition), 2), [1 3 2 4]); % mean across trials
 
 % Create table
@@ -255,19 +255,29 @@ acc_table = array2table(table_array, 'VariableNames', {'set', 'repeat', 'set_cen
 acc_table.set = categorical(acc_table.set);
 acc_table.repeat = nominal(acc_table.repeat);
 
-%acc_table.x = zscore(acc_table.x);
+acc_table.x = zscore(acc_table.x);
 %acc_table.set_center = zscore(acc_table.set_center);
 
 %% LME - does include network location explain more variance?
+
+tic;
 
 % LME
 model_full_spec = 'x ~ set_center*dist + (1|repeat)';
 model_full = fitlme(acc_table, model_full_spec);
 
-% Null
-model_null_spec = 'x ~ set_center + (1|repeat)';
-model_null = fitlme(acc_table, model_null_spec);
-compare(model_null, model_full)
+model_null_spec = cell(1, 1);
+model_null_spec{1} = 'x ~ 1 + (1|repeat)';
+model_null_spec{2} = 'x ~ set_center + dist + (1|repeat)';
+model_null_spec{3} = 'x ~ set_center + set_center:dist + (1|repeat)';
+model_null_spec{4} = 'x ~ dist + set_center:dist + (1|repeat)';
+model_nulls = cell(size(model_null_spec));
+for null_model = 1 : length(model_null_spec)
+    model_nulls{null_model} = fitlme(acc_table, model_null_spec{null_model});
+    compare(model_nulls{null_model}, model_full)
+end
+
+toc
 
 %% Plot model
 % Assuming x ~ set_center * dist + (1|repeat)
@@ -299,36 +309,44 @@ title(['SII map ' condition_labels{condition}]); ylabel('channel distance'); xla
 %% Set-center regression (LME) for classification accuracy
 
 % Accuracy values
-measure = 17;
+measure = 17; % 16 = IIS; 17 = SII
+channel_sets = nchoosek((1:15), 4);
 values = mean(acc.net_accuracies(:, :, measure), 2);
 
 % Create table
 tic;
-table_array = zeros(numel(values), 4);
+table_array = zeros(numel(values), 5);
 row_counter = 1;
 for network = 1 : size(values, 1)
-    row = [network mean(channel_sets(network, :)) channel_set_distance(channel_sets(network, :)) values(network)];
-    table_array(row_counter, :) = row;
-    row_counter = row_counter + 1;
+    for repeat = 1 : size(values, 2)
+        row = [network repeat mean(channel_sets(network, :)) channel_set_distance(channel_sets(network, :)) values(network)];
+        table_array(row_counter, :) = row;
+        row_counter = row_counter + 1;
+    end
 end
 toc
 
-acc_table = array2table(table_array, 'VariableNames', {'set', 'set_center', 'dist', 'x'});
+acc_table = array2table(table_array, 'VariableNames', {'set', 'repeat', 'center', 'dist', 'x'});
 acc_table.set = categorical(acc_table.set);
 
-%acc_table.x = zscore(acc_table.x);
+acc_table.x = zscore(acc_table.x);
 %acc_table.set_center = zscore(acc_table.set_center);
 
 %% LME - does include network location explain more variance?
 
 % LME
-model_full_spec = 'x ~ set_center + (1|set)';
+model_full_spec = 'x ~ center + dist + (1|set)';
 model_full = fitlme(acc_table, model_full_spec);
 
 % Null
-model_null_spec = 'x ~ 1 + (1|set)';
-model_null = fitlme(acc_table, model_null_spec);
-compare(model_null, model_full)
+model_null_spec = cell(1, 1);
+model_null_spec{1} = 'x ~ dist + (1|set)';
+model_null_spec{2} = 'x ~ center + (1|set)';
+model_nulls = cell(size(model_null_spec));
+for null_model = 1 : length(model_null_spec)
+    model_nulls{null_model} = fitlme(acc_table, model_null_spec{null_model});
+    compare(model_nulls{null_model}, model_full)
+end
 
 %% Plot classification accuracies on center-distance map
 

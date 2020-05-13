@@ -9,8 +9,8 @@ Summarise SVM classification results
 %% Setup
 
 results_location = 'results/';
-measures = {'4ch_medianSplit_power', '4ch_medianSplit_coherence', '4ch_phi3Composition_unpart', '4ch_phiStarComposition', '4ch_phiStarGaussianComposition'};
-measure_labels = {'P', 'C', '4ch\phi3comp', '\Phi*comp', '\Phi*gcomp'};
+measures = {'4ch_medianSplit_power', '4ch_medianSplit_coherence', '4ch_medianSplit_correlation', '2ch_phi3Composition_unpart', '3ch_phi3Composition_unpart', '4ch_phi3Composition_unpart', '4ch_phi3Value', '4ch_phiStarComposition', '4ch_phiStarGaussianComposition'};
+measure_labels = {'P', 'C', 'r', '2ch\phi3comp', '3ch\phi3comp', '4ch\phi3comp', '4ch\Phi3', '\Phi*comp', '\Phi*gcomp'};
 
 clim = [0 1];
 
@@ -46,6 +46,14 @@ xlim([0 length(results)+1]); ylim([0.5 1]);
 set(gca, 'XTick', (1: length(results)), 'XTickLabel', measure_labels);
 ylabel('accuracy');
 
+% Plot cumulative histogram for each measure
+figure;
+for measure = 1 : length(measures)
+    cdfplot(mean(results{measure}.accuracy, 2)); % Average across subjects
+    hold on;
+end
+legend(measure_labels, 'Location', 'southeast');
+
 %% Stats
 
 % Repeated measures ANOVA
@@ -80,6 +88,14 @@ errorbar(mean(accuracy, 1), std(accuracy, [], 1), '.');
 xlim([0 length(results)+1]); ylim([0.5 1]);
 set(gca, 'XTick', (1: length(results)), 'XTickLabel', measure_labels);
 ylabel('accuracy');
+
+% Plot cumulative histogram for each measure
+figure;
+for measure = 1 : length(measures)
+    cdfplot(mean(results{measure}.accuracy, 2)); % Average across subjects
+    hold on;
+end
+legend(measure_labels, 'Location', 'southeast');
 
 %% Stats
 

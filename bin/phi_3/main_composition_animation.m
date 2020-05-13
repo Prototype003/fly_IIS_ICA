@@ -16,7 +16,8 @@ output_file = 'animations/composition';
 
 %% Load
 
-load('results_split/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM0_f01c1tauBin16s1036t1');
+%load('results_split/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM0_f01c1tauBin16s1036t1');
+load('results_split2/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM0_f01c1tauBin4s1036t1');
 
 %% Setup Hasse graph
 
@@ -66,13 +67,13 @@ nChannels = 4;
 % [phis{2}, anest] = composition_table(nChannels, 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM1_f01c2tauBin24tauOffset0s1036t1.mat');
 % compositions = [wake(end, :); anest(end, :)];
 
-% [phis{1}, ~, wake, wake2] = composition_table(nChannels, 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM1_f01c1tauBin24tauOffset0s0002t1.mat');
-% [phis{2}, ~, anest, anest2] = composition_table(nChannels, 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM1_f01c2tauBin24tauOffset0s0002t1.mat');
-% compositions = [wake(end, :); anest(end, :); wake2(end, :); anest2(end, :)];
+[phis{1}, ~, wake, wake2] = composition_table(nChannels, 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM1_f01c1tauBin24tauOffset0s0002t1.mat');
+[phis{2}, ~, anest, anest2] = composition_table(nChannels, 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM1_f01c2tauBin24tauOffset0s0002t1.mat');
+compositions = [wake(end, :); anest(end, :); wake2(end, :); anest2(end, :)];
 
-[phis{1}, wake] = composition_table(nChannels, 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM1_f01c1tauBin24tauOffset0s0002t1.mat');
-[phis{2}, anest] = composition_table(nChannels, 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM1_f01c2tauBin24tauOffset0s0002t1.mat');
-compositions = [wake(end, :); anest(end, :)];
+% [phis{1}, wake] = composition_table(nChannels, 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM1_f01c1tauBin24tauOffset0s0002t1.mat');
+% [phis{2}, anest] = composition_table(nChannels, 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM1_f01c2tauBin24tauOffset0s0002t1.mat');
+% compositions = [wake(end, :); anest(end, :)];
 
 compositions = fliplr(compositions);
 

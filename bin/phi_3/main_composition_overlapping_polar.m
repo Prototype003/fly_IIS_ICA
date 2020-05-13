@@ -51,9 +51,9 @@ composition_phis = permute(sum(composition_phis, 1), [2 3 4 5 6 7 1]);
 composition_phis = composition_phis ./ sum(phis{1}.state_counters(:, 1, 1, 1, 1));
 
 % Unpartitioned - partitioned
-composition_phis = permute(composition_phis(1, :, :, :, :, :) - composition_phis(2, :, :, :, :, :), [2 3 4 5 6 7 1]);
+%composition_phis = permute(composition_phis(1, :, :, :, :, :) - composition_phis(2, :, :, :, :, :), [2 3 4 5 6 7 1]);
 % Unpartitioned
-%composition_phis = permute(composition_phis(1, :, :, :, :, :), [2 3 4 5 6 7 1]);
+composition_phis = permute(composition_phis(1, :, :, :, :, :), [2 3 4 5 6 7 1]);
 % Partitioned
 %composition_phis = permute(composition_phis(2, :, :, :, :, :), [2 3 4 5 6 7 1]);
 %% Setup Hasse graph

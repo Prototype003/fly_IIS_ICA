@@ -26,7 +26,7 @@ addpath('../svm_classification/');
 
 %% Load power
 
-powers = load_power(bin_dir);
+[powers, freqs, params] = load_power(bin_dir);
 
 % Mean across frequency bins
 powers = mean(powers(freq_range, :, :, :, :), 1);
@@ -37,7 +37,7 @@ powers = permute(powers, [2 3 4 5 1]); % trials x channels x conditions x flies
 class_type = 'across';
 results_file = ['medianSplit_power_svm_' class_type '.mat'];
 
-cost_powers = (-20:20);%0;%(-20:20);
+cost_powers = (-20:20:20);%0;%(-20:20);
 costs = 2 .^ cost_powers;
 cost_accuracies = zeros(length(costs), size(networks, 1));
 

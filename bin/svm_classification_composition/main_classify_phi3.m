@@ -19,7 +19,7 @@ For
 
 % 'unpart': unpartitioned; 'part': partitioned
 % 'diff': unpartitioned-partitioned; 'both': unpartitioned AND partitioned
-constellation_type = 'both';
+constellation_type = 'diff';
 
 addpath('C:\Users\this_\Documents\MATLAB\Toolboxes\liblinear-2.20\windows');
 
@@ -94,84 +94,91 @@ big_mips = big_mips ./ single(sum(phis.state_counters(:, 1, 1, 1, 1)));
 % ~10 hours for all flies, with cost search (when using just 1 cpu)
 % ~300 seconds for 1 fly, with cost search (when using 4 cpus)
 
-% class_type = 'within';
-% results_file = [num2str(nChannels) 'ch_phi3Composition_' constellation_type '_svm_' class_type '.mat'];
-% 
-% cost_powers = (-20:20);%0;%(-20:20);
-% costs = 2 .^ cost_powers;
-% cost_accuracies = zeros(length(costs), size(big_mips, 2), size(big_mips, 4));
-% 
-% big_mips_par = parallel.pool.Constant(big_mips);
-% costs_par = parallel.pool.Constant(costs);
-% 
-% for fly = 1 : size(big_mips, 4) % Roughly 70s per fly, cost-level
-%     disp(['fly ' num2str(fly)]); tic;
-%     
-%     parfor network = 1 : size(big_mips, 2)
-%         disp(network);
-%         
-%         features = permute(big_mips_par.Value(:, network, :, fly, :), [3 1 5 2 4]); % trials x comp-phis x conditions
-%         accuracies = zeros(size(costs_par.Value));
-%         
-%         for cost_counter = 1 : length(costs_par.Value)
-%             cost = costs_par.Value(cost_counter);
-%             results = svm_lol_liblinear_manual(features, cost); % observations x features x classes
-%             accuracies(cost_counter) = results.accuracy;
-%         end
-%         
-%         cost_accuracies(:, network, fly) = accuracies;
-%         
-%     end
-%     
-%     toc
-%     
-% end
-% 
-% accuracy = zeros(size(cost_accuracies, 2), size(cost_accuracies, 3));
-% for fly = 1 : size(cost_accuracies, 3)
-%     for network = 1 : size(cost_accuracies, 2)
-%         accuracy(network, fly) = max(cost_accuracies(:, network, fly));
-%     end
-% end
-% 
-% %% Save accuracies
-% 
-% save([results_location results_file], 'accuracy', 'cost_accuracies', 'costs', 'nChannels', 'tau');
-% 
-% disp('saved within');
+% With 8-fold (trial) validation, costs (-20:10:20), 4 cpus - ~30s per fly
 
-%% Classify across flies
-% ~40 minutes
-
-class_type = 'across';
+class_type = 'within';
 results_file = [num2str(nChannels) 'ch_phi3Composition_' constellation_type '_svm_' class_type '.mat'];
 
-cost_powers = (-20:20);%0;%(-20:20);
+cost_powers = (-20:10:20);%0;%(-20:20);
 costs = 2 .^ cost_powers;
-cost_accuracies = zeros(length(costs), size(big_mips, 2));
+cost_accuracies = zeros(length(costs), size(big_mips, 2), size(big_mips, 4));
 
 big_mips_par = parallel.pool.Constant(big_mips);
 costs_par = parallel.pool.Constant(costs);
 
-tic;
-parfor network = 1 : size(big_mips, 2)
-    disp(network); tic;
+for fly = 1 : size(big_mips, 4) % Roughly 70s per fly, cost-level
+    disp(['fly ' num2str(fly)]);
+    tic;
     
-    features = permute(mean(big_mips_par.Value(:, network, :, :, :), 3), [4 1 5 2 3]); % flies x comp-phis x conditions
-    accuracies = zeros(size(costs_par.Value));
-    
-    for cost_counter = 1 : length(costs_par.Value)
-        cost = costs_par.Value(cost_counter);
+    parfor network = 1 : size(big_mips, 2)
+        disp(network);
         
-        results = svm_lol_liblinear_manual(features, cost);
-        accuracies(cost_counter) = results.accuracy;
+        features = permute(big_mips_par.Value(:, network, :, fly, :), [3 1 5 2 4]); % trials x comp-phis x conditions
+        accuracies = zeros(size(costs_par.Value));
+        
+        for cost_counter = 1 : length(costs_par.Value)
+            cost = costs_par.Value(cost_counter);
+            results = svm_lol_liblinear_manual(features, cost); % observations x features x classes
+            accuracies(cost_counter) = results.accuracy;
+        end
+        
+        cost_accuracies(:, network, fly) = accuracies;
         
     end
     
-    cost_accuracies(:, network) = accuracies;
-
+    toc
+    
 end
-toc
+
+accuracy = zeros(size(cost_accuracies, 2), size(cost_accuracies, 3));
+for fly = 1 : size(cost_accuracies, 3)
+    for network = 1 : size(cost_accuracies, 2)
+        accuracy(network, fly) = max(cost_accuracies(:, network, fly));
+    end
+end
+
+%% Save accuracies
+
+save([results_location results_file], 'accuracy', 'cost_accuracies', 'costs', 'nChannels', 'tau');
+
+disp('saved within');
+
+%% Classify across flies
+% ~40 minutes
+% With 13-fold (flies) validation, costs (-20:10:20), 4 cpus - ~40 seconds
+
+class_type = 'across';
+results_file = [num2str(nChannels) 'ch_phi3Composition_' constellation_type '_svm_' class_type '.mat'];
+
+cost_powers = (-20:10:20);%0;%(-20:20);
+costs = 2 .^ cost_powers;
+cost_accuracies = zeros(length(costs), size(big_mips, 2), size(big_mips, 3));
+
+big_mips_par = parallel.pool.Constant(big_mips);
+costs_par = parallel.pool.Constant(costs);
+
+for trial = 1 : size(big_mips, 3)
+    disp(['trial ' num2str(trial)]);
+    tic;
+    parfor network = 1 : size(big_mips, 2)
+        disp(network); tic;
+        
+        features = permute(big_mips_par.Value(:, network, trial, :, :), [4 1 5 2 3]); % flies x comp-phis x conditions
+        accuracies = zeros(size(costs_par.Value));
+        
+        for cost_counter = 1 : length(costs_par.Value)
+            cost = costs_par.Value(cost_counter);
+            
+            results = svm_lol_liblinear_manual(features, cost);
+            accuracies(cost_counter) = results.accuracy;
+            
+        end
+        
+        cost_accuracies(:, network, trial) = accuracies;
+        
+    end
+    toc
+end
 accuracy = max(cost_accuracies, [], 1);
 
 %% Save accuracies

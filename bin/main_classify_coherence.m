@@ -24,7 +24,7 @@ chronux_params.pad = 1; % I think Dror used 1, apparently higher padding gives h
 nFlies = length(flies);
 nConditions = length(conditions);
 
-across_flies = 0;
+across_flies = 1;
 
 data_directory = 'workspace_results/';
 data_filename = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim.mat';

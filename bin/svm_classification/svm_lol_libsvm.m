@@ -95,16 +95,16 @@ if nargin > 1
 %     data_test = (data_test - min_mat) ./ (max_mat - min_mat);
     
     % Normalise training data ([-1 1])
-    means = mean(data_train, 1);
-    stds = std(data_train, [], 1);
-    means_mat = repmat(means, [size(data_train, 1), 1]);
-    stds_mat = repmat(stds, [size(data_train, 1), 1]);
-    data_train = (data_train - means_mat) ./ stds_mat;
-    
-    % Normalise testing data (using same parameters as for training data)
-    means_mat = repmat(means, [size(data_test, 1), 1]);
-    stds_mat = repmat(stds, [size(data_test, 1), 1]);
-    data_test = (data_test - means_mat) ./ stds_mat;
+%     means = mean(data_train, 1);
+%     stds = std(data_train, [], 1);
+%     means_mat = repmat(means, [size(data_train, 1), 1]);
+%     stds_mat = repmat(stds, [size(data_train, 1), 1]);
+%     data_train = (data_train - means_mat) ./ stds_mat;
+%     
+%     % Normalise testing data (using same parameters as for training data)
+%     means_mat = repmat(means, [size(data_test, 1), 1]);
+%     stds_mat = repmat(stds, [size(data_test, 1), 1]);
+%     data_test = (data_test - means_mat) ./ stds_mat;
     
     % Normalise data (training and testing data independently)
     %data_train = zscore(data_train, [], 1);
@@ -143,16 +143,16 @@ else
         end
         
         % Normalise training data ([-1 1])
-        means = mean(data_train, 1);
-        stds = std(data_train, [], 1);
-        means_mat = repmat(means, [size(data_train, 1), 1]);
-        stds_mat = repmat(stds, [size(data_train, 1), 1]);
-        data_train = (data_train - means_mat) ./ stds_mat;
-        
-        % Normalise testing data (using same parameters as for training data)
-        means_mat = repmat(means, [size(data_test, 1), 1]);
-        stds_mat = repmat(stds, [size(data_test, 1), 1]);
-        data_test = (data_test - means_mat) ./ stds_mat;
+%         means = mean(data_train, 1);
+%         stds = std(data_train, [], 1);
+%         means_mat = repmat(means, [size(data_train, 1), 1]);
+%         stds_mat = repmat(stds, [size(data_train, 1), 1]);
+%         data_train = (data_train - means_mat) ./ stds_mat;
+%         
+%         % Normalise testing data (using same parameters as for training data)
+%         means_mat = repmat(means, [size(data_test, 1), 1]);
+%         stds_mat = repmat(stds, [size(data_test, 1), 1]);
+%         data_test = (data_test - means_mat) ./ stds_mat;
         
         % Train SVM
         trained = svmtrain(data_train_labels, data_train, '-t 0'); % '-t 0' = linear; '-t 2' = rbf ('-t 2' is default)

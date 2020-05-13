@@ -13,7 +13,7 @@ Outputs:
 
 function [ r ] = fisher_zr( z )
 
-r = (exp(2*z)-1) / (exp(2*z)+1);
+r = (exp(2*z)-1) ./ (exp(2*z)+1);
 
 end
 

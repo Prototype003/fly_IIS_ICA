@@ -52,27 +52,46 @@ for future_state = 1 : size(tpm, 2)
     tpm(:, future_state) = tpm(:, future_state) ./ transition_counter;
 end
 
+%     function [index] = state2loli_index(state)
+%         % Placeholder function to mimic pyphi.convert.state2loli_index() for the 2 channel scenario
+%         % Inputs:
+%         %   state = vector of 1s and 0s
+%         % Outputs:
+%         %   index = corresponding loli index (1-indexed, not 0-indexed as in Python)
+%         
+%         if length(state) == 1
+%             index = state + 1; % Assumes that states start from 0, not 1 (e.g. 0,1 and not 1,2)
+%             return
+%         end
+%         
+%         if state == [0 0]
+%             index = 1;
+%         elseif state == [1 0]
+%             index = 2;
+%         elseif state == [0 1]
+%             index = 3;
+%         else % state == [1 1]
+%             index = 4;
+%         end
+%     end
+
     function [index] = state2loli_index(state)
-        % Placeholder function to mimic pyphi.convert.state2loli_index() for the 2 channel scenario
+        % Function to mimic pyphi.convert.state2loli_index()
+        % Converts LOLI bit-index (fortran order) into decimal index
         % Inputs:
         %   state = vector of 1s and 0s
         % Outputs:
         %   index = corresponding loli index (1-indexed, not 0-indexed as in Python)
         
-        if length(state) == 1
-            index = state + 1; % Assumes that states start from 0, not 1 (e.g. 0,1 and not 1,2)
-            return
-        end
+        % TODO: flip bit-order if using C order (as opposed to Fortran
+        % order)
         
-        if state == [0 0]
-            index = 1;
-        elseif state == [1 0]
-            index = 2;
-        elseif state == [0 1]
-            index = 3;
-        else % state == [1 1]
-            index = 4;
+        % LOLI indexing is fortran order (as opposed to C order)
+        index = 0;
+        for bit = 1 : length(state)
+            index = index + state(bit) * 2^(bit-1);
         end
+        index = index + 1;
     end
 
 end

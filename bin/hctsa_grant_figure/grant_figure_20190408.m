@@ -264,3 +264,36 @@ end
 legend('r', '2ch', '3ch', '4ch');
 xlabel('accuracy'); ylabel('p');
 title('across-fly classification');
+
+%% Classification box-plot (across)
+% Compare r with 4-ch Phi
+
+figure;
+boxplot(...
+    [accuracies_a{1}.accuracies; accuracies_a{4}.accuracies],...
+    [ones(size(accuracies_a{1}.accuracies)); ones(size(accuracies_a{4}.accuracies))+1],...
+    'Whisker', 3 ...
+    );
+hold on;
+plot([0 3], [50 50], 'k--'); % chance line
+set(gca, 'TickLabelInterpreter', 'tex')
+ylabel('% accuracy');
+title('awake/anest classification using r and \Phi');
+xticklabels({'r', '\Phi'});
+
+%%
+
+figure;
+h1 = raincloud_plot(accuracies_a{1}.accuracies, 'box_on', 1, 'color', [1 0 0], 'alpha', 0.5,...
+     'box_dodge', 1, 'box_dodge_amount', .15, 'dot_dodge_amount', .15,...
+     'box_col_match', 0);
+h2 = raincloud_plot(accuracies_a{4}.accuracies, 'box_on', 1, 'color', [0.3 0.3 1], 'alpha', 0.5,...
+     'box_dodge', 1, 'box_dodge_amount', .35, 'dot_dodge_amount', .35, 'box_col_match', 0);
+title('awake/anest classification using r and \Phi');
+set(gca,'XLim', [0 100], 'YLim', [-.02 0.08]);
+set(gca, 'YTick', []);
+xlabel('% accuracy');
+
+hold on;
+ch = plot([50 50], [-0.05 0.1], 'k--', 'LineWidth', 2);
+legend([h1{1} h2{1} ch], {'r', '\Phi', 'chance'});

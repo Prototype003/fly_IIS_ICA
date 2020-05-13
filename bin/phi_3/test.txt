@@ -1,0 +1,503 @@
+[{'purview_phis': [{'partition_phis': [], 'partitions': [], 'purview': (), 'mip': Mip
+  phi: 0.0
+  mechanism: ()
+  purview: ()
+  partition:
+    
+  direction: past
+  unpartitioned_repertoire:
+    None
+  partitioned_repertoire:
+    None}, {'partition_phis': [], 'partitions': [], 'purview': (0,), 'mip': Mip
+  phi: 0.0
+  mechanism: ()
+  purview: (0,)
+  partition:
+    
+  direction: past
+  unpartitioned_repertoire:
+    None
+  partitioned_repertoire:
+    None}, {'partition_phis': [], 'partitions': [], 'purview': (1,), 'mip': Mip
+  phi: 0.0
+  mechanism: ()
+  purview: (1,)
+  partition:
+    
+  direction: past
+  unpartitioned_repertoire:
+    None
+  partitioned_repertoire:
+    None}, {'partition_phis': [], 'partitions': [], 'purview': (0, 1), 'mip': Mip
+  phi: 0.0
+  mechanism: ()
+  purview: (0, 1)
+  partition:
+    
+  direction: past
+  unpartitioned_repertoire:
+    None
+  partitioned_repertoire:
+    None}], 'mechanism': ()}, {'purview_phis': [{'partition_phis': [], 'partitions': [], 'purview': (), 'mip': Mip
+  phi: 0.0
+  mechanism: (0,)
+  purview: ()
+  partition:
+    
+  direction: past
+  unpartitioned_repertoire:
+    None
+  partitioned_repertoire:
+    None}, {'partition_phis': [Mip
+  phi: 0.044079
+  mechanism: (0,)
+  purview: (0,)
+  partition:
+    []   0 
+    -- X --
+    0    []
+  direction: past
+  unpartitioned_repertoire:
+    [[0.54407917]
+     [0.45592083]]
+  partitioned_repertoire:
+    [[0.5]
+     [0.5]]], 'partitions': [(Part(mechanism=(), purview=(0,)), Part(mechanism=(0,), purview=()))], 'purview': (0,), 'mip': Mip
+  phi: 0.044079
+  mechanism: (0,)
+  purview: (0,)
+  partition:
+    []   0 
+    -- X --
+    0    []
+  direction: past
+  unpartitioned_repertoire:
+    [[0.54407917]
+     [0.45592083]]
+  partitioned_repertoire:
+    [[0.5]
+     [0.5]]}, {'partition_phis': [Mip
+  phi: 0.015543
+  mechanism: (0,)
+  purview: (1,)
+  partition:
+    []   0 
+    -- X --
+    1    []
+  direction: past
+  unpartitioned_repertoire:
+    [[0.48445661 0.51554339]]
+  partitioned_repertoire:
+    [[0.5 0.5]]], 'partitions': [(Part(mechanism=(), purview=(1,)), Part(mechanism=(0,), purview=()))], 'purview': (1,), 'mip': Mip
+  phi: 0.015543
+  mechanism: (0,)
+  purview: (1,)
+  partition:
+    []   0 
+    -- X --
+    1    []
+  direction: past
+  unpartitioned_repertoire:
+    [[0.48445661 0.51554339]]
+  partitioned_repertoire:
+    [[0.5 0.5]]}, {'partition_phis': [Mip
+  phi: 0.044079
+  mechanism: (0,)
+  purview: (0, 1)
+  partition:
+    []   0
+    -- X -
+    0    1
+  direction: past
+  unpartitioned_repertoire:
+    [[0.26402663 0.28005253]
+     [0.22042998 0.23549086]]
+  partitioned_repertoire:
+    [[0.24222831 0.25777169]
+     [0.24222831 0.25777169]], Mip
+  phi: 0.015543
+  mechanism: (0,)
+  purview: (0, 1)
+  partition:
+    []   0
+    -- X -
+    1    0
+  direction: past
+  unpartitioned_repertoire:
+    [[0.26402663 0.28005253]
+     [0.22042998 0.23549086]]
+  partitioned_repertoire:
+    [[0.27203958 0.27203958]
+     [0.22796042 0.22796042]], Mip
+  phi: 0.059622
+  mechanism: (0,)
+  purview: (0, 1)
+  partition:
+    []    0 
+    --- X --
+    0,1   []
+  direction: past
+  unpartitioned_repertoire:
+    [[0.26402663 0.28005253]
+     [0.22042998 0.23549086]]
+  partitioned_repertoire:
+    [[0.25 0.25]
+     [0.25 0.25]]], 'partitions': [(Part(mechanism=(), purview=(0,)), Part(mechanism=(0,), purview=(1,))), (Part(mechanism=(), purview=(1,)), Part(mechanism=(0,), purview=(0,))), (Part(mechanism=(), purview=(0, 1)), Part(mechanism=(0,), purview=()))], 'purview': (0, 1), 'mip': Mip
+  phi: 0.015543
+  mechanism: (0,)
+  purview: (0, 1)
+  partition:
+    []   0
+    -- X -
+    1    0
+  direction: past
+  unpartitioned_repertoire:
+    [[0.26402663 0.28005253]
+     [0.22042998 0.23549086]]
+  partitioned_repertoire:
+    [[0.27203958 0.27203958]
+     [0.22796042 0.22796042]]}], 'mechanism': (0,)}, {'purview_phis': [{'partition_phis': [], 'partitions': [], 'purview': (), 'mip': Mip
+  phi: 0.0
+  mechanism: (1,)
+  purview: ()
+  partition:
+    
+  direction: past
+  unpartitioned_repertoire:
+    None
+  partitioned_repertoire:
+    None}, {'partition_phis': [Mip
+  phi: 0.001512
+  mechanism: (1,)
+  purview: (0,)
+  partition:
+    []   1 
+    -- X --
+    0    []
+  direction: past
+  unpartitioned_repertoire:
+    [[0.49848757]
+     [0.50151243]]
+  partitioned_repertoire:
+    [[0.5]
+     [0.5]]], 'partitions': [(Part(mechanism=(), purview=(0,)), Part(mechanism=(1,), purview=()))], 'purview': (0,), 'mip': Mip
+  phi: 0.001512
+  mechanism: (1,)
+  purview: (0,)
+  partition:
+    []   1 
+    -- X --
+    0    []
+  direction: past
+  unpartitioned_repertoire:
+    [[0.49848757]
+     [0.50151243]]
+  partitioned_repertoire:
+    [[0.5]
+     [0.5]]}, {'partition_phis': [Mip
+  phi: 0.063358
+  mechanism: (1,)
+  purview: (1,)
+  partition:
+    []   1 
+    -- X --
+    1    []
+  direction: past
+  unpartitioned_repertoire:
+    [[0.56335839 0.43664161]]
+  partitioned_repertoire:
+    [[0.5 0.5]]], 'partitions': [(Part(mechanism=(), purview=(1,)), Part(mechanism=(1,), purview=()))], 'purview': (1,), 'mip': Mip
+  phi: 0.063358
+  mechanism: (1,)
+  purview: (1,)
+  partition:
+    []   1 
+    -- X --
+    1    []
+  direction: past
+  unpartitioned_repertoire:
+    [[0.56335839 0.43664161]]
+  partitioned_repertoire:
+    [[0.5 0.5]]}, {'partition_phis': [Mip
+  phi: 0.001513
+  mechanism: (1,)
+  purview: (0, 1)
+  partition:
+    []   1
+    -- X -
+    0    1
+  direction: past
+  unpartitioned_repertoire:
+    [[0.28090035 0.21758722]
+     [0.28245805 0.21905438]]
+  partitioned_repertoire:
+    [[0.2816792 0.2183208]
+     [0.2816792 0.2183208]], Mip
+  phi: 0.063359
+  mechanism: (1,)
+  purview: (0, 1)
+  partition:
+    []   1
+    -- X -
+    1    0
+  direction: past
+  unpartitioned_repertoire:
+    [[0.28090035 0.21758722]
+     [0.28245805 0.21905438]]
+  partitioned_repertoire:
+    [[0.24924378 0.24924378]
+     [0.25075622 0.25075622]], Mip
+  phi: 0.06487
+  mechanism: (1,)
+  purview: (0, 1)
+  partition:
+    []    1 
+    --- X --
+    0,1   []
+  direction: past
+  unpartitioned_repertoire:
+    [[0.28090035 0.21758722]
+     [0.28245805 0.21905438]]
+  partitioned_repertoire:
+    [[0.25 0.25]
+     [0.25 0.25]]], 'partitions': [(Part(mechanism=(), purview=(0,)), Part(mechanism=(1,), purview=(1,))), (Part(mechanism=(), purview=(1,)), Part(mechanism=(1,), purview=(0,))), (Part(mechanism=(), purview=(0, 1)), Part(mechanism=(1,), purview=()))], 'purview': (0, 1), 'mip': Mip
+  phi: 0.001513
+  mechanism: (1,)
+  purview: (0, 1)
+  partition:
+    []   1
+    -- X -
+    0    1
+  direction: past
+  unpartitioned_repertoire:
+    [[0.28090035 0.21758722]
+     [0.28245805 0.21905438]]
+  partitioned_repertoire:
+    [[0.2816792 0.2183208]
+     [0.2816792 0.2183208]]}], 'mechanism': (1,)}, {'purview_phis': [{'partition_phis': [], 'partitions': [], 'purview': (), 'mip': Mip
+  phi: 0.0
+  mechanism: (0, 1)
+  purview: ()
+  partition:
+    
+  direction: past
+  unpartitioned_repertoire:
+    None
+  partitioned_repertoire:
+    None}, {'partition_phis': [Mip
+  phi: 0.042578
+  mechanism: (0, 1)
+  purview: (0,)
+  partition:
+    []   0,1
+    -- X ---
+    0    [] 
+  direction: past
+  unpartitioned_repertoire:
+    [[0.54257809]
+     [0.45742191]]
+  partitioned_repertoire:
+    [[0.5]
+     [0.5]], Mip
+  phi: 0.044091
+  mechanism: (0, 1)
+  purview: (0,)
+  partition:
+    0    1
+    -- X -
+    []   0
+  direction: past
+  unpartitioned_repertoire:
+    [[0.54257809]
+     [0.45742191]]
+  partitioned_repertoire:
+    [[0.49848757]
+     [0.50151243]], Mip
+  phi: 0.001501
+  mechanism: (0, 1)
+  purview: (0,)
+  partition:
+    0   1 
+    - X --
+    0   []
+  direction: past
+  unpartitioned_repertoire:
+    [[0.54257809]
+     [0.45742191]]
+  partitioned_repertoire:
+    [[0.54407917]
+     [0.45592083]]], 'partitions': [(Part(mechanism=(), purview=(0,)), Part(mechanism=(0, 1), purview=())), (Part(mechanism=(0,), purview=()), Part(mechanism=(1,), purview=(0,))), (Part(mechanism=(0,), purview=(0,)), Part(mechanism=(1,), purview=()))], 'purview': (0,), 'mip': Mip
+  phi: 0.001501
+  mechanism: (0, 1)
+  purview: (0,)
+  partition:
+    0   1 
+    - X --
+    0   []
+  direction: past
+  unpartitioned_repertoire:
+    [[0.54257809]
+     [0.45742191]]
+  partitioned_repertoire:
+    [[0.54407917]
+     [0.45592083]]}, {'partition_phis': [Mip
+  phi: 0.048004
+  mechanism: (0, 1)
+  purview: (1,)
+  partition:
+    []   0,1
+    -- X ---
+    1    [] 
+  direction: past
+  unpartitioned_repertoire:
+    [[0.5480041 0.4519959]]
+  partitioned_repertoire:
+    [[0.5 0.5]], Mip
+  phi: 0.015354
+  mechanism: (0, 1)
+  purview: (1,)
+  partition:
+    0    1
+    -- X -
+    []   1
+  direction: past
+  unpartitioned_repertoire:
+    [[0.5480041 0.4519959]]
+  partitioned_repertoire:
+    [[0.56335839 0.43664161]], Mip
+  phi: 0.063547
+  mechanism: (0, 1)
+  purview: (1,)
+  partition:
+    0   1 
+    - X --
+    1   []
+  direction: past
+  unpartitioned_repertoire:
+    [[0.5480041 0.4519959]]
+  partitioned_repertoire:
+    [[0.48445661 0.51554339]]], 'partitions': [(Part(mechanism=(), purview=(1,)), Part(mechanism=(0, 1), purview=())), (Part(mechanism=(0,), purview=()), Part(mechanism=(1,), purview=(1,))), (Part(mechanism=(0,), purview=(1,)), Part(mechanism=(1,), purview=()))], 'purview': (1,), 'mip': Mip
+  phi: 0.015354
+  mechanism: (0, 1)
+  purview: (1,)
+  partition:
+    0    1
+    -- X -
+    []   1
+  direction: past
+  unpartitioned_repertoire:
+    [[0.5480041 0.4519959]]
+  partitioned_repertoire:
+    [[0.56335839 0.43664161]]}, {'partition_phis': [Mip
+  phi: 0.042696
+  mechanism: (0, 1)
+  purview: (0, 1)
+  partition:
+    []   0,1
+    -- X ---
+    0     1 
+  direction: past
+  unpartitioned_repertoire:
+    [[0.29791366 0.24477287]
+     [0.25010075 0.20721271]]
+  partitioned_repertoire:
+    [[0.27400205 0.22599795]
+     [0.27400205 0.22599795]], Mip
+  phi: 0.048122
+  mechanism: (0, 1)
+  purview: (0, 1)
+  partition:
+    []   0,1
+    -- X ---
+    1     0 
+  direction: past
+  unpartitioned_repertoire:
+    [[0.29791366 0.24477287]
+     [0.25010075 0.20721271]]
+  partitioned_repertoire:
+    [[0.27128904 0.27128904]
+     [0.22871096 0.22871096]], Mip
+  phi: 0.0907
+  mechanism: (0, 1)
+  purview: (0, 1)
+  partition:
+    []    0,1
+    --- X ---
+    0,1   [] 
+  direction: past
+  unpartitioned_repertoire:
+    [[0.29791366 0.24477287]
+     [0.25010075 0.20721271]]
+  partitioned_repertoire:
+    [[0.25 0.25]
+     [0.25 0.25]], Mip
+  phi: 0.059543
+  mechanism: (0, 1)
+  purview: (0, 1)
+  partition:
+    0     1 
+    -- X ---
+    []   0,1
+  direction: past
+  unpartitioned_repertoire:
+    [[0.29791366 0.24477287]
+     [0.25010075 0.20721271]]
+  partitioned_repertoire:
+    [[0.28090035 0.21758722]
+     [0.28245805 0.21905438]], Mip
+  phi: 0.016737
+  mechanism: (0, 1)
+  purview: (0, 1)
+  partition:
+    0   1
+    - X -
+    0   1
+  direction: past
+  unpartitioned_repertoire:
+    [[0.29791366 0.24477287]
+     [0.25010075 0.20721271]]
+  partitioned_repertoire:
+    [[0.30651156 0.2375676 ]
+     [0.25684683 0.19907401]], Mip
+  phi: 0.107757
+  mechanism: (0, 1)
+  purview: (0, 1)
+  partition:
+    0   1
+    - X -
+    1   0
+  direction: past
+  unpartitioned_repertoire:
+    [[0.29791366 0.24477287]
+     [0.25010075 0.20721271]]
+  partitioned_repertoire:
+    [[0.2414956  0.25699197]
+     [0.24296101 0.25855142]], Mip
+  phi: 0.064951
+  mechanism: (0, 1)
+  purview: (0, 1)
+  partition:
+     0    1 
+    --- X --
+    0,1   []
+  direction: past
+  unpartitioned_repertoire:
+    [[0.29791366 0.24477287]
+     [0.25010075 0.20721271]]
+  partitioned_repertoire:
+    [[0.26402663 0.28005253]
+     [0.22042998 0.23549086]]], 'partitions': [(Part(mechanism=(), purview=(0,)), Part(mechanism=(0, 1), purview=(1,))), (Part(mechanism=(), purview=(1,)), Part(mechanism=(0, 1), purview=(0,))), (Part(mechanism=(), purview=(0, 1)), Part(mechanism=(0, 1), purview=())), (Part(mechanism=(0,), purview=()), Part(mechanism=(1,), purview=(0, 1))), (Part(mechanism=(0,), purview=(0,)), Part(mechanism=(1,), purview=(1,))), (Part(mechanism=(0,), purview=(1,)), Part(mechanism=(1,), purview=(0,))), (Part(mechanism=(0,), purview=(0, 1)), Part(mechanism=(1,), purview=()))], 'purview': (0, 1), 'mip': Mip
+  phi: 0.016737
+  mechanism: (0, 1)
+  purview: (0, 1)
+  partition:
+    0   1
+    - X -
+    0   1
+  direction: past
+  unpartitioned_repertoire:
+    [[0.29791366 0.24477287]
+     [0.25010075 0.20721271]]
+  partitioned_repertoire:
+    [[0.30651156 0.2375676 ]
+     [0.25684683 0.19907401]]}], 'mechanism': (0, 1)}]
