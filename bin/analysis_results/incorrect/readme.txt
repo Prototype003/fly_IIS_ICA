@@ -1,1 +1,0 @@
-This directory is for results which are incorrect due to phistar being calculated with incorrect covariances.
