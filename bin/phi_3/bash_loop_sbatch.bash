@@ -11,7 +11,7 @@
 
 
 # To set a project account for credit charging, 
-#SBATCH --account=qb48
+#SBATCH --account=ot95
 
 # Request CPU resource for a serial job
 #SBATCH --ntasks=1
