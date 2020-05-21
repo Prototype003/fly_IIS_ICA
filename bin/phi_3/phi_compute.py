@@ -25,8 +25,8 @@ tau_bin = int(sys.argv[8]) # 0=don't average across tau samples, use stepsize ta
 sample_offsets = int(sys.argv[9]) # Compute TPM across sample offsets before binning (for when tau_bin == 1)
 
 # Fly data location
-data_directory = "../workspace_results/"
-data_file_prefix = "split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim"
+data_directory = "../ICA/results/"
+data_file_prefix = "split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_ICA"
 data_file = data_file_prefix + ".mat"
 
 # Output location
