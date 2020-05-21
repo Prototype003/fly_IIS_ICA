@@ -2,9 +2,13 @@
 
 %{
 
-Joins 2-channel results (across all parameters)
+Joins 4-channel results (across all parameters)
 
 %}
+
+%% Settings
+
+nComponents = 4; % number of ICs
 
 %% Setup
 
@@ -20,7 +24,7 @@ trials = (1:8);
 % _nChannels4_globalTPM1_f01c2tauBin4500tauOffset21s1036t1
 
 source_dir = '../results_split/';
-source_prefix = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels'...
+source_prefix = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_ICA_nChannels'...
     num2str(nChannels)...
     '_globalTPM' num2str(global_tpm)...
     ];
@@ -33,7 +37,7 @@ else % strcmp(tau_type, 'bin')
     binOffset_string = 'binOffset1';
 end
 
-channel_sets = nchoosek((1:15), nChannels);
+channel_sets = nchoosek((1:nComponents), nChannels);
 nStates = 2^nChannels;
 dims_state_ind = [size(channel_sets, 1) length(trials), length(flies), length(conditions), length(taus)];
 dims_state_dep = [nStates dims_state_ind];
