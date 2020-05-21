@@ -52,7 +52,7 @@ for concept_order = 1 : nChannels
     end
 end
 
-output_file = [source_prefix(1:60) '_phithree' source_prefix(61:end) '.mat'];
+output_file = [source_prefix(1:64) '_phithree' source_prefix(65:end) '.mat'];
 
 %% Join split results
 
