@@ -79,4 +79,8 @@ end
 
 %% Save
 
-save('results/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_ICA.mat', 'fly_data', 'fly_table', 'fly_pca', 'fly_rica', 'fly_ica');
+% Save everything
+save('results/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_ICA_all.mat', 'fly_data', 'fly_table', 'fly_pca', 'fly_rica', 'fly_ica');
+
+% Python can't load MATLAB tables, save only IC matrix
+save('results/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_ICA.mat', 'fly_data');
