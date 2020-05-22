@@ -24,18 +24,6 @@ load(data_file);
 % Output filename
 out_prefix = ['results/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_ICAAllTrials_nComponents' num2str(nComponents)];
 
-%% Reformat data to avoid constantly having to use nested loops
-
-% field_names = {'LFP', 'trial', 'fly', 'condition'};
-% fly_table = array2table(zeros(0, 4), 'VariableNames', field_names);
-% for fly = 1 : size(fly_data, 4)
-%     for condition = 1 : size(fly_data, 5)
-%         for trial = 1 : size(fly_data, 3)
-%             fly_table = [fly_table; cell2table({fly_data(:, :, trial, fly, condition), trial, fly, condition}, 'VariableNames', field_names)];
-%         end
-%     end
-% end
-
 %% Combine trials/conditions for ICA
 
 % samples x trials x conditions x channels x flies
@@ -73,29 +61,29 @@ for fly = 1 : size(data, 3)
     
 end
 
+pca_models = struct();
+pca_models.scores = pc_scores;
+pca_models.coeffs = pc_coeffs;
+pca_models.latents = pc_latents;
+
 toc
 
 %% Convert IC scores to original format
 % (original format - can reuse older code)
 % NOTE - original fly_data variable is overwritten with ICs
 
-dims = size(fly_data); % the second dimension is changed by ICA
-dims(2) = nComponents;
+new_dims = dims;
+new_dims(4) = nComponents; % number of channels has changed
 
-fly_data = zeros(dims);
+ica_scores = reshape(ica_scores, new_dims);
+ica_scores = permute(ica_scores, [1 4 2 5 3]);
 
-for row = 1 : size(fly_table, 1)
-    
-    fly_data(:, :, fly_table.trial(row), fly_table.fly(row), fly_table.condition(row)) = fly_ica.ic_score{row};
-    
-end
+fly_data = ica_scores;
 
 %% Save
 
-% TODO - update to have number of independent components in the filename
-
 % Save everything
-save([out_prefix '_all.mat'], 'fly_data', 'fly_table', 'fly_pca', 'fly_rica', 'fly_ica');
+save([out_prefix '_all.mat'], 'pca_models', 'ica_models', 'ica_scores');
 
 % Python can't load MATLAB tables, save only IC matrix
 save([out_prefix '.mat'], 'fly_data');
