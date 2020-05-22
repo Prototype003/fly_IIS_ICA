@@ -37,7 +37,7 @@ tau_bin = 0;
 sample_offset = 0;
 
 % split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM0_f03c2tau4tauOffset0s0939t6.mat
-file_prefix = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels' num2str(nChannels)];
+file_prefix = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_ICA_nChannels' num2str(nChannels)];
 
 nStates = 2^nChannels;
 nConcepts = 15;
@@ -70,7 +70,7 @@ end
 %% Load
 
 source_dir = '../phi_3/results/';
-source_file = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_phithree_nChannels' num2str(nChannels) '_globalTPM0.mat'];
+source_file = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_ICAAllTrials_nComponents4_phithree_nChannels' num2str(nChannels) '_globalTPM0.mat'];
 tic
 disp('loading');
 tmp = load([source_dir source_file]);
@@ -249,8 +249,8 @@ save([results_location results_file], 'net_accuracies', 'validation_costs', 'val
 %% Save accuracies
 % Save everything (big file)
 
-save(['results_svmDetails/' results_file], 'net_accuracies', 'net_accuracy_details', 'costs', 'cost_powers', 'nChannels', 'tau', '-v7.3');
-
-disp(['saved everything for ' class_type]);
+% save(['results_svmDetails/' results_file], 'net_accuracies', 'net_accuracy_details', 'costs', 'cost_powers', 'nChannels', 'tau', '-v7.3');
+% 
+% disp(['saved everything for ' class_type]);
 
 end
