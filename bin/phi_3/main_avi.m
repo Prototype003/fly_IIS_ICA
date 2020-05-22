@@ -19,7 +19,7 @@ nChannels = 4;
 
 %% Load
 
-load('results/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_phithree_nChannels4_globalTPM0.mat');
+load('results/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_ICA_phithree_nChannels4_globalTPM0.mat');
 
 %% Get state-weighted compositions for all parameters
 
@@ -381,18 +381,18 @@ subplots = zeros(3, 2);
 % Phi raincloud
 subplot(size(subplots, 1), size(subplots, 2), 1);
 data = cell(1, 1);
-data{1, 1} = phi_flyMean(:, 1);
-data{2, 1} = phi_flyMean(:, 2);
+data{1, 1} = phi_setMean(:, 1);
+data{2, 1} = phi_setMean(:, 2);
 h = rm_raincloud(data, [0 0 0]);
 % Update rain
 for c = 1 : numel(h.s)
-    h.s{c}.SizeData = 1;
+    h.s{c}.SizeData = 5;
 end
 % Update mean-points
 for c = 1 : numel(h.m)
     h.m(c).SizeData = 10;
 end
-set(gca, 'XScale', 'log');
+%set(gca, 'XScale', 'log');
 title('SII');
 xlabel('SII', 'Rotation', 0);
 set(gca, 'YTick', 1+condition_offsets, 'YTickLabel', {'wake', 'anest'});
@@ -403,11 +403,11 @@ box on;
 % Phi raincloud (wake/anest)
 subplot(size(subplots, 1), size(subplots, 2), 2);
 data = cell(1, 1);
-data{1} = phi_flyMean(:, 1) ./ phi_flyMean(:, 2);
+data{1} = phi_setMean(:, 1) ./ phi_setMean(:, 2);
 h = rm_raincloud(data, [0 0 0]);
 % Update rain
 for c = 1 : numel(h.s)
-    h.s{c}.SizeData = 1;
+    h.s{c}.SizeData = 5;
 end
 % Update mean-points
 for c = 1 : numel(h.m)
@@ -425,7 +425,7 @@ box on;
 % Mechanism raindcloud
 subplot(size(subplots, 1), size(subplots, 2), [3 4]); axis off;
 axes_pos = get(gca, 'Position');
-values = orders_flyMean(:, :, :, 1); % 1=unpart; 2=part; 3=diff
+values = orders_setMean(:, :, :, 1); % 1=unpart; 2=part; 3=diff
 
 base_offset = 100;
 baselines_wake = (0:base_offset:(size(values, 2)-1)*base_offset);
@@ -466,7 +466,7 @@ for c_order = 1 : size(values, 2)
         % Shift baseline (rain)
         handles{cloud_counter}{2}.YData = rain_scatter;
         handles{cloud_counter}{2}.YData = handles{cloud_counter}{2}.YData + baselines(cloud_counter) - rain_offset; % move rain
-        handles{cloud_counter}{2}.SizeData = 2; % raindrop size
+        handles{cloud_counter}{2}.SizeData = 10; % raindrop size
         
         % Hide all axes except the first
         if cloud_counter > 1
@@ -475,13 +475,14 @@ for c_order = 1 : size(values, 2)
         
         view([-90 90]); % flip x-y axes
         
-        set(gca, 'XScale', 'log');
+        %set(gca, 'XScale', 'log');
         
         set(gca,...
             'YTick', (baselines_wake+baselines_anest)/2,...
             'YTickLabel', (length(baselines_wake):-1:1));
         
         ylabel('mechanism size');
+        xlabel('\phi');
         
         cloud_counter = cloud_counter + 1;
     end
@@ -491,19 +492,19 @@ end
 % [smallest baseline + space; highest point of highest cloud + space]
 limits = [min(baselines)-cloud_rain_dist-(2*rain_spread)-cloud_rain_dist max(handles{1}{1}.YData)+rain_spread];
 set(ax,'YLim',[min(limits(:)) max(limits(:))]); % set the same values for both axes
-linkaxes(ax);
+%linkaxes(ax);
 
 % Plot order rainclouds
 part_type = 1; % only plot for UP
 subplot(size(subplots, 1), size(subplots, 2), [5 6]);
 % Calculate t-scores
 % Convert to cell array (orders x conditions), each cell holds 1xflies
-data = cell(size(orders_flyMean, 2), 1);%size(orders, 3));
+data = cell(size(orders_setMean, 2), 1);%size(orders, 3));
 for c_order = 1 : size(data, 1)
     for condition = 1 : 1%size(data, 2)
         
         % Ratio wake/anest
-        data{c_order, condition} = squeeze(orders_flyMean(:, c_order, condition, part_type)) ./ squeeze(orders_flyMean(:, c_order, 2, part_type)); % wake/anest
+        data{c_order, condition} = squeeze(orders_setMean(:, c_order, condition, part_type)) ./ squeeze(orders_setMean(:, c_order, 2, part_type)); % wake/anest
         
         %(for log transformed values)
         %data{c_order, condition} = squeeze(orders_flyMean(:, c_order, condition, part_type)) - squeeze(orders_flyMean(:, c_order, 2, part_type)); % wake-anest
@@ -526,7 +527,7 @@ h = rm_raincloud(data, [0 0 0]);
 %h = rm_raincloud(data, [1 0 0; 0 0 1]);
 % Update rain
 for c = 1 : numel(h.s)
-    h.s{c}.SizeData = 1;
+    h.s{c}.SizeData = 5;
 end
 % Update lines
 for c = 1 : numel(h.l)
@@ -540,7 +541,7 @@ end
 title('full (F) wake / anest.');
 xlabel('\Delta\phi', 'Rotation', 0); ylabel('mechanism size'); % x-y are swapped in rm_raincloud
 %xlim([0 0.45]);
-xlim([1 1.63]); ylim([-7 63]);
+%xlim([1 1.63]); ylim([-7 63]);
 box on;
 %hold on;
 %line([0 0], [-100 800], 'Color', 'k');

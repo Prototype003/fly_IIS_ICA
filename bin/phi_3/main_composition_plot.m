@@ -16,7 +16,7 @@ marker_size = 500;
 
 %% Load phi compositions
 
-load('results/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_phithree_nChannels4_globalTPM0.mat');
+load('results/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_ICA_phithree_nChannels4_globalTPM0.mat');
 
 %% Average across states, trials
 
@@ -92,7 +92,7 @@ nChannels = 4;
 
 % Select channel set, fly to plot
 channel_set = 1;
-fly = 1;
+fly = 11;
 part_type = 1;
 compositions_plot = permute(compositions(:, channel_set, :, fly, :, part_type), [5 1 2 3 4 6]);
 

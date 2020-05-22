@@ -13,7 +13,7 @@ trial-averaged values)
 %% Setup
 
 const_type = 'unpart'; % 'part'; 'both'
-class_type = 'across'; % 'within'; 'across'
+class_type = 'within'; % 'within'; 'across'
 
 %% Load accuracies
 
@@ -29,6 +29,15 @@ comp_accuracies = permute(mean(acc.net_accuracies(:, :, 16), 2), [1 3 2]);
 
 % Accuracy of SII
 p_accuracies = permute(mean(acc.net_accuracies(:, :, 17), 2), [1 3 2]);
+
+% Accuracies of individual concepts
+c_accuracies = permute(acc.net_accuracies(:, :, 1:15), [2 3 1]);
+
+% Accuracy of IIS
+comp_accuracies = permute(acc.net_accuracies(:, :, 16), [2 3 1]);
+
+% Accuracy of SII
+p_accuracies = permute(acc.net_accuracies(:, :, 17), [2 3 1]);
 
 %% Processing
 % Average across all concepts within the same order
@@ -67,9 +76,9 @@ set(gcf, 'Renderer', 'painters');
 
 colours = cbrewer('qual', 'Dark2', size(acc_all, 2)); % https://au.mathworks.com/matlabcentral/mlc-downloads/downloads/submissions/34087/versions/2/screenshot.jpg
 
-base_offset = 37; % 17;
+base_offset = 5; % 17;
 baselines = (0:-base_offset:-(size(acc_all, 2)-1)*base_offset); % baselines of clouds
-rain_spread = 10;
+rain_spread = 1;
 cloud_rain_dist = 1;
 rain_offset = (rain_spread/2) + cloud_rain_dist; % middle of rain
 rain_scatter = (rand(size(acc_all, 1), 1) - 0.5) * rain_spread;
@@ -100,7 +109,7 @@ for feature_type = 1 : size(acc_all, 2)
     % Shift baseline (rain)
     handles{feature_type}{2}.YData = rain_scatter;
     handles{feature_type}{2}.YData = handles{feature_type}{2}.YData + baselines(feature_type) - rain_offset; % move rain
-    handles{feature_type}{2}.SizeData = 2; % raindrop size
+    handles{feature_type}{2}.SizeData = 10; % raindrop size
     
     % Shift boxplots
     handles{feature_type}{3}.Position([2 4]) = [-rain_spread/2 rain_spread]; % set box width to match rain spread
