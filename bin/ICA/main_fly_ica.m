@@ -15,11 +15,17 @@ nComponents = 4;
 
 %% Setup
 
+addpath('FastICA_25/');
+
 % Load data
 data_file = '../../../fly_phi/bin/workspace_results/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim.mat';
 load(data_file);
 
-% Reformat data to avoid constantly having to use nested loops
+% Output filename
+out_prefix = ['results/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_ICA_nComponents' num2str(nComponents)];
+
+%% Reformat data to avoid constantly having to use nested loops
+
 field_names = {'LFP', 'trial', 'fly', 'condition'};
 fly_table = array2table(zeros(0, 4), 'VariableNames', field_names);
 for fly = 1 : size(fly_data, 4)
@@ -40,7 +46,7 @@ independent_components = cell(size(fly_table, 1), 1);
 for row = 1 : size(fly_table)
     disp(row);
     
-    lfp = fly_table.LFP{1};
+    lfp = fly_table.LFP{row};
     
     % Whiten the data using zscore and PCA
     [coeff, score, latent] = pca(zscore(lfp));
@@ -80,7 +86,7 @@ end
 %% Save
 
 % Save everything
-save('results/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_ICA_all.mat', 'fly_data', 'fly_table', 'fly_pca', 'fly_rica', 'fly_ica');
+save([out_prefix '_all.mat'], 'fly_data', 'fly_table', 'fly_pca', 'fly_rica', 'fly_ica');
 
 % Python can't load MATLAB tables, save only IC matrix
-save('results/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_ICA.mat', 'fly_data');
+save([out_prefix '.mat'], 'fly_data');
