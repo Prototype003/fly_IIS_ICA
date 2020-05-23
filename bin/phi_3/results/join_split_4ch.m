@@ -53,7 +53,7 @@ for concept_order = 1 : nChannels
 end
 
 infix = '_ICAAllTrials_nComponents4';
-output_file = [source_prefix(1:60) infix '_phithree' source_prefix(60+length(infix):end) '.mat'];
+output_file = [source_prefix(1:60) infix '_phithree' source_prefix(61+length(infix):end) '.mat'];
 
 %% Join split results
 
