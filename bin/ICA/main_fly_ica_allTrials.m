@@ -31,7 +31,7 @@ data = permute(fly_data, [1 3 5 2 4]);
 
 dims = size(data);
 
-data = reshape(fly_data, [prod(dims(1:3)) dims(4) dims(5)]);
+data = reshape(data, [prod(dims(1:3)) dims(4) dims(5)]);
 
 %% Conduct ICA
 tic;
@@ -40,7 +40,7 @@ pc_scores = zeros(size(data));
 pc_coeffs = zeros(size(fly_data, 2), size(fly_data, 2), size(fly_data, 4));
 pc_latents = zeros(size(fly_data, 2), size(fly_data, 4));
 
-ica_models = cell(size(data, 2), 1);
+ica_models = cell(size(data, 3), 1);
 ica_scores = zeros(size(data, 1), nComponents, size(data, 3));
 
 for fly = 1 : size(data, 3)
@@ -56,6 +56,7 @@ for fly = 1 : size(data, 3)
     ica_models{fly} = rica(score, nComponents); % MATLAB's reconstructionICA
     
     % Get independent components
+    % NOTE - final weights are just coeff * ica_model.TransformWeights
     ic = transform(ica_models{fly}, score);
     ica_scores(:, :, fly) = ic;
     
