@@ -10,6 +10,10 @@ See figures/videos from http://www.eneuro.org/content/4/5/ENEURO.0085-17.2017
 
 %}
 
+%% Settings
+
+tau_levels = 4;
+
 %% Setup
 
 output_file = 'animations/composition_all';
@@ -19,11 +23,11 @@ nChannels = 4;
 
 %% Load
 
-load('results/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_ICA_phithree_nChannels4_globalTPM0.mat');
+load('results/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_ICAAllTrials_nComponents4_phithree_nChannels4_globalTPM0.mat');
 
 %% Get state-weighted compositions for all parameters
 
-composition_phis = phis{1}.big_mips;
+composition_phis = phis{1}.big_mips(:, :, :, :, :, :, :, tau_levels);
 %nonzero = composition_phis(composition_phis~=0);
 %composition_phis = log(composition_phis+min(nonzero));
 %composition_phis = log(composition_phis+1);
@@ -33,7 +37,7 @@ for partitioned = 1 : 2
     for concept = 1 : 15
         composition_phis(:, partitioned, concept, :, :, :, :) = ...
             permute(composition_phis(:, partitioned, concept, :, :, :, :), [1 4 5 6 7 2 3]) .* ...
-            double(phis{1}.state_counters);
+            double(phis{1}.state_counters(:, :, :, :, :, tau_levels));
     end
 end
 
@@ -42,7 +46,7 @@ composition_phis = permute(sum(composition_phis, 1), [2 3 4 5 6 7 1]);
 
 % Divide by total number of states (for weighted average)
 % Assumes equal number of samples for all parameters
-composition_phis = composition_phis ./ sum(phis{1}.state_counters(:, 1, 1, 1, 1));
+composition_phis = composition_phis ./ sum(phis{1}.state_counters(:, 1, 1, 1, 1, tau_levels));
 
 % Average across trials
 composition_phis = mean(composition_phis, 4);
@@ -91,20 +95,20 @@ orders_flyMean = permute(orders_flyMean, [2 1 5 6 3 4]);
 %orders_flyMean = log(orders_flyMean);
 
 % Average phi across trials, channel-sets (flies x conditions)
-phi_setMean = mean(mean(phis{1}.phis, 2), 1);
+phi_setMean = mean(mean(phis{1}.phis(:, :, :, :, tau_levels), 2), 1);
 % nonzeros = phis{1}.phis(phis{1}.phis ~= 0);
 % phi_setMean = mean(mean(log(phis{1}.phis+min(nonzeros)), 2), 1);
 % %phi_setMean = log(mean(mean(phis{1}.phis, 2), 1));
 % phi_setMean = mean(log(mean(phis{1}.phis, 2)), 1);
-phi_setMean = permute(phi_setMean, [3 4 2 1]);
+phi_setMean = permute(phi_setMean, [3 4 2 1 5]);
 
 % Average phi across trials, flies (channel-sets x conditions)
-phi_flyMean = mean(mean(phis{1}.phis, 2), 3);
+phi_flyMean = mean(mean(phis{1}.phis(:, :, :, :, tau_levels), 2), 3);
 % nonzeros = phis{1}.phis(phis{1}.phis ~= 0);
 % phi_flyMean = mean(mean(log(phis{1}.phis+min(nonzeros)), 2), 3);
 % %phi_flyMean = log(mean(mean(phis{1}.phis, 2), 3));
 % phi_flyMean = mean(log(mean(phis{1}.phis, 2)), 3);
-phi_flyMean = permute(phi_flyMean, [1 4 2 3]);
+phi_flyMean = permute(phi_flyMean, [1 4 2 3 5]);
 
 % t-score across flies, between conditions (channel-sets x orders x part-types)
 composition_anest_tscores = zeros([size(orders, 2) size(compositions, 1) size(orders, 6)]);
@@ -768,7 +772,7 @@ end
 %% Big phi LME
 
 % composition_unpart | composition_part | composition_diff
-values = phis{1}.phis;
+values = phis{1}.phis(:, :, :, :, tau_levels);
 
 channel_sets = double(phis{1}.channel_sets);
 
