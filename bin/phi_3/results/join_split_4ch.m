@@ -63,7 +63,7 @@ phis = cell(1);
 phis{1} = struct();
 phis{1}.nChannels = int8(nChannels);
 phis{1}.channel_sets = int8(channel_sets);
-phis{1}.taus = int8(taus);
+phis{1}.taus = taus;
 
 phis{1}.phis = single(zeros(dims_state_ind));
 phis{1}.big_mips = cell(dims_state_dep);
