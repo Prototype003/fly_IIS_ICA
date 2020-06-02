@@ -144,10 +144,10 @@ plot([0.5 0.5], [-200 200], 'k--');
 % Formatting
 ylim(ax(1), [min(handles{end}{2}.YData)-2 max(handles{1}{1}.YData)+1]);
 xlim(ax(1), [min(acc_all(:))-0.01 max(acc_all(:))+0.01]);
-title(ax(1), ['classification using single concept (' const_type ')']);
+title(ax(1), ['within-fly classification']);
 xlabel(ax(1), [class_type '-fly accuracy']);
-ylabel(ax(1), 'order of \phi');
-set(ax(1), 'YTick', fliplr(baselines), 'YTickLabel', fliplr({'r', '1', '2', '3', '4', 'all', '\Phi'}));
+ylabel(ax(1), 'mechanism size');
+set(ax(1), 'YTick', fliplr(baselines), 'YTickLabel', fliplr({'r', '1', '2', '3', '4', 'IIS', '\Phi'}));
 
 % Draw separating lines
 for base = max_order+1 : length(baselines)
