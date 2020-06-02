@@ -43,22 +43,37 @@ pc_latents = zeros(size(fly_data, 2), size(fly_data, 4));
 ica_models = cell(size(data, 3), 1);
 ica_scores = zeros(size(data, 1), nComponents, size(data, 3));
 
+ica_mixers = zeros(nComponents, size(data, 2), size(data, 3));
+ica_coeffs = zeros(size(data, 2), nComponents, size(data, 3));
+
 for fly = 1 : size(data, 3)
     disp(fly);
     
-    % Whiten the data using zscore and PCA
-    [coeff, score, latent] = pca(zscore(data(:, :, fly)));
-    pc_scores(:, :, fly) = score;
-    pc_coeffs(:, :, fly) = coeff;
-    pc_latents(:, fly) = latent;
+%     % Whiten the data using zscore and PCA
+%     [coeff, score, latent] = pca(zscore(data(:, :, fly)));
+%     pc_scores(:, :, fly) = score;
+%     pc_coeffs(:, :, fly) = coeff;
+%     pc_latents(:, fly) = latent;
+%     
+%     % ICA
+%     ica_models{fly} = rica(score, nComponents); % MATLAB's reconstructionICA
+%     
+%     % Get independent components
+%     % NOTE - final weights are just coeff * ica_model.TransformWeights
+%     ic = transform(ica_models{fly}, score);
+%     ica_scores(:, :, fly) = ic;
     
     % ICA
-    ica_models{fly} = rica(score, nComponents); % MATLAB's reconstructionICA
-    
-    % Get independent components
-    % NOTE - final weights are just coeff * ica_model.TransformWeights
-    ic = transform(ica_models{fly}, score);
-    ica_scores(:, :, fly) = ic;
+    % NOTE - fastica uses dimensions (signals x samples)
+    % NOTE - (AB)' = B'A'
+    % NOTE - refer to line 481 of fastica
+    %   icasig = W * mixedsig = (signals x samples)
+    %   (samples x signals) = (W*mixedsig)' = (mixedsig'*W)
+    %       where mixedsig as input to fastica is signals x samples)
+    [ics, mix, demix] = fastica(data(:, :, fly)', 'numOfIC', nComponents);
+    ica_scores(:, :, fly) = ics';
+    ica_mixers(:, :, fly) = mix';
+    ica_coeffs(:, :, fly) = demix';
     
 end
 
@@ -66,6 +81,11 @@ pca_models = struct();
 pca_models.scores = pc_scores;
 pca_models.coeffs = pc_coeffs;
 pca_models.latents = pc_latents;
+
+ica_models = struct();
+ica_models.scores = ica_scores;
+ica_models.coeffs = ica_coeffs;
+ica_models.mixers = ica_mixers;
 
 toc
 
@@ -84,7 +104,7 @@ fly_data = ica_scores;
 %% Save
 
 % Save everything
-save([out_prefix '_all.mat'], 'pca_models', 'ica_models', 'ica_scores');
+save([out_prefix '_all.mat'], 'ica_models');
 
 % Python can't load MATLAB tables, save only IC matrix
 save([out_prefix '.mat'], 'fly_data');
