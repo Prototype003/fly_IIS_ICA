@@ -17,7 +17,93 @@ nComponents = 4;
 sample_rate = 1000;
 
 % Load ICs
-load('results/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_ICA_all.mat');
+load(['results/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_ICAAllTrials'...
+    '_nComponents' num2str(nComponents)...
+    '_all.mat']);
+load(['results/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_ICAAllTrials'...
+    '_nComponents' num2str(nComponents)...
+    '.mat']);
+
+%% Get overall weights for the transformation (RICA)
+
+ica_models = ica_models(1:13); % incorrect length specified when this was created
+
+weights = zeros([size(ica_models{1}.TransformWeights) length(ica_models)]);
+for fly = 1 : length(ica_models)
+    weights(:, :, fly) = pca_models.coeffs(:, :, fly) * ica_models{fly}.TransformWeights;
+end
+
+weights = abs(weights); % To see which are most important
+
+% Plot
+nFlies = 13;
+figure;
+for fly = 1 : nFlies
+    subplot(4, 4, fly);
+    imagesc(weights(:, :, fly)', [min(weights(:)) max(weights(:))]);
+    cbar = colorbar; title(cbar, 'abs. weight');
+    ylabel('IC'); xlabel('channel');
+    title(['fly' num2str(fly)]);
+end
+
+% Order ICs based on channel location
+
+% Find max weight across channels for each IC
+[value, location] = max(weights, [], 1);
+% Sort ICs based on channel location of max weight
+[sorted, order] = sort(location, 2);
+% Reorder weights
+for fly = 1 : size(weights, 3)
+    weights(:, :, fly) = weights(:, order(1, :, fly), fly);
+end
+
+% Plot
+nFlies = 13;
+figure;
+for fly = 1 : nFlies
+    subplot(4, 4, fly);
+    imagesc(weights(:, :, fly)', [min(weights(:)) max(weights(:))]);
+    cbar = colorbar; title(cbar, 'abs. weight');
+    ylabel('IC'); xlabel('channel');
+    title(['fly' num2str(fly)]);
+end
+
+%% Get overall weights for the transformation (fastica)
+
+weights = abs(ica_models.coeffs); % To see which are most important
+
+% Plot
+nFlies = 13;
+figure;
+for fly = 1 : nFlies
+    subplot(4, 4, fly);
+    imagesc(weights(:, :, fly)', [min(weights(:)) max(weights(:))]);
+    cbar = colorbar; title(cbar, 'abs. weight');
+    ylabel('IC'); xlabel('channel');
+    title(['fly' num2str(fly)]);
+end
+
+% Order ICs based on channel location
+
+% Find max weight across channels for each IC
+[value, location] = max(weights, [], 1);
+% Sort ICs based on channel location of max weight
+[sorted, order] = sort(location, 2);
+% Reorder weights
+for fly = 1 : size(weights, 3)
+    weights(:, :, fly) = weights(:, order(1, :, fly), fly);
+end
+
+% Plot
+nFlies = 13;
+figure;
+for fly = 1 : nFlies
+    subplot(4, 4, fly);
+    imagesc(weights(:, :, fly)', [min(weights(:)) max(weights(:))]);
+    cbar = colorbar; title(cbar, 'abs. weight');
+    ylabel('IC'); xlabel('channel');
+    title(['fly' num2str(fly)]);
+end
 
 %% Compute power spectra
 
@@ -36,7 +122,7 @@ f = sample_rate*(0:(L/2))/L;
 
 %% Plot power spectra
 
-fly = 1;
+fly = 3;
 trials = (8);
 
 cond_colours = {'r', 'b'};
@@ -54,7 +140,7 @@ ylabel('|P1(f)|');
 
 %% Plot original signals
 
-fly = 1;
+fly = 2;
 trials = (8);
 
 cond_colours = {'r:', 'b:'};
