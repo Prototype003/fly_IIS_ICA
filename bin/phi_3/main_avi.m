@@ -10,9 +10,9 @@ See figures/videos from http://www.eneuro.org/content/4/5/ENEURO.0085-17.2017
 
 %}
 
-%% Settings
+%% Setup
 
-tau_levels = 4;
+tau = 4;
 
 %% Setup
 
@@ -24,6 +24,8 @@ nChannels = 4;
 %% Load
 
 load('results/split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_ICAAllTrials_nComponents4_phithree_nChannels4_globalTPM0.mat');
+
+tau_levels = find(phis{1}.taus == tau);
 
 %% Get state-weighted compositions for all parameters
 
@@ -101,6 +103,7 @@ phi_setMean = mean(mean(phis{1}.phis(:, :, :, :, tau_levels), 2), 1);
 % %phi_setMean = log(mean(mean(phis{1}.phis, 2), 1));
 % phi_setMean = mean(log(mean(phis{1}.phis, 2)), 1);
 phi_setMean = permute(phi_setMean, [3 4 2 1 5]);
+phi_setMean = reshape(phis{1}.phis(:, :, :, :, tau_levels), [8*13 2]);
 
 % Average phi across trials, flies (channel-sets x conditions)
 phi_flyMean = mean(mean(phis{1}.phis(:, :, :, :, tau_levels), 2), 3);
@@ -132,246 +135,6 @@ for c_order = 1 : length(order_concepts)
 end
 orders_anest_tscores = permute(orders_anest_tscores, [2 1 3]); % (channel-sets x orders x part-types)
 
-%% Plot order rainclouds
-
-figure;
-titles = {'UP', 'P', 'UP - P', '\Phi'};
-set(gcf, 'color', 'w');
-subplots = zeros(1, 4);
-subplot_counter = 1;
-for part_type = 1 : size(orders_setMean, 4)
-    subplot(1, length(subplots), subplot_counter);
-    
-    % Convert to cell array (orders x conditions), each cell holds 1xflies
-    data = cell(size(orders_setMean, 2), 1);%size(orders, 3));
-    for c_order = 1 : size(data, 1)
-        for condition = 1 : 1%size(data, 2)
-            data{c_order, condition} = squeeze(orders_setMean(:, c_order, condition, part_type)) - squeeze(orders_setMean(:, c_order, 2, part_type));
-        end
-    end
-    
-    h = rm_raincloud(data, [0 0 0]);
-    
-    %h = rm_raincloud(data, [1 0 0; 0 0 1]);
-    
-    % Update rain
-    for c = 1 : numel(h.s)
-        h.s{c}.SizeData = 10;
-    end
-        
-    % Update lines
-    for c = 1 : numel(h.l)
-        h.l(c).LineWidth = 1;
-    end
-    
-    % Update mean-points
-    for c = 1 : numel(h.m)
-        h.m(c).SizeData = 20;
-    end
-    
-    % Labels
-    title(titles{part_type});
-    xlabel('\phi', 'Rotation', 0); ylabel('order'); % x-y are swapped in rm_raincloud
-    
-    %hold on;
-    %line([0 0], [-100 800], 'Color', 'k');
-    
-    subplot_counter = subplot_counter + 1;
-end
-
-% Phi raincloud
-subplot(1, length(subplots), length(subplots));
-
-data = cell(1, 1);
-data{1} = phi_setMean(:, 1) - phi_setMean(:, 2);
-
-h = rm_raincloud(data, [0 0 0]);
-
-% Update rain
-for c = 1 : numel(h.s)
-    h.s{c}.SizeData = 10;
-end
-
-% Update mean-points
-for c = 1 : numel(h.m)
-    h.m(c).SizeData = 20;
-end
-
-% Labels
-title(titles{end});
-xlabel('\Phi', 'Rotation', 0); % x-y are swapped in rm_raincloud
-set(gca, 'YTick', []);
-
-%hold on;
-%line([0 0], [-100 100], 'Color', 'k');
-
-%% Plot order averages (Figure 2020-04-23)
-
-figure;
-titles = {'full (F)', 'disconnected (D)', 'F - D', 'SII'};
-condition_colours = {'r', 'b'};
-ylims = [-3.9 -2.8; -3.9 -2.8; -4.8 -4.15]; % for log-transformed values
-ylims = [0.02 0.07; 0.02 0.07; 0 0.007];
-set(gcf, 'color', 'w');
-condition_offsets = [-0.2 0.2];
-subplots = zeros(2, 4);
-
-% Phi raincloud
-subplot(size(subplots, 1), size(subplots, 2), 1);
-data = cell(1, 1);
-data{1, 1} = phi_flyMean(:, 1);
-data{2, 1} = phi_flyMean(:, 2);
-h = rm_raincloud(data, [0 0 0]);
-% Update rain
-for c = 1 : numel(h.s)
-    h.s{c}.SizeData = 1;
-end
-% Update mean-points
-for c = 1 : numel(h.m)
-    h.m(c).SizeData = 10;
-end
-set(gca, 'XScale', 'log');
-title(titles{end});
-xlabel('SII', 'Rotation', 0);
-set(gca, 'YTick', 1+condition_offsets, 'YTickLabel', {'wake', 'anest'});
-set(gca, 'YTick', [h.m(2).YData h.m(1).YData], 'YTickLabel', fliplr({'wake', 'anest'}));
-delete(h.l);
-box on;
-
-% % Plot Phi values
-% subplot(size(subplots, 1), size(subplots, 2), 1);
-% for condition = 1 : size(orders_setMean, 3)
-%     
-%     errorbar((1)+condition_offsets(condition),...
-%         squeeze(mean(phi_setMean(:, condition), 1)),...
-%         squeeze(std(phi_setMean(:, condition), [], 1) ./ sqrt(size(phi_setMean, 1))),...
-%         [condition_colours{condition} '.']);
-%     hold on;
-%     
-% end
-% title(titles{end});
-% ylabel('SII', 'Rotation', 0);
-% xlim([0.8 1.2]); %ylim([-3.9 -3.3]);
-% set(gca, 'YScale', 'log');
-% set(gca, 'XTick', 1+condition_offsets, 'XTickLabel', {'wake', 'anest'});
-
-% Plot mechanism values
-subplot_counter = 2;
-for part_type = 1 : size(orders_setMean, 4)
-    subplot(size(subplots, 1), size(subplots, 2), subplot_counter);
-    
-    for condition = 1 : size(orders_setMean, 3)
-        
-        % Plot average across flies
-        bar((1:size(orders_setMean, 2))+condition_offsets(condition),...
-            squeeze(mean(orders_setMean(:, :, condition, part_type), 1, 'omitnan')),...
-            0.35,...
-            condition_colours{condition});
-        hold on;
-        
-        % Plot average across flies
-        errorbar((1:size(orders_setMean, 2))+condition_offsets(condition),...
-            squeeze(mean(orders_setMean(:, :, condition, part_type), 1, 'omitnan')),...
-            squeeze(std(orders_setMean(:, :, condition, part_type), [], 1, 'omitnan') ./ sqrt(size(orders_setMean, 1))),...
-            'k.');
-        
-    end
-    
-    title(titles{part_type});
-    xlabel('mechanism size');
-    ylabel('\phi', 'Rotation', 0);
-    xlim([0.5 size(orders_setMean, 2)+0.5]);
-    set(gca, 'YScale', 'log');
-    ylim(ylims(part_type, :));
-    
-    subplot_counter = subplot_counter + 1;
-end
-set(gca, 'YScale', 'linear');
-
-% Phi raincloud
-subplot(size(subplots, 1), size(subplots, 2), 5);
-data = cell(1, 1);
-data{1} = phi_flyMean(:, 1) ./ phi_flyMean(:, 2);
-h = rm_raincloud(data, [0 0 0]);
-% Update rain
-for c = 1 : numel(h.s)
-    h.s{c}.SizeData = 1;
-end
-% Update mean-points
-for c = 1 : numel(h.m)
-    h.m(c).SizeData = 10;
-end
-% Labels
-title('SII wake / anest.');
-xlabel('\Delta\Phi', 'Rotation', 0); % x-y are swapped in rm_raincloud
-set(gca, 'YTick', []);
-%set(gca, 'XScale', 'log');
-%hold on;
-%line([0 0], [-100 100], 'Color', 'k');
-box on;
-
-% Plot order rainclouds
-part_type = 1; % only plot for UP
-subplot(size(subplots, 1), size(subplots, 2), [6 8]);
-% Calculate t-scores
-% Convert to cell array (orders x conditions), each cell holds 1xflies
-data = cell(size(orders_flyMean, 2), 1);%size(orders, 3));
-for c_order = 1 : size(data, 1)
-    for condition = 1 : 1%size(data, 2)
-        
-        % Ratio wake/anest
-        data{c_order, condition} = squeeze(orders_flyMean(:, c_order, condition, part_type)) ./ squeeze(orders_flyMean(:, c_order, 2, part_type)); % wake/anest
-        
-        %(for log transformed values)
-        %data{c_order, condition} = squeeze(orders_flyMean(:, c_order, condition, part_type)) - squeeze(orders_flyMean(:, c_order, 2, part_type)); % wake-anest
-        
-        % Average tscores across all mechanisms with the same order
-        %data{c_order, condition} = squeeze(orders_anest_tscores(:, c_order, part_type));
-        
-        % All tscores for all mechanisms
-        %tscores = composition_anest_tscores(:, order_concepts{c_order}, part_type);
-        %data{c_order, condition} = tscores(:);
-    end
-end
-% Average concept tscores within concept-order
-orders_anest_tscores = zeros(nChannels, size(composition_anest_tscores, 1), 3);
-for c_order = 1 : length(order_concepts)
-    orders_anest_tscores(c_order, :, :) = squeeze(mean(composition_anest_tscores(:, order_concepts{c_order}, :), 2));
-end
-orders_anest_tscores = permute(orders_anest_tscores, [2 1 3]); % (channel-sets x orders x part-types)
-h = rm_raincloud(data, [0 0 0]);
-%h = rm_raincloud(data, [1 0 0; 0 0 1]);
-% Update rain
-for c = 1 : numel(h.s)
-    h.s{c}.SizeData = 1;
-end
-% Update lines
-for c = 1 : numel(h.l)
-    h.l(c).LineWidth = 1;
-end
-% Update mean-points
-for c = 1 : numel(h.m)
-    h.m(c).SizeData = 10;
-end
-% Labels
-title('full (F) wake / anest.');
-xlabel('\Delta\phi', 'Rotation', 0); ylabel('mechanism size'); % x-y are swapped in rm_raincloud
-%xlim([0 0.45]);
-xlim([1 1.63]); ylim([-7 63]);
-box on;
-%hold on;
-%line([0 0], [-100 800], 'Color', 'k');
-
-%% Print
-
-figure_name = '../phi_3/figures/fig3_raw';
-
-set(gcf, 'PaperOrientation', 'Landscape');
-
-print(figure_name, '-dsvg', '-painters'); % SVG
-print(figure_name, '-dpdf', '-painters', '-bestfit'); % PDF
-print(figure_name, '-dpng'); % PNG
-
 %% Rainclouds for everything Figure 2020-04-23
 
 figure;
@@ -397,8 +160,8 @@ for c = 1 : numel(h.m)
     h.m(c).SizeData = 10;
 end
 %set(gca, 'XScale', 'log');
-title('SII');
-xlabel('SII', 'Rotation', 0);
+title('\Phi');
+xlabel('\Phi', 'Rotation', 0);
 set(gca, 'YTick', 1+condition_offsets, 'YTickLabel', {'wake', 'anest'});
 set(gca, 'YTick', [h.m(2).YData h.m(1).YData], 'YTickLabel', fliplr({'wake', 'anest'}));
 delete(h.l);
@@ -418,13 +181,14 @@ for c = 1 : numel(h.m)
     h.m(c).SizeData = 10;
 end
 % Labels
-title('SII wake / anest.');
+title('\Phi wake / anest.');
 xlabel('\Delta\Phi', 'Rotation', 0); % x-y are swapped in rm_raincloud
 set(gca, 'YTick', []);
 %set(gca, 'XScale', 'log');
 %hold on;
 %line([0 0], [-100 100], 'Color', 'k');
 box on;
+hold on; line([1 1], get(gca, 'YLim'), 'LineWidth', 2, 'Color', 'k');
 
 % Mechanism raindcloud
 subplot(size(subplots, 1), size(subplots, 2), [3 4]); axis off;
@@ -496,7 +260,7 @@ end
 % [smallest baseline + space; highest point of highest cloud + space]
 limits = [min(baselines)-cloud_rain_dist-(2*rain_spread)-cloud_rain_dist max(handles{1}{1}.YData)+rain_spread];
 set(ax,'YLim',[min(limits(:)) max(limits(:))]); % set the same values for both axes
-%linkaxes(ax);
+linkaxes(ax);
 
 % Plot order rainclouds
 part_type = 1; % only plot for UP
