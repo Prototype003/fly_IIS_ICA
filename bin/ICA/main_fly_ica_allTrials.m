@@ -68,7 +68,7 @@ for fly = 1 : size(data, 3)
     % NOTE - (AB)' = B'A'
     % NOTE - refer to line 481 of fastica
     %   icasig = W * mixedsig = (signals x samples)
-    %   (samples x signals) = (W*mixedsig)' = (mixedsig'*W)
+    %   (samples x signals) = (W*mixedsig)' = (mixedsig'*W')
     %       where mixedsig as input to fastica is signals x samples)
     [ics, mix, demix] = fastica(data(:, :, fly)', 'numOfIC', nComponents);
     ica_scores(:, :, fly) = ics';
