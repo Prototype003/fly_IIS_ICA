@@ -82,14 +82,14 @@ phis = tmp.phis{1};
 %% Preprocess
 
 % Weighted average across states
-big_mips = phis.big_mips;
+big_mips = phis.big_mips(:, :, :, :, :, :, :, tau);
 for const_type = 1 : size(phis.big_mips, 2)
     for concept = 1 : size(phis.big_mips, 3)
-        big_mips(:, const_type, concept, :, :, :, :) = permute(big_mips(:, const_type, concept, :, :, :, :), [1 4 5 6 7 2 3]) .* single(phis.state_counters);
+        big_mips(:, const_type, concept, :, :, :, :) = permute(big_mips(:, const_type, concept, :, :, :, :), [1 4 5 6 7 2 3]) .* single(phis.state_counters(:, :, :, :, :, tau));
     end
 end
 big_mips = permute(sum(big_mips, 1), [2 3 4 5 6 7 1]);
-big_mips = big_mips ./ single(sum(phis.state_counters(:, 1, 1, 1, 1))); % State count should be constant across all parameters
+big_mips = big_mips ./ single(sum(phis.state_counters(:, 1, 1, 1, 1, tau))); % State count should be constant across all parameters
 
 % Get desired constellation type
 % And specify index-vector (start of each constellation, 0-indexed as any
@@ -151,7 +151,7 @@ pc = parcluster('local');
 %parpool(pc, 8)
 
 % Broadcast variables
-phis_p = parallel.pool.Constant(double(phis.phis));
+phis_p = parallel.pool.Constant(double(phis.phis(:, :, :, :, tau)));
 big_mips_p = parallel.pool.Constant(double(big_mips));
 const_starts_p = parallel.pool.Constant(const_starts);
 costs_p = parallel.pool.Constant(costs);
