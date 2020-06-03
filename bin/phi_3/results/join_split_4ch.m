@@ -55,6 +55,8 @@ end
 infix = '_ICAAllTrials_nComponents4_ic2channels';
 output_file = [source_prefix(1:60) infix '_phithree' source_prefix(61:end) '_' binOffset_string '.mat'];
 
+addpath('../'); % For TPM conversion
+
 %% Join split results
 
 % NOTE: currently the actual parameters are used for indexing, so they need
@@ -105,7 +107,7 @@ for fly = flies
                     phis{1}.state_counters(:, set_counter, trial, fly, condition, tau_counter) = int16(tmp.phi.state_counters);
                     phis{1}.big_mips(:, :, :, set_counter, trial, fly, condition, tau_counter) = constellation_parse(tmp.phi.big_mips, concept_list_full);
                     phis{1}.state_phis(:, set_counter, trial, fly, condition, tau_counter) = single(tmp.phi.state_phis);
-                    phis{1}.tpms(:, :, set_counter, trial, fly, condition, tau_counter) = single(tmp.phi.tpm);
+                    phis{1}.tpms(:, :, set_counter, trial, fly, condition, tau_counter) = tpm_sbn2sbs(single(tmp.phi.tpm));
                     
                 end
             end
