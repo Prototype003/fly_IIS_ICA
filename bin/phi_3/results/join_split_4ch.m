@@ -17,8 +17,8 @@ global_tpm = 0;
 flies = (1:13);
 conditions = (1:2);
 taus = [1 2 3 4 5 10 20 30 40 50 75 100 125 150 175 200 225 250];
-tau_type = 'step'; % 'step' or 'bin'
-bin_offsets = 0; % Currently this script only works for a single tau_offset
+tau_type = 'bin'; % 'step' or 'bin'
+bin_offsets = 1; % Currently this script only works for a single tau_offset
 trials = (1:8);
 
 % _nChannels4_globalTPM1_f01c2tauBin4500tauOffset21s1036t1
@@ -52,8 +52,8 @@ for concept_order = 1 : nChannels
     end
 end
 
-infix = '_ICAAllTrials_nComponents4';
-output_file = [source_prefix(1:60) infix '_phithree' source_prefix(61+length(infix):end) '.mat'];
+infix = '_ICAAllTrials_nComponents4_ic2channels';
+output_file = [source_prefix(1:60) infix '_phithree' source_prefix(61:end) '_' binOffset_string '.mat'];
 
 %% Join split results
 
