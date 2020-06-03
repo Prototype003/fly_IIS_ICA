@@ -55,7 +55,7 @@ end
 infix = '_ICAAllTrials_nComponents4_ic2channels';
 output_file = [source_prefix(1:60) infix '_phithree' source_prefix(61:end) '_' binOffset_string '.mat'];
 
-addpath('../'); % For TPM conversion
+addpath('../../'); % For TPM conversion
 
 %% Join split results
 
