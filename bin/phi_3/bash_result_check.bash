@@ -9,7 +9,7 @@ global_tpm=0
 tau_bin=0
 sample_offset=0
 
-prefix="split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels${nChannels}_globalTPM${global_tpm}_"
+prefix="split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_ICAAllTrials_nComponents4_ic2channels_nChannels${nChannels}_globalTPM${global_tpm}_"
 suffix=".mat"
 
 if [ $global_tpm -eq 0 ]; then

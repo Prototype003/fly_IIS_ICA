@@ -26,11 +26,11 @@ sample_offsets = int(sys.argv[9]) # Compute TPM across sample offsets before bin
 
 # Fly data location
 data_directory = "../ICA/results/"
-data_file_prefix = "split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_ICAAllTrials_nComponents4"
+data_file_prefix = "split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_ICAAllTrials_nComponents4_ic2channels"
 data_file = data_file_prefix + ".mat"
 
 # Output location
-results_directory = "results_split/"
+results_directory = "results_split_ic2channels/"
 if not os.path.exists(results_directory):
 	os.makedirs(results_directory)
 
