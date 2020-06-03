@@ -19,6 +19,6 @@ for (( line=1; line<=$lines; line=$line+$line_increment )); do
 	done
 	
 	echo "array submitting (from line $line)"
-	sbatch --job-name="phi3_loop" --output="logs/loop_${line}.out" --error="logs/loop_${line}.err" bash_loop_sbatch.bash $line
+	sbatch --job-name="$line" --output="logs/loop_${line}.out" --error="logs/loop_${line}.err" bash_loop_sbatch.bash $line
 	echo "submitted"
 done
