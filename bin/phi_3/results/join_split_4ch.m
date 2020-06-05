@@ -14,7 +14,7 @@ nComponents = 4; % number of ICs
 
 nChannels = 4;
 global_tpm = 0;
-flies = (1:13);
+flies = (1:2); % (1:13);
 conditions = (1:2);
 taus = [1 2 3 4 5 10 20 30 40 50 75 100 125 150 175 200 225 250];
 tau_type = 'bin'; % 'step' or 'bin'
@@ -23,11 +23,16 @@ trials = (1:8);
 
 % _nChannels4_globalTPM1_f01c2tauBin4500tauOffset21s1036t1
 
-source_dir = '../results_split/';
-source_prefix = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_ICAAllTrials_nComponents4_nChannels'...
-    num2str(nChannels)...
+source_dir = '../results_split_ic2channels/';
+
+prefix = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim';
+infix = '_ICAAllTrials_nComponents4_ic2channels';
+suffix = [...
+    '_nChannels' num2str(nChannels)...
     '_globalTPM' num2str(global_tpm)...
     ];
+
+source_prefix = [prefix infix suffix];
 
 if strcmp(tau_type, 'step')
     tau_string = 'tau';
@@ -53,7 +58,7 @@ for concept_order = 1 : nChannels
 end
 
 infix = '_ICAAllTrials_nComponents4_ic2channels';
-output_file = [source_prefix(1:60) infix '_phithree' source_prefix(61:end) '_' binOffset_string '.mat'];
+output_file = [prefix infix '_phithree' suffix '_' binOffset_string '.mat'];
 
 addpath('../../'); % For TPM conversion
 
