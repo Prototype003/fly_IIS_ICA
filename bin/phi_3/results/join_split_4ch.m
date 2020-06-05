@@ -8,7 +8,7 @@ Joins 4-channel results (across all parameters)
 
 %% Settings
 
-nComponents = 15; % number of ICs / channels
+nComponents = 4; % number of ICs / channels
 
 %% Setup
 
