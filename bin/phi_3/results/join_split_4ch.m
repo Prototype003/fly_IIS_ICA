@@ -37,9 +37,11 @@ source_prefix = [prefix infix suffix];
 if strcmp(tau_type, 'step')
     tau_string = 'tau';
     binOffset_string = '';
+    sbs_tpm = 1;
 else % strcmp(tau_type, 'bin')
     tau_string = 'tauBin';
     binOffset_string = 'binOffset1';
+    sbs_tpm = 0; % Currently phi-code stores SBN TPM when binning
 end
 
 channel_sets = nchoosek((1:nComponents), nChannels);
@@ -112,7 +114,11 @@ for fly = flies
                     phis{1}.state_counters(:, set_counter, trial, fly, condition, tau_counter) = int16(tmp.phi.state_counters);
                     phis{1}.big_mips(:, :, :, set_counter, trial, fly, condition, tau_counter) = constellation_parse(tmp.phi.big_mips, concept_list_full);
                     phis{1}.state_phis(:, set_counter, trial, fly, condition, tau_counter) = single(tmp.phi.state_phis);
-                    phis{1}.tpms(:, :, set_counter, trial, fly, condition, tau_counter) = tpm_sbn2sbs(single(tmp.phi.tpm));
+                    if sbs_tpm == 1
+                        phis{1}.tpms(:, :, set_counter, trial, fly, condition, tau_counter) = single(tmp.phi.tpm);
+                    else % sbs_tpm == 0
+                        phis{1}.tpms(:, :, set_counter, trial, fly, condition, tau_counter) = tpm_sbn2sbs(single(tmp.phi.tpm));
+                    end
                     
                 end
             end
