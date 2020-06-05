@@ -26,7 +26,7 @@
 #SBATCH --time=0-00:10:00
 
 #SBATCH --qos=shortq
-#SBATCH --partition=short,comp,desktop
+#SBATCH --partition=short,comp
 
 # To receive an email when job completes or fails
 # SBATCH --mail-user=aleu6@student.monash.edu
