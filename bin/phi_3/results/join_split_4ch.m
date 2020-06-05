@@ -59,7 +59,6 @@ for concept_order = 1 : nChannels
     end
 end
 
-infix = '_ICAAllTrials_nComponents4_ic2channels';
 output_file = [prefix infix '_phithree' suffix '_' binOffset_string '.mat'];
 
 addpath('../../'); % For TPM conversion
