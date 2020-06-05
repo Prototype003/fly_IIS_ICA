@@ -122,6 +122,28 @@ def binarise_trial_median(fly_data):
 	
 	return fly_data_binarised, 2, channel_medians
 
+def binarise_trial_diff(fly_data):
+	"""
+	Binarises time series baesd on gradient between adjacent samples: 1 if increasing, 0 otherwise
+	Inputs:
+		fly_data = data matrix with dimensions (samples x channels x epoch-trials x flies x conditions)
+	Outputs:
+		fly_data_binarised = matrix with same dimensions as fly_data, with binarised values
+			Samples dimension will be 1 element smaller
+		channel_gradients = matrix holding gradients used for binarisation
+	"""
+	
+	# Get gradients across samples, per channel, trial, fly, and condition
+	channel_gradients = np.diff(fly_data, n=1, axis=0)
+	
+	# Binarise baesd on gradients:
+	# Increasing = 1
+	# Decreasing or unchanging = 0
+	fly_data_binarised = (channel_gradients > 0).astype(int)
+	
+	return fly_data_binarised, 2, channel_gradients
+	
+
 def build_tpm(fly_data, tau, n_values):
 	"""
 	Builds a TPM for one fly and one condition, holding the probabilities that each combination of
@@ -264,7 +286,7 @@ def build_tpm_sbn(fly_data, tau, n_values):
 	
 	return tpm
 
-def build_tpm_bin_offsets(fly_data, n_values, tau):
+def build_tpm_bin_offsets(fly_data, n_values, tau, binarise_method):
 	"""
 	Builds a state-by-node TPM, holding the probabilities of each node being "on" given some past
 	network states. Averages across tau samples (into bins) before finding transition probabilities.
@@ -278,6 +300,7 @@ def build_tpm_bin_offsets(fly_data, n_values, tau):
 			e.g. 1 means no averaging/binning across samples
 			e.g. 2 means averaging each group of 2 samples
 		n_values = number of states each *node* can be in (e.g. 2 for ON and OFF)
+		binarise_method = string 'median' for binarising based on median or 'diff' for based on gradient
 	Outputs:
 		tpm = matrix with dimensions (n_values^channels x channels)
 	"""
@@ -317,9 +340,14 @@ def build_tpm_bin_offsets(fly_data, n_values, tau):
 		fly_data_offset = tau_resample(fly_data_offset[:, :, None, None, None], tau)
 		fly_data_offset = fly_data_offset[:, :, 0, 0, 0] # Get rid of those appended singleton dimensions
 		
-		# Binarise by median split
-		fly_data_offset, n_values, medians = binarise_trial_median(fly_data_offset[:, :, None, None, None])
-		fly_data_offset = fly_data_offset[:, :, 0, 0, 0] # Get rid of those appended singleton dimensions
+		if binarise_method == 'median':
+			# Binarise by median split
+			fly_data_offset, n_values, medians = binarise_trial_median(fly_data_offset[:, :, None, None, None])
+			fly_data_offset = fly_data_offset[:, :, 0, 0, 0] # Get rid of those appended singleton dimensions
+		else: # binarise_method == 'diff'
+			fly_data_offset, n_values, medians = binarise_trial_diff(fly_data_offset[:, :, None, None, None])
+			fly_data_offset = fly_data_offset[:, :, 0, 0, 0] # Get rid of those appended singleton dimensions
+			
 		
 		for sample in range(0, fly_data_offset.shape[0]-tau_step): # The last sample to transition is the second last one
 			sample_current = fly_data_offset[sample, :]
