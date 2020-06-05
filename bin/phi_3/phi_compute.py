@@ -44,7 +44,7 @@ else:
 	tau_string = tau_type + str(tau)
 
 # Results file
-results_file_suffix = "_nChannels" + str(nChannels) + "_" + binarise_method "_globalTPM" + str(global_tpm) + "_f" + "{0:0>2}".format(fly) + "c" + str(condition) + tau_string + "s" + "{0:0>4}".format(set) + "t" + str(trial)
+results_file_suffix = "_nChannels" + str(nChannels) + "_" + binarise_method + "_globalTPM" + str(global_tpm) + "_f" + "{0:0>2}".format(fly) + "c" + str(condition) + tau_string + "s" + "{0:0>4}".format(set) + "t" + str(trial)
 results_file = data_file_prefix + results_file_suffix + ".mat"
 
 # Load data ############################################################################
