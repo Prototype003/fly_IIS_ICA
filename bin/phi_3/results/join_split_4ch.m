@@ -14,7 +14,7 @@ nComponents = 15; % number of ICs / channels
 
 nChannels = 4;
 global_tpm = 1;
-flies = (1:2); % (1:13);
+flies = (1:13); % (1:13);
 conditions = (1:2);
 taus = [1 4 100 200 300 400 500 600 700 800 900 1000]; % [1 2 3 4 5 10 20 30 40 50 75 100 125 150 175 200 225 250];
 tau_type = 'bin'; % 'step' or 'bin'
