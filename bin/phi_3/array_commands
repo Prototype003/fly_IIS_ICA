@@ -1,312 +1,312 @@
-python3 phi_compute.py 4 1 1 1 1 1 1 1 1
-python3 phi_compute.py 4 1 1 1 4 1 1 1 1
-python3 phi_compute.py 4 1 1 1 100 1 1 1 1
-python3 phi_compute.py 4 1 1 1 200 1 1 1 1
-python3 phi_compute.py 4 1 1 1 300 1 1 1 1
-python3 phi_compute.py 4 1 1 1 400 1 1 1 1
-python3 phi_compute.py 4 1 1 1 500 1 1 1 1
-python3 phi_compute.py 4 1 1 1 600 1 1 1 1
-python3 phi_compute.py 4 1 1 1 700 1 1 1 1
-python3 phi_compute.py 4 1 1 1 800 1 1 1 1
-python3 phi_compute.py 4 1 1 1 900 1 1 1 1
-python3 phi_compute.py 4 1 1 1 1000 1 1 1 1
-python3 phi_compute.py 4 1 2 1 1 1 1 1 1
-python3 phi_compute.py 4 1 2 1 4 1 1 1 1
-python3 phi_compute.py 4 1 2 1 100 1 1 1 1
-python3 phi_compute.py 4 1 2 1 200 1 1 1 1
-python3 phi_compute.py 4 1 2 1 300 1 1 1 1
-python3 phi_compute.py 4 1 2 1 400 1 1 1 1
-python3 phi_compute.py 4 1 2 1 500 1 1 1 1
-python3 phi_compute.py 4 1 2 1 600 1 1 1 1
-python3 phi_compute.py 4 1 2 1 700 1 1 1 1
-python3 phi_compute.py 4 1 2 1 800 1 1 1 1
-python3 phi_compute.py 4 1 2 1 900 1 1 1 1
-python3 phi_compute.py 4 1 2 1 1000 1 1 1 1
-python3 phi_compute.py 4 2 1 1 1 1 1 1 1
-python3 phi_compute.py 4 2 1 1 4 1 1 1 1
-python3 phi_compute.py 4 2 1 1 100 1 1 1 1
-python3 phi_compute.py 4 2 1 1 200 1 1 1 1
-python3 phi_compute.py 4 2 1 1 300 1 1 1 1
-python3 phi_compute.py 4 2 1 1 400 1 1 1 1
-python3 phi_compute.py 4 2 1 1 500 1 1 1 1
-python3 phi_compute.py 4 2 1 1 600 1 1 1 1
-python3 phi_compute.py 4 2 1 1 700 1 1 1 1
-python3 phi_compute.py 4 2 1 1 800 1 1 1 1
-python3 phi_compute.py 4 2 1 1 900 1 1 1 1
-python3 phi_compute.py 4 2 1 1 1000 1 1 1 1
-python3 phi_compute.py 4 2 2 1 1 1 1 1 1
-python3 phi_compute.py 4 2 2 1 4 1 1 1 1
-python3 phi_compute.py 4 2 2 1 100 1 1 1 1
-python3 phi_compute.py 4 2 2 1 200 1 1 1 1
-python3 phi_compute.py 4 2 2 1 300 1 1 1 1
-python3 phi_compute.py 4 2 2 1 400 1 1 1 1
-python3 phi_compute.py 4 2 2 1 500 1 1 1 1
-python3 phi_compute.py 4 2 2 1 600 1 1 1 1
-python3 phi_compute.py 4 2 2 1 700 1 1 1 1
-python3 phi_compute.py 4 2 2 1 800 1 1 1 1
-python3 phi_compute.py 4 2 2 1 900 1 1 1 1
-python3 phi_compute.py 4 2 2 1 1000 1 1 1 1
-python3 phi_compute.py 4 3 1 1 1 1 1 1 1
-python3 phi_compute.py 4 3 1 1 4 1 1 1 1
-python3 phi_compute.py 4 3 1 1 100 1 1 1 1
-python3 phi_compute.py 4 3 1 1 200 1 1 1 1
-python3 phi_compute.py 4 3 1 1 300 1 1 1 1
-python3 phi_compute.py 4 3 1 1 400 1 1 1 1
-python3 phi_compute.py 4 3 1 1 500 1 1 1 1
-python3 phi_compute.py 4 3 1 1 600 1 1 1 1
-python3 phi_compute.py 4 3 1 1 700 1 1 1 1
-python3 phi_compute.py 4 3 1 1 800 1 1 1 1
-python3 phi_compute.py 4 3 1 1 900 1 1 1 1
-python3 phi_compute.py 4 3 1 1 1000 1 1 1 1
-python3 phi_compute.py 4 3 2 1 1 1 1 1 1
-python3 phi_compute.py 4 3 2 1 4 1 1 1 1
-python3 phi_compute.py 4 3 2 1 100 1 1 1 1
-python3 phi_compute.py 4 3 2 1 200 1 1 1 1
-python3 phi_compute.py 4 3 2 1 300 1 1 1 1
-python3 phi_compute.py 4 3 2 1 400 1 1 1 1
-python3 phi_compute.py 4 3 2 1 500 1 1 1 1
-python3 phi_compute.py 4 3 2 1 600 1 1 1 1
-python3 phi_compute.py 4 3 2 1 700 1 1 1 1
-python3 phi_compute.py 4 3 2 1 800 1 1 1 1
-python3 phi_compute.py 4 3 2 1 900 1 1 1 1
-python3 phi_compute.py 4 3 2 1 1000 1 1 1 1
-python3 phi_compute.py 4 4 1 1 1 1 1 1 1
-python3 phi_compute.py 4 4 1 1 4 1 1 1 1
-python3 phi_compute.py 4 4 1 1 100 1 1 1 1
-python3 phi_compute.py 4 4 1 1 200 1 1 1 1
-python3 phi_compute.py 4 4 1 1 300 1 1 1 1
-python3 phi_compute.py 4 4 1 1 400 1 1 1 1
-python3 phi_compute.py 4 4 1 1 500 1 1 1 1
-python3 phi_compute.py 4 4 1 1 600 1 1 1 1
-python3 phi_compute.py 4 4 1 1 700 1 1 1 1
-python3 phi_compute.py 4 4 1 1 800 1 1 1 1
-python3 phi_compute.py 4 4 1 1 900 1 1 1 1
-python3 phi_compute.py 4 4 1 1 1000 1 1 1 1
-python3 phi_compute.py 4 4 2 1 1 1 1 1 1
-python3 phi_compute.py 4 4 2 1 4 1 1 1 1
-python3 phi_compute.py 4 4 2 1 100 1 1 1 1
-python3 phi_compute.py 4 4 2 1 200 1 1 1 1
-python3 phi_compute.py 4 4 2 1 300 1 1 1 1
-python3 phi_compute.py 4 4 2 1 400 1 1 1 1
-python3 phi_compute.py 4 4 2 1 500 1 1 1 1
-python3 phi_compute.py 4 4 2 1 600 1 1 1 1
-python3 phi_compute.py 4 4 2 1 700 1 1 1 1
-python3 phi_compute.py 4 4 2 1 800 1 1 1 1
-python3 phi_compute.py 4 4 2 1 900 1 1 1 1
-python3 phi_compute.py 4 4 2 1 1000 1 1 1 1
-python3 phi_compute.py 4 5 1 1 1 1 1 1 1
-python3 phi_compute.py 4 5 1 1 4 1 1 1 1
-python3 phi_compute.py 4 5 1 1 100 1 1 1 1
-python3 phi_compute.py 4 5 1 1 200 1 1 1 1
-python3 phi_compute.py 4 5 1 1 300 1 1 1 1
-python3 phi_compute.py 4 5 1 1 400 1 1 1 1
-python3 phi_compute.py 4 5 1 1 500 1 1 1 1
-python3 phi_compute.py 4 5 1 1 600 1 1 1 1
-python3 phi_compute.py 4 5 1 1 700 1 1 1 1
-python3 phi_compute.py 4 5 1 1 800 1 1 1 1
-python3 phi_compute.py 4 5 1 1 900 1 1 1 1
-python3 phi_compute.py 4 5 1 1 1000 1 1 1 1
-python3 phi_compute.py 4 5 2 1 1 1 1 1 1
-python3 phi_compute.py 4 5 2 1 4 1 1 1 1
-python3 phi_compute.py 4 5 2 1 100 1 1 1 1
-python3 phi_compute.py 4 5 2 1 200 1 1 1 1
-python3 phi_compute.py 4 5 2 1 300 1 1 1 1
-python3 phi_compute.py 4 5 2 1 400 1 1 1 1
-python3 phi_compute.py 4 5 2 1 500 1 1 1 1
-python3 phi_compute.py 4 5 2 1 600 1 1 1 1
-python3 phi_compute.py 4 5 2 1 700 1 1 1 1
-python3 phi_compute.py 4 5 2 1 800 1 1 1 1
-python3 phi_compute.py 4 5 2 1 900 1 1 1 1
-python3 phi_compute.py 4 5 2 1 1000 1 1 1 1
-python3 phi_compute.py 4 6 1 1 1 1 1 1 1
-python3 phi_compute.py 4 6 1 1 4 1 1 1 1
-python3 phi_compute.py 4 6 1 1 100 1 1 1 1
-python3 phi_compute.py 4 6 1 1 200 1 1 1 1
-python3 phi_compute.py 4 6 1 1 300 1 1 1 1
-python3 phi_compute.py 4 6 1 1 400 1 1 1 1
-python3 phi_compute.py 4 6 1 1 500 1 1 1 1
-python3 phi_compute.py 4 6 1 1 600 1 1 1 1
-python3 phi_compute.py 4 6 1 1 700 1 1 1 1
-python3 phi_compute.py 4 6 1 1 800 1 1 1 1
-python3 phi_compute.py 4 6 1 1 900 1 1 1 1
-python3 phi_compute.py 4 6 1 1 1000 1 1 1 1
-python3 phi_compute.py 4 6 2 1 1 1 1 1 1
-python3 phi_compute.py 4 6 2 1 4 1 1 1 1
-python3 phi_compute.py 4 6 2 1 100 1 1 1 1
-python3 phi_compute.py 4 6 2 1 200 1 1 1 1
-python3 phi_compute.py 4 6 2 1 300 1 1 1 1
-python3 phi_compute.py 4 6 2 1 400 1 1 1 1
-python3 phi_compute.py 4 6 2 1 500 1 1 1 1
-python3 phi_compute.py 4 6 2 1 600 1 1 1 1
-python3 phi_compute.py 4 6 2 1 700 1 1 1 1
-python3 phi_compute.py 4 6 2 1 800 1 1 1 1
-python3 phi_compute.py 4 6 2 1 900 1 1 1 1
-python3 phi_compute.py 4 6 2 1 1000 1 1 1 1
-python3 phi_compute.py 4 7 1 1 1 1 1 1 1
-python3 phi_compute.py 4 7 1 1 4 1 1 1 1
-python3 phi_compute.py 4 7 1 1 100 1 1 1 1
-python3 phi_compute.py 4 7 1 1 200 1 1 1 1
-python3 phi_compute.py 4 7 1 1 300 1 1 1 1
-python3 phi_compute.py 4 7 1 1 400 1 1 1 1
-python3 phi_compute.py 4 7 1 1 500 1 1 1 1
-python3 phi_compute.py 4 7 1 1 600 1 1 1 1
-python3 phi_compute.py 4 7 1 1 700 1 1 1 1
-python3 phi_compute.py 4 7 1 1 800 1 1 1 1
-python3 phi_compute.py 4 7 1 1 900 1 1 1 1
-python3 phi_compute.py 4 7 1 1 1000 1 1 1 1
-python3 phi_compute.py 4 7 2 1 1 1 1 1 1
-python3 phi_compute.py 4 7 2 1 4 1 1 1 1
-python3 phi_compute.py 4 7 2 1 100 1 1 1 1
-python3 phi_compute.py 4 7 2 1 200 1 1 1 1
-python3 phi_compute.py 4 7 2 1 300 1 1 1 1
-python3 phi_compute.py 4 7 2 1 400 1 1 1 1
-python3 phi_compute.py 4 7 2 1 500 1 1 1 1
-python3 phi_compute.py 4 7 2 1 600 1 1 1 1
-python3 phi_compute.py 4 7 2 1 700 1 1 1 1
-python3 phi_compute.py 4 7 2 1 800 1 1 1 1
-python3 phi_compute.py 4 7 2 1 900 1 1 1 1
-python3 phi_compute.py 4 7 2 1 1000 1 1 1 1
-python3 phi_compute.py 4 8 1 1 1 1 1 1 1
-python3 phi_compute.py 4 8 1 1 4 1 1 1 1
-python3 phi_compute.py 4 8 1 1 100 1 1 1 1
-python3 phi_compute.py 4 8 1 1 200 1 1 1 1
-python3 phi_compute.py 4 8 1 1 300 1 1 1 1
-python3 phi_compute.py 4 8 1 1 400 1 1 1 1
-python3 phi_compute.py 4 8 1 1 500 1 1 1 1
-python3 phi_compute.py 4 8 1 1 600 1 1 1 1
-python3 phi_compute.py 4 8 1 1 700 1 1 1 1
-python3 phi_compute.py 4 8 1 1 800 1 1 1 1
-python3 phi_compute.py 4 8 1 1 900 1 1 1 1
-python3 phi_compute.py 4 8 1 1 1000 1 1 1 1
-python3 phi_compute.py 4 8 2 1 1 1 1 1 1
-python3 phi_compute.py 4 8 2 1 4 1 1 1 1
-python3 phi_compute.py 4 8 2 1 100 1 1 1 1
-python3 phi_compute.py 4 8 2 1 200 1 1 1 1
-python3 phi_compute.py 4 8 2 1 300 1 1 1 1
-python3 phi_compute.py 4 8 2 1 400 1 1 1 1
-python3 phi_compute.py 4 8 2 1 500 1 1 1 1
-python3 phi_compute.py 4 8 2 1 600 1 1 1 1
-python3 phi_compute.py 4 8 2 1 700 1 1 1 1
-python3 phi_compute.py 4 8 2 1 800 1 1 1 1
-python3 phi_compute.py 4 8 2 1 900 1 1 1 1
-python3 phi_compute.py 4 8 2 1 1000 1 1 1 1
-python3 phi_compute.py 4 9 1 1 1 1 1 1 1
-python3 phi_compute.py 4 9 1 1 4 1 1 1 1
-python3 phi_compute.py 4 9 1 1 100 1 1 1 1
-python3 phi_compute.py 4 9 1 1 200 1 1 1 1
-python3 phi_compute.py 4 9 1 1 300 1 1 1 1
-python3 phi_compute.py 4 9 1 1 400 1 1 1 1
-python3 phi_compute.py 4 9 1 1 500 1 1 1 1
-python3 phi_compute.py 4 9 1 1 600 1 1 1 1
-python3 phi_compute.py 4 9 1 1 700 1 1 1 1
-python3 phi_compute.py 4 9 1 1 800 1 1 1 1
-python3 phi_compute.py 4 9 1 1 900 1 1 1 1
-python3 phi_compute.py 4 9 1 1 1000 1 1 1 1
-python3 phi_compute.py 4 9 2 1 1 1 1 1 1
-python3 phi_compute.py 4 9 2 1 4 1 1 1 1
-python3 phi_compute.py 4 9 2 1 100 1 1 1 1
-python3 phi_compute.py 4 9 2 1 200 1 1 1 1
-python3 phi_compute.py 4 9 2 1 300 1 1 1 1
-python3 phi_compute.py 4 9 2 1 400 1 1 1 1
-python3 phi_compute.py 4 9 2 1 500 1 1 1 1
-python3 phi_compute.py 4 9 2 1 600 1 1 1 1
-python3 phi_compute.py 4 9 2 1 700 1 1 1 1
-python3 phi_compute.py 4 9 2 1 800 1 1 1 1
-python3 phi_compute.py 4 9 2 1 900 1 1 1 1
-python3 phi_compute.py 4 9 2 1 1000 1 1 1 1
-python3 phi_compute.py 4 10 1 1 1 1 1 1 1
-python3 phi_compute.py 4 10 1 1 4 1 1 1 1
-python3 phi_compute.py 4 10 1 1 100 1 1 1 1
-python3 phi_compute.py 4 10 1 1 200 1 1 1 1
-python3 phi_compute.py 4 10 1 1 300 1 1 1 1
-python3 phi_compute.py 4 10 1 1 400 1 1 1 1
-python3 phi_compute.py 4 10 1 1 500 1 1 1 1
-python3 phi_compute.py 4 10 1 1 600 1 1 1 1
-python3 phi_compute.py 4 10 1 1 700 1 1 1 1
-python3 phi_compute.py 4 10 1 1 800 1 1 1 1
-python3 phi_compute.py 4 10 1 1 900 1 1 1 1
-python3 phi_compute.py 4 10 1 1 1000 1 1 1 1
-python3 phi_compute.py 4 10 2 1 1 1 1 1 1
-python3 phi_compute.py 4 10 2 1 4 1 1 1 1
-python3 phi_compute.py 4 10 2 1 100 1 1 1 1
-python3 phi_compute.py 4 10 2 1 200 1 1 1 1
-python3 phi_compute.py 4 10 2 1 300 1 1 1 1
-python3 phi_compute.py 4 10 2 1 400 1 1 1 1
-python3 phi_compute.py 4 10 2 1 500 1 1 1 1
-python3 phi_compute.py 4 10 2 1 600 1 1 1 1
-python3 phi_compute.py 4 10 2 1 700 1 1 1 1
-python3 phi_compute.py 4 10 2 1 800 1 1 1 1
-python3 phi_compute.py 4 10 2 1 900 1 1 1 1
-python3 phi_compute.py 4 10 2 1 1000 1 1 1 1
-python3 phi_compute.py 4 11 1 1 1 1 1 1 1
-python3 phi_compute.py 4 11 1 1 4 1 1 1 1
-python3 phi_compute.py 4 11 1 1 100 1 1 1 1
-python3 phi_compute.py 4 11 1 1 200 1 1 1 1
-python3 phi_compute.py 4 11 1 1 300 1 1 1 1
-python3 phi_compute.py 4 11 1 1 400 1 1 1 1
-python3 phi_compute.py 4 11 1 1 500 1 1 1 1
-python3 phi_compute.py 4 11 1 1 600 1 1 1 1
-python3 phi_compute.py 4 11 1 1 700 1 1 1 1
-python3 phi_compute.py 4 11 1 1 800 1 1 1 1
-python3 phi_compute.py 4 11 1 1 900 1 1 1 1
-python3 phi_compute.py 4 11 1 1 1000 1 1 1 1
-python3 phi_compute.py 4 11 2 1 1 1 1 1 1
-python3 phi_compute.py 4 11 2 1 4 1 1 1 1
-python3 phi_compute.py 4 11 2 1 100 1 1 1 1
-python3 phi_compute.py 4 11 2 1 200 1 1 1 1
-python3 phi_compute.py 4 11 2 1 300 1 1 1 1
-python3 phi_compute.py 4 11 2 1 400 1 1 1 1
-python3 phi_compute.py 4 11 2 1 500 1 1 1 1
-python3 phi_compute.py 4 11 2 1 600 1 1 1 1
-python3 phi_compute.py 4 11 2 1 700 1 1 1 1
-python3 phi_compute.py 4 11 2 1 800 1 1 1 1
-python3 phi_compute.py 4 11 2 1 900 1 1 1 1
-python3 phi_compute.py 4 11 2 1 1000 1 1 1 1
-python3 phi_compute.py 4 12 1 1 1 1 1 1 1
-python3 phi_compute.py 4 12 1 1 4 1 1 1 1
-python3 phi_compute.py 4 12 1 1 100 1 1 1 1
-python3 phi_compute.py 4 12 1 1 200 1 1 1 1
-python3 phi_compute.py 4 12 1 1 300 1 1 1 1
-python3 phi_compute.py 4 12 1 1 400 1 1 1 1
-python3 phi_compute.py 4 12 1 1 500 1 1 1 1
-python3 phi_compute.py 4 12 1 1 600 1 1 1 1
-python3 phi_compute.py 4 12 1 1 700 1 1 1 1
-python3 phi_compute.py 4 12 1 1 800 1 1 1 1
-python3 phi_compute.py 4 12 1 1 900 1 1 1 1
-python3 phi_compute.py 4 12 1 1 1000 1 1 1 1
-python3 phi_compute.py 4 12 2 1 1 1 1 1 1
-python3 phi_compute.py 4 12 2 1 4 1 1 1 1
-python3 phi_compute.py 4 12 2 1 100 1 1 1 1
-python3 phi_compute.py 4 12 2 1 200 1 1 1 1
-python3 phi_compute.py 4 12 2 1 300 1 1 1 1
-python3 phi_compute.py 4 12 2 1 400 1 1 1 1
-python3 phi_compute.py 4 12 2 1 500 1 1 1 1
-python3 phi_compute.py 4 12 2 1 600 1 1 1 1
-python3 phi_compute.py 4 12 2 1 700 1 1 1 1
-python3 phi_compute.py 4 12 2 1 800 1 1 1 1
-python3 phi_compute.py 4 12 2 1 900 1 1 1 1
-python3 phi_compute.py 4 12 2 1 1000 1 1 1 1
-python3 phi_compute.py 4 13 1 1 1 1 1 1 1
-python3 phi_compute.py 4 13 1 1 4 1 1 1 1
-python3 phi_compute.py 4 13 1 1 100 1 1 1 1
-python3 phi_compute.py 4 13 1 1 200 1 1 1 1
-python3 phi_compute.py 4 13 1 1 300 1 1 1 1
-python3 phi_compute.py 4 13 1 1 400 1 1 1 1
-python3 phi_compute.py 4 13 1 1 500 1 1 1 1
-python3 phi_compute.py 4 13 1 1 600 1 1 1 1
-python3 phi_compute.py 4 13 1 1 700 1 1 1 1
-python3 phi_compute.py 4 13 1 1 800 1 1 1 1
-python3 phi_compute.py 4 13 1 1 900 1 1 1 1
-python3 phi_compute.py 4 13 1 1 1000 1 1 1 1
-python3 phi_compute.py 4 13 2 1 1 1 1 1 1
-python3 phi_compute.py 4 13 2 1 4 1 1 1 1
-python3 phi_compute.py 4 13 2 1 100 1 1 1 1
-python3 phi_compute.py 4 13 2 1 200 1 1 1 1
-python3 phi_compute.py 4 13 2 1 300 1 1 1 1
-python3 phi_compute.py 4 13 2 1 400 1 1 1 1
-python3 phi_compute.py 4 13 2 1 500 1 1 1 1
-python3 phi_compute.py 4 13 2 1 600 1 1 1 1
-python3 phi_compute.py 4 13 2 1 700 1 1 1 1
-python3 phi_compute.py 4 13 2 1 800 1 1 1 1
-python3 phi_compute.py 4 13 2 1 900 1 1 1 1
-python3 phi_compute.py 4 13 2 1 1000 1 1 1 1
+python3 phi_compute.py 4 1 1 1 1 1 1 1 1 diff
+python3 phi_compute.py 4 1 1 1 4 1 1 1 1 diff
+python3 phi_compute.py 4 1 1 1 100 1 1 1 1 diff
+python3 phi_compute.py 4 1 1 1 200 1 1 1 1 diff
+python3 phi_compute.py 4 1 1 1 300 1 1 1 1 diff
+python3 phi_compute.py 4 1 1 1 400 1 1 1 1 diff
+python3 phi_compute.py 4 1 1 1 500 1 1 1 1 diff
+python3 phi_compute.py 4 1 1 1 600 1 1 1 1 diff
+python3 phi_compute.py 4 1 1 1 700 1 1 1 1 diff
+python3 phi_compute.py 4 1 1 1 800 1 1 1 1 diff
+python3 phi_compute.py 4 1 1 1 900 1 1 1 1 diff
+python3 phi_compute.py 4 1 1 1 1000 1 1 1 1 diff
+python3 phi_compute.py 4 1 2 1 1 1 1 1 1 diff
+python3 phi_compute.py 4 1 2 1 4 1 1 1 1 diff
+python3 phi_compute.py 4 1 2 1 100 1 1 1 1 diff
+python3 phi_compute.py 4 1 2 1 200 1 1 1 1 diff
+python3 phi_compute.py 4 1 2 1 300 1 1 1 1 diff
+python3 phi_compute.py 4 1 2 1 400 1 1 1 1 diff
+python3 phi_compute.py 4 1 2 1 500 1 1 1 1 diff
+python3 phi_compute.py 4 1 2 1 600 1 1 1 1 diff
+python3 phi_compute.py 4 1 2 1 700 1 1 1 1 diff
+python3 phi_compute.py 4 1 2 1 800 1 1 1 1 diff
+python3 phi_compute.py 4 1 2 1 900 1 1 1 1 diff
+python3 phi_compute.py 4 1 2 1 1000 1 1 1 1 diff
+python3 phi_compute.py 4 2 1 1 1 1 1 1 1 diff
+python3 phi_compute.py 4 2 1 1 4 1 1 1 1 diff
+python3 phi_compute.py 4 2 1 1 100 1 1 1 1 diff
+python3 phi_compute.py 4 2 1 1 200 1 1 1 1 diff
+python3 phi_compute.py 4 2 1 1 300 1 1 1 1 diff
+python3 phi_compute.py 4 2 1 1 400 1 1 1 1 diff
+python3 phi_compute.py 4 2 1 1 500 1 1 1 1 diff
+python3 phi_compute.py 4 2 1 1 600 1 1 1 1 diff
+python3 phi_compute.py 4 2 1 1 700 1 1 1 1 diff
+python3 phi_compute.py 4 2 1 1 800 1 1 1 1 diff
+python3 phi_compute.py 4 2 1 1 900 1 1 1 1 diff
+python3 phi_compute.py 4 2 1 1 1000 1 1 1 1 diff
+python3 phi_compute.py 4 2 2 1 1 1 1 1 1 diff
+python3 phi_compute.py 4 2 2 1 4 1 1 1 1 diff
+python3 phi_compute.py 4 2 2 1 100 1 1 1 1 diff
+python3 phi_compute.py 4 2 2 1 200 1 1 1 1 diff
+python3 phi_compute.py 4 2 2 1 300 1 1 1 1 diff
+python3 phi_compute.py 4 2 2 1 400 1 1 1 1 diff
+python3 phi_compute.py 4 2 2 1 500 1 1 1 1 diff
+python3 phi_compute.py 4 2 2 1 600 1 1 1 1 diff
+python3 phi_compute.py 4 2 2 1 700 1 1 1 1 diff
+python3 phi_compute.py 4 2 2 1 800 1 1 1 1 diff
+python3 phi_compute.py 4 2 2 1 900 1 1 1 1 diff
+python3 phi_compute.py 4 2 2 1 1000 1 1 1 1 diff
+python3 phi_compute.py 4 3 1 1 1 1 1 1 1 diff
+python3 phi_compute.py 4 3 1 1 4 1 1 1 1 diff
+python3 phi_compute.py 4 3 1 1 100 1 1 1 1 diff
+python3 phi_compute.py 4 3 1 1 200 1 1 1 1 diff
+python3 phi_compute.py 4 3 1 1 300 1 1 1 1 diff
+python3 phi_compute.py 4 3 1 1 400 1 1 1 1 diff
+python3 phi_compute.py 4 3 1 1 500 1 1 1 1 diff
+python3 phi_compute.py 4 3 1 1 600 1 1 1 1 diff
+python3 phi_compute.py 4 3 1 1 700 1 1 1 1 diff
+python3 phi_compute.py 4 3 1 1 800 1 1 1 1 diff
+python3 phi_compute.py 4 3 1 1 900 1 1 1 1 diff
+python3 phi_compute.py 4 3 1 1 1000 1 1 1 1 diff
+python3 phi_compute.py 4 3 2 1 1 1 1 1 1 diff
+python3 phi_compute.py 4 3 2 1 4 1 1 1 1 diff
+python3 phi_compute.py 4 3 2 1 100 1 1 1 1 diff
+python3 phi_compute.py 4 3 2 1 200 1 1 1 1 diff
+python3 phi_compute.py 4 3 2 1 300 1 1 1 1 diff
+python3 phi_compute.py 4 3 2 1 400 1 1 1 1 diff
+python3 phi_compute.py 4 3 2 1 500 1 1 1 1 diff
+python3 phi_compute.py 4 3 2 1 600 1 1 1 1 diff
+python3 phi_compute.py 4 3 2 1 700 1 1 1 1 diff
+python3 phi_compute.py 4 3 2 1 800 1 1 1 1 diff
+python3 phi_compute.py 4 3 2 1 900 1 1 1 1 diff
+python3 phi_compute.py 4 3 2 1 1000 1 1 1 1 diff
+python3 phi_compute.py 4 4 1 1 1 1 1 1 1 diff
+python3 phi_compute.py 4 4 1 1 4 1 1 1 1 diff
+python3 phi_compute.py 4 4 1 1 100 1 1 1 1 diff
+python3 phi_compute.py 4 4 1 1 200 1 1 1 1 diff
+python3 phi_compute.py 4 4 1 1 300 1 1 1 1 diff
+python3 phi_compute.py 4 4 1 1 400 1 1 1 1 diff
+python3 phi_compute.py 4 4 1 1 500 1 1 1 1 diff
+python3 phi_compute.py 4 4 1 1 600 1 1 1 1 diff
+python3 phi_compute.py 4 4 1 1 700 1 1 1 1 diff
+python3 phi_compute.py 4 4 1 1 800 1 1 1 1 diff
+python3 phi_compute.py 4 4 1 1 900 1 1 1 1 diff
+python3 phi_compute.py 4 4 1 1 1000 1 1 1 1 diff
+python3 phi_compute.py 4 4 2 1 1 1 1 1 1 diff
+python3 phi_compute.py 4 4 2 1 4 1 1 1 1 diff
+python3 phi_compute.py 4 4 2 1 100 1 1 1 1 diff
+python3 phi_compute.py 4 4 2 1 200 1 1 1 1 diff
+python3 phi_compute.py 4 4 2 1 300 1 1 1 1 diff
+python3 phi_compute.py 4 4 2 1 400 1 1 1 1 diff
+python3 phi_compute.py 4 4 2 1 500 1 1 1 1 diff
+python3 phi_compute.py 4 4 2 1 600 1 1 1 1 diff
+python3 phi_compute.py 4 4 2 1 700 1 1 1 1 diff
+python3 phi_compute.py 4 4 2 1 800 1 1 1 1 diff
+python3 phi_compute.py 4 4 2 1 900 1 1 1 1 diff
+python3 phi_compute.py 4 4 2 1 1000 1 1 1 1 diff
+python3 phi_compute.py 4 5 1 1 1 1 1 1 1 diff
+python3 phi_compute.py 4 5 1 1 4 1 1 1 1 diff
+python3 phi_compute.py 4 5 1 1 100 1 1 1 1 diff
+python3 phi_compute.py 4 5 1 1 200 1 1 1 1 diff
+python3 phi_compute.py 4 5 1 1 300 1 1 1 1 diff
+python3 phi_compute.py 4 5 1 1 400 1 1 1 1 diff
+python3 phi_compute.py 4 5 1 1 500 1 1 1 1 diff
+python3 phi_compute.py 4 5 1 1 600 1 1 1 1 diff
+python3 phi_compute.py 4 5 1 1 700 1 1 1 1 diff
+python3 phi_compute.py 4 5 1 1 800 1 1 1 1 diff
+python3 phi_compute.py 4 5 1 1 900 1 1 1 1 diff
+python3 phi_compute.py 4 5 1 1 1000 1 1 1 1 diff
+python3 phi_compute.py 4 5 2 1 1 1 1 1 1 diff
+python3 phi_compute.py 4 5 2 1 4 1 1 1 1 diff
+python3 phi_compute.py 4 5 2 1 100 1 1 1 1 diff
+python3 phi_compute.py 4 5 2 1 200 1 1 1 1 diff
+python3 phi_compute.py 4 5 2 1 300 1 1 1 1 diff
+python3 phi_compute.py 4 5 2 1 400 1 1 1 1 diff
+python3 phi_compute.py 4 5 2 1 500 1 1 1 1 diff
+python3 phi_compute.py 4 5 2 1 600 1 1 1 1 diff
+python3 phi_compute.py 4 5 2 1 700 1 1 1 1 diff
+python3 phi_compute.py 4 5 2 1 800 1 1 1 1 diff
+python3 phi_compute.py 4 5 2 1 900 1 1 1 1 diff
+python3 phi_compute.py 4 5 2 1 1000 1 1 1 1 diff
+python3 phi_compute.py 4 6 1 1 1 1 1 1 1 diff
+python3 phi_compute.py 4 6 1 1 4 1 1 1 1 diff
+python3 phi_compute.py 4 6 1 1 100 1 1 1 1 diff
+python3 phi_compute.py 4 6 1 1 200 1 1 1 1 diff
+python3 phi_compute.py 4 6 1 1 300 1 1 1 1 diff
+python3 phi_compute.py 4 6 1 1 400 1 1 1 1 diff
+python3 phi_compute.py 4 6 1 1 500 1 1 1 1 diff
+python3 phi_compute.py 4 6 1 1 600 1 1 1 1 diff
+python3 phi_compute.py 4 6 1 1 700 1 1 1 1 diff
+python3 phi_compute.py 4 6 1 1 800 1 1 1 1 diff
+python3 phi_compute.py 4 6 1 1 900 1 1 1 1 diff
+python3 phi_compute.py 4 6 1 1 1000 1 1 1 1 diff
+python3 phi_compute.py 4 6 2 1 1 1 1 1 1 diff
+python3 phi_compute.py 4 6 2 1 4 1 1 1 1 diff
+python3 phi_compute.py 4 6 2 1 100 1 1 1 1 diff
+python3 phi_compute.py 4 6 2 1 200 1 1 1 1 diff
+python3 phi_compute.py 4 6 2 1 300 1 1 1 1 diff
+python3 phi_compute.py 4 6 2 1 400 1 1 1 1 diff
+python3 phi_compute.py 4 6 2 1 500 1 1 1 1 diff
+python3 phi_compute.py 4 6 2 1 600 1 1 1 1 diff
+python3 phi_compute.py 4 6 2 1 700 1 1 1 1 diff
+python3 phi_compute.py 4 6 2 1 800 1 1 1 1 diff
+python3 phi_compute.py 4 6 2 1 900 1 1 1 1 diff
+python3 phi_compute.py 4 6 2 1 1000 1 1 1 1 diff
+python3 phi_compute.py 4 7 1 1 1 1 1 1 1 diff
+python3 phi_compute.py 4 7 1 1 4 1 1 1 1 diff
+python3 phi_compute.py 4 7 1 1 100 1 1 1 1 diff
+python3 phi_compute.py 4 7 1 1 200 1 1 1 1 diff
+python3 phi_compute.py 4 7 1 1 300 1 1 1 1 diff
+python3 phi_compute.py 4 7 1 1 400 1 1 1 1 diff
+python3 phi_compute.py 4 7 1 1 500 1 1 1 1 diff
+python3 phi_compute.py 4 7 1 1 600 1 1 1 1 diff
+python3 phi_compute.py 4 7 1 1 700 1 1 1 1 diff
+python3 phi_compute.py 4 7 1 1 800 1 1 1 1 diff
+python3 phi_compute.py 4 7 1 1 900 1 1 1 1 diff
+python3 phi_compute.py 4 7 1 1 1000 1 1 1 1 diff
+python3 phi_compute.py 4 7 2 1 1 1 1 1 1 diff
+python3 phi_compute.py 4 7 2 1 4 1 1 1 1 diff
+python3 phi_compute.py 4 7 2 1 100 1 1 1 1 diff
+python3 phi_compute.py 4 7 2 1 200 1 1 1 1 diff
+python3 phi_compute.py 4 7 2 1 300 1 1 1 1 diff
+python3 phi_compute.py 4 7 2 1 400 1 1 1 1 diff
+python3 phi_compute.py 4 7 2 1 500 1 1 1 1 diff
+python3 phi_compute.py 4 7 2 1 600 1 1 1 1 diff
+python3 phi_compute.py 4 7 2 1 700 1 1 1 1 diff
+python3 phi_compute.py 4 7 2 1 800 1 1 1 1 diff
+python3 phi_compute.py 4 7 2 1 900 1 1 1 1 diff
+python3 phi_compute.py 4 7 2 1 1000 1 1 1 1 diff
+python3 phi_compute.py 4 8 1 1 1 1 1 1 1 diff
+python3 phi_compute.py 4 8 1 1 4 1 1 1 1 diff
+python3 phi_compute.py 4 8 1 1 100 1 1 1 1 diff
+python3 phi_compute.py 4 8 1 1 200 1 1 1 1 diff
+python3 phi_compute.py 4 8 1 1 300 1 1 1 1 diff
+python3 phi_compute.py 4 8 1 1 400 1 1 1 1 diff
+python3 phi_compute.py 4 8 1 1 500 1 1 1 1 diff
+python3 phi_compute.py 4 8 1 1 600 1 1 1 1 diff
+python3 phi_compute.py 4 8 1 1 700 1 1 1 1 diff
+python3 phi_compute.py 4 8 1 1 800 1 1 1 1 diff
+python3 phi_compute.py 4 8 1 1 900 1 1 1 1 diff
+python3 phi_compute.py 4 8 1 1 1000 1 1 1 1 diff
+python3 phi_compute.py 4 8 2 1 1 1 1 1 1 diff
+python3 phi_compute.py 4 8 2 1 4 1 1 1 1 diff
+python3 phi_compute.py 4 8 2 1 100 1 1 1 1 diff
+python3 phi_compute.py 4 8 2 1 200 1 1 1 1 diff
+python3 phi_compute.py 4 8 2 1 300 1 1 1 1 diff
+python3 phi_compute.py 4 8 2 1 400 1 1 1 1 diff
+python3 phi_compute.py 4 8 2 1 500 1 1 1 1 diff
+python3 phi_compute.py 4 8 2 1 600 1 1 1 1 diff
+python3 phi_compute.py 4 8 2 1 700 1 1 1 1 diff
+python3 phi_compute.py 4 8 2 1 800 1 1 1 1 diff
+python3 phi_compute.py 4 8 2 1 900 1 1 1 1 diff
+python3 phi_compute.py 4 8 2 1 1000 1 1 1 1 diff
+python3 phi_compute.py 4 9 1 1 1 1 1 1 1 diff
+python3 phi_compute.py 4 9 1 1 4 1 1 1 1 diff
+python3 phi_compute.py 4 9 1 1 100 1 1 1 1 diff
+python3 phi_compute.py 4 9 1 1 200 1 1 1 1 diff
+python3 phi_compute.py 4 9 1 1 300 1 1 1 1 diff
+python3 phi_compute.py 4 9 1 1 400 1 1 1 1 diff
+python3 phi_compute.py 4 9 1 1 500 1 1 1 1 diff
+python3 phi_compute.py 4 9 1 1 600 1 1 1 1 diff
+python3 phi_compute.py 4 9 1 1 700 1 1 1 1 diff
+python3 phi_compute.py 4 9 1 1 800 1 1 1 1 diff
+python3 phi_compute.py 4 9 1 1 900 1 1 1 1 diff
+python3 phi_compute.py 4 9 1 1 1000 1 1 1 1 diff
+python3 phi_compute.py 4 9 2 1 1 1 1 1 1 diff
+python3 phi_compute.py 4 9 2 1 4 1 1 1 1 diff
+python3 phi_compute.py 4 9 2 1 100 1 1 1 1 diff
+python3 phi_compute.py 4 9 2 1 200 1 1 1 1 diff
+python3 phi_compute.py 4 9 2 1 300 1 1 1 1 diff
+python3 phi_compute.py 4 9 2 1 400 1 1 1 1 diff
+python3 phi_compute.py 4 9 2 1 500 1 1 1 1 diff
+python3 phi_compute.py 4 9 2 1 600 1 1 1 1 diff
+python3 phi_compute.py 4 9 2 1 700 1 1 1 1 diff
+python3 phi_compute.py 4 9 2 1 800 1 1 1 1 diff
+python3 phi_compute.py 4 9 2 1 900 1 1 1 1 diff
+python3 phi_compute.py 4 9 2 1 1000 1 1 1 1 diff
+python3 phi_compute.py 4 10 1 1 1 1 1 1 1 diff
+python3 phi_compute.py 4 10 1 1 4 1 1 1 1 diff
+python3 phi_compute.py 4 10 1 1 100 1 1 1 1 diff
+python3 phi_compute.py 4 10 1 1 200 1 1 1 1 diff
+python3 phi_compute.py 4 10 1 1 300 1 1 1 1 diff
+python3 phi_compute.py 4 10 1 1 400 1 1 1 1 diff
+python3 phi_compute.py 4 10 1 1 500 1 1 1 1 diff
+python3 phi_compute.py 4 10 1 1 600 1 1 1 1 diff
+python3 phi_compute.py 4 10 1 1 700 1 1 1 1 diff
+python3 phi_compute.py 4 10 1 1 800 1 1 1 1 diff
+python3 phi_compute.py 4 10 1 1 900 1 1 1 1 diff
+python3 phi_compute.py 4 10 1 1 1000 1 1 1 1 diff
+python3 phi_compute.py 4 10 2 1 1 1 1 1 1 diff
+python3 phi_compute.py 4 10 2 1 4 1 1 1 1 diff
+python3 phi_compute.py 4 10 2 1 100 1 1 1 1 diff
+python3 phi_compute.py 4 10 2 1 200 1 1 1 1 diff
+python3 phi_compute.py 4 10 2 1 300 1 1 1 1 diff
+python3 phi_compute.py 4 10 2 1 400 1 1 1 1 diff
+python3 phi_compute.py 4 10 2 1 500 1 1 1 1 diff
+python3 phi_compute.py 4 10 2 1 600 1 1 1 1 diff
+python3 phi_compute.py 4 10 2 1 700 1 1 1 1 diff
+python3 phi_compute.py 4 10 2 1 800 1 1 1 1 diff
+python3 phi_compute.py 4 10 2 1 900 1 1 1 1 diff
+python3 phi_compute.py 4 10 2 1 1000 1 1 1 1 diff
+python3 phi_compute.py 4 11 1 1 1 1 1 1 1 diff
+python3 phi_compute.py 4 11 1 1 4 1 1 1 1 diff
+python3 phi_compute.py 4 11 1 1 100 1 1 1 1 diff
+python3 phi_compute.py 4 11 1 1 200 1 1 1 1 diff
+python3 phi_compute.py 4 11 1 1 300 1 1 1 1 diff
+python3 phi_compute.py 4 11 1 1 400 1 1 1 1 diff
+python3 phi_compute.py 4 11 1 1 500 1 1 1 1 diff
+python3 phi_compute.py 4 11 1 1 600 1 1 1 1 diff
+python3 phi_compute.py 4 11 1 1 700 1 1 1 1 diff
+python3 phi_compute.py 4 11 1 1 800 1 1 1 1 diff
+python3 phi_compute.py 4 11 1 1 900 1 1 1 1 diff
+python3 phi_compute.py 4 11 1 1 1000 1 1 1 1 diff
+python3 phi_compute.py 4 11 2 1 1 1 1 1 1 diff
+python3 phi_compute.py 4 11 2 1 4 1 1 1 1 diff
+python3 phi_compute.py 4 11 2 1 100 1 1 1 1 diff
+python3 phi_compute.py 4 11 2 1 200 1 1 1 1 diff
+python3 phi_compute.py 4 11 2 1 300 1 1 1 1 diff
+python3 phi_compute.py 4 11 2 1 400 1 1 1 1 diff
+python3 phi_compute.py 4 11 2 1 500 1 1 1 1 diff
+python3 phi_compute.py 4 11 2 1 600 1 1 1 1 diff
+python3 phi_compute.py 4 11 2 1 700 1 1 1 1 diff
+python3 phi_compute.py 4 11 2 1 800 1 1 1 1 diff
+python3 phi_compute.py 4 11 2 1 900 1 1 1 1 diff
+python3 phi_compute.py 4 11 2 1 1000 1 1 1 1 diff
+python3 phi_compute.py 4 12 1 1 1 1 1 1 1 diff
+python3 phi_compute.py 4 12 1 1 4 1 1 1 1 diff
+python3 phi_compute.py 4 12 1 1 100 1 1 1 1 diff
+python3 phi_compute.py 4 12 1 1 200 1 1 1 1 diff
+python3 phi_compute.py 4 12 1 1 300 1 1 1 1 diff
+python3 phi_compute.py 4 12 1 1 400 1 1 1 1 diff
+python3 phi_compute.py 4 12 1 1 500 1 1 1 1 diff
+python3 phi_compute.py 4 12 1 1 600 1 1 1 1 diff
+python3 phi_compute.py 4 12 1 1 700 1 1 1 1 diff
+python3 phi_compute.py 4 12 1 1 800 1 1 1 1 diff
+python3 phi_compute.py 4 12 1 1 900 1 1 1 1 diff
+python3 phi_compute.py 4 12 1 1 1000 1 1 1 1 diff
+python3 phi_compute.py 4 12 2 1 1 1 1 1 1 diff
+python3 phi_compute.py 4 12 2 1 4 1 1 1 1 diff
+python3 phi_compute.py 4 12 2 1 100 1 1 1 1 diff
+python3 phi_compute.py 4 12 2 1 200 1 1 1 1 diff
+python3 phi_compute.py 4 12 2 1 300 1 1 1 1 diff
+python3 phi_compute.py 4 12 2 1 400 1 1 1 1 diff
+python3 phi_compute.py 4 12 2 1 500 1 1 1 1 diff
+python3 phi_compute.py 4 12 2 1 600 1 1 1 1 diff
+python3 phi_compute.py 4 12 2 1 700 1 1 1 1 diff
+python3 phi_compute.py 4 12 2 1 800 1 1 1 1 diff
+python3 phi_compute.py 4 12 2 1 900 1 1 1 1 diff
+python3 phi_compute.py 4 12 2 1 1000 1 1 1 1 diff
+python3 phi_compute.py 4 13 1 1 1 1 1 1 1 diff
+python3 phi_compute.py 4 13 1 1 4 1 1 1 1 diff
+python3 phi_compute.py 4 13 1 1 100 1 1 1 1 diff
+python3 phi_compute.py 4 13 1 1 200 1 1 1 1 diff
+python3 phi_compute.py 4 13 1 1 300 1 1 1 1 diff
+python3 phi_compute.py 4 13 1 1 400 1 1 1 1 diff
+python3 phi_compute.py 4 13 1 1 500 1 1 1 1 diff
+python3 phi_compute.py 4 13 1 1 600 1 1 1 1 diff
+python3 phi_compute.py 4 13 1 1 700 1 1 1 1 diff
+python3 phi_compute.py 4 13 1 1 800 1 1 1 1 diff
+python3 phi_compute.py 4 13 1 1 900 1 1 1 1 diff
+python3 phi_compute.py 4 13 1 1 1000 1 1 1 1 diff
+python3 phi_compute.py 4 13 2 1 1 1 1 1 1 diff
+python3 phi_compute.py 4 13 2 1 4 1 1 1 1 diff
+python3 phi_compute.py 4 13 2 1 100 1 1 1 1 diff
+python3 phi_compute.py 4 13 2 1 200 1 1 1 1 diff
+python3 phi_compute.py 4 13 2 1 300 1 1 1 1 diff
+python3 phi_compute.py 4 13 2 1 400 1 1 1 1 diff
+python3 phi_compute.py 4 13 2 1 500 1 1 1 1 diff
+python3 phi_compute.py 4 13 2 1 600 1 1 1 1 diff
+python3 phi_compute.py 4 13 2 1 700 1 1 1 1 diff
+python3 phi_compute.py 4 13 2 1 800 1 1 1 1 diff
+python3 phi_compute.py 4 13 2 1 900 1 1 1 1 diff
+python3 phi_compute.py 4 13 2 1 1000 1 1 1 1 diff

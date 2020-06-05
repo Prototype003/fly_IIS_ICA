@@ -23,6 +23,7 @@ trial = int(sys.argv[6]) # 1-indexed
 global_tpm = int(sys.argv[7]) # 0=8 trials (2250 samples); 1=1 trial (18000 samples)
 tau_bin = int(sys.argv[8]) # 0=don't average across tau samples, use stepsize tau; 1=average across tau samples, afterwards use stepsize 1
 sample_offsets = int(sys.argv[9]) # Compute TPM across sample offsets before binning (for when tau_bin == 1)
+binarise_method = sys.argv[10] # Method for binarising - 'median' or 'diff'
 
 # Fly data location
 data_directory = "../ICA/results/"
@@ -30,7 +31,7 @@ data_file_prefix = "split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim
 data_file = data_file_prefix + ".mat"
 
 # Output location
-results_directory = "results_split_ICAAllTrials_globalTPM/"
+results_directory = "results_split_ICAAllTrials_globalTPM_diff/"
 if not os.path.exists(results_directory):
 	os.makedirs(results_directory)
 
@@ -43,7 +44,7 @@ else:
 	tau_string = tau_type + str(tau)
 
 # Results file
-results_file_suffix = "_nChannels" + str(nChannels) + "_globalTPM" + str(global_tpm) + "_f" + "{0:0>2}".format(fly) + "c" + str(condition) + tau_string + "s" + "{0:0>4}".format(set) + "t" + str(trial)
+results_file_suffix = "_nChannels" + str(nChannels) + "_" + binarise_method "_globalTPM" + str(global_tpm) + "_f" + "{0:0>2}".format(fly) + "c" + str(condition) + tau_string + "s" + "{0:0>4}".format(set) + "t" + str(trial)
 results_file = data_file_prefix + results_file_suffix + ".mat"
 
 # Load data ############################################################################
@@ -78,7 +79,7 @@ tpm_built = 0
 if tau_bin == 1:
 	if sample_offsets == 1:
 		n_values = 2
-		tpm, transition_counters = build_tpm_bin_offsets(fly_data, n_values, tau)
+		tpm, transition_counters = build_tpm_bin_offsets(fly_data, n_values, tau, binarise_method)
 		tpm_formatted = tpm
 		tpm_built = 1
 	else:

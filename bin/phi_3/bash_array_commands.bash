@@ -10,6 +10,7 @@ trials=1
 global_tpm=1
 tau_bin=1
 sample_offset=1
+bin_method="diff"
 > array_commands
 for (( fly=1; fly<=$flies; fly++ )); do
 	for condition in "${conditions[@]}"; do
@@ -17,7 +18,7 @@ for (( fly=1; fly<=$flies; fly++ )); do
 			for tau in "${taus[@]}"; do
 				for (( trial=1; trial<=$trials; trial++ )); do
 					
-					echo "python3 phi_compute.py $nChannels $fly $condition $set $tau $trial $global_tpm $tau_bin $sample_offset" >> array_commands
+					echo "python3 phi_compute.py $nChannels $fly $condition $set $tau $trial $global_tpm $tau_bin $sample_offset $bin_method" >> array_commands
 					
 				done
 			done
