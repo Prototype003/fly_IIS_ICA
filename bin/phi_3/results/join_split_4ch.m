@@ -13,23 +13,22 @@ nComponents = 4; % number of ICs / channels
 %% Setup
 
 nChannels = 4;
-global_tpm = 1;
+global_tpm = 0;
 flies = (1:13); % (1:13);
 conditions = (1:2);
-taus = [1 4 100 200 300 400 500 600 700 800 900 1000]; % [1 2 3 4 5 10 20 30 40 50 75 100 125 150 175 200 225 250];
-tau_type = 'bin'; % 'step' or 'bin'
-bin_offsets = 1; % Currently this script only works for a single tau_offset
-trials = (1); %(1:8);
+taus = 4; %[1 4 100 200 300 400 500 600 700 800 900 1000]; % [1 2 3 4 5 10 20 30 40 50 75 100 125 150 175 200 225 250];
+tau_type = 'step'; % 'step' or 'bin'
+bin_offsets = 0; % Currently this script only works for a single tau_offset
+trials = (1:8);
 
 % _nChannels4_globalTPM1_f01c2tauBin4500tauOffset21s1036t1
 
-source_dir = '../results_split_ICAAllTrials_globalTPM_diff/';
+source_dir = '../results_split_ic2channels/';
 
 prefix = 'split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim';
-infix = '_ICAAllTrials_nComponents4';
+infix = '_ICAAllTrials_nComponents4_ic2channels';
 suffix = [...
     '_nChannels' num2str(nChannels)...
-    '_diff'...
     '_globalTPM' num2str(global_tpm)...
     ];
 
