@@ -31,7 +31,7 @@ for (( fly=1; fly<=$flies; fly++ )); do
 					
 					id="f${fly_padded}c${condition}${tau_string}${tau}${offset_string}s${set_padded}t${trial}"
 					
-					results_file="results_split/${prefix}${id}${suffix}"
+					results_file="results_split_ic2channels/${prefix}${id}${suffix}"
 					
 					# Check if results file exists, if not, output command to recompute
 					if [ ! -e $results_file ]; then
