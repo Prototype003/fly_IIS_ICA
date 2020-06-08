@@ -40,7 +40,7 @@ if strcmp(tau_type, 'step')
     sbs_tpm = 1;
 else % strcmp(tau_type, 'bin')
     tau_string = 'tauBin';
-    binOffset_string = 'binOffset1';
+    binOffset_string = '_binOffset1';
     sbs_tpm = 0; % Currently phi-code stores SBN TPM when binning
 end
 
@@ -59,7 +59,7 @@ for concept_order = 1 : nChannels
     end
 end
 
-output_file = [prefix infix '_phithree' suffix '_' binOffset_string '.mat'];
+output_file = [prefix infix '_phithree' suffix binOffset_string '.mat'];
 
 addpath('../../'); % For TPM conversion
 
