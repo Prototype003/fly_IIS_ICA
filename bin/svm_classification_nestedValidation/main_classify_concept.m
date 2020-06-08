@@ -37,7 +37,8 @@ tau_bin = 0;
 sample_offset = 0;
 
 % split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_nChannels4_globalTPM0_f03c2tau4tauOffset0s0939t6.mat
-file_prefix = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_ICA_nChannels' num2str(nChannels)];
+file_prefix = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim'];
+descriptor = ['_ICAAllTrials_nComponents4_ic2channels_phithree_nChannels' num2str(4) '_globalTPM0'];
 
 nStates = 2^nChannels;
 nConcepts = 15;
@@ -70,7 +71,8 @@ end
 %% Load
 
 source_dir = '../phi_3/results/';
-source_file = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_ICAAllTrials_nComponents4_phithree_nChannels' num2str(nChannels) '_globalTPM0.mat'];
+%source_file = ['split2250_bipolarRerefType1_lineNoiseRemoved_postPuffpreStim_ICAAllTrials_nComponents4_ic2channels_phithree_nChannels' num2str(nChannels) '_globalTPM0.mat'];
+source_file = [file_prefix descriptor '.mat'];
 tic
 disp('loading');
 tmp = load([source_dir source_file]);
@@ -132,7 +134,8 @@ end
 
 %% Classify
 
-results_file = [num2str(nChannels) 'ch_phi3Concept_' constellation_type '_svm_' class_type '.mat'];
+%results_file = [num2str(nChannels) 'ch_phi3Concept_' constellation_type '_svm_' class_type '.mat'];
+results_file = [descriptor '_' constellation_type '_svm_' class_type '.mat'];
 
 cost_powers = (-50:10:50);
 costs = 2 .^ cost_powers;
@@ -145,10 +148,10 @@ net_accuracy_details = cell(size(big_mips, 2), size(big_mips, var_source_dim), n
 pc = parcluster('local');
 
 % Set JobStorageLocation to specific directory for this particular job
-%pc.JobStorageLocation = strcat('matlab_pct/', getenv('SLURM_JOB_ID'));
+pc.JobStorageLocation = strcat('matlab_pct/', getenv('SLURM_JOB_ID'));
 
 % Start pool
-%parpool(pc, 8)
+parpool(pc, 8)
 
 % Broadcast variables
 phis_p = parallel.pool.Constant(double(phis.phis(:, :, :, :, tau)));
