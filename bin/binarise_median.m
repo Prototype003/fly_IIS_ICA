@@ -1,6 +1,6 @@
 %% Function: global median split
 
-function [binarised] = binarise_global_median(data)
+function [binarised] = binarise_median(data)
 % Binarised data based on median (median across first dimension
 %
 % Inputs:
